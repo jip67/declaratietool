@@ -46,6 +46,36 @@ Laat je proxy het subdomein doorsturen naar `http://<ip-van-de-server>:8000` (of
 
 Bij **Nginx Proxy Manager**: *Proxy Hosts → Add*, domein invullen, scheme `http`, forward host het IP van de server, poort `8000`, en op het tabblad *SSL* een Let's Encrypt-certificaat aanvragen met *Force SSL*. Zet onder *Advanced* eventueel `client_max_body_size 50m;`.
 
+### Gewone Nginx met een (wildcard)certificaat
+
+```nginx
+server {
+    listen 80;
+    server_name declaraties.example.nl;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name declaraties.example.nl;
+
+    ssl_certificate     /pad/naar/fullchain.pem;   # je (wildcard)certificaat
+    ssl_certificate_key /pad/naar/privkey.pem;
+
+    client_max_body_size 50m;
+
+    location / {
+        proxy_pass http://127.0.0.1:8000;          # of http://<ip-van-de-docker-host>:8000
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+Draait Nginx zelf in een container, gebruik dan in `proxy_pass` het IP-adres van de Docker-host (niet `127.0.0.1`). Controleer met `nginx -t` en herlaad met `nginx -s reload`.
+
 ## 4. Eerste gebruiker
 
 In Portainer: **Containers → declaratietool-app-1 → Console → Connect** (`/bin/sh`), en dan:
