@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}{{ t('public.title', reference=claim.reference) }}{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>{{ t('public.title', reference=claim.reference) }}</h1>
+  {% include "_steps.html" %}
+  {% if saved %}<p class="success">{{ t('public.saved') }}</p>{% endif %}
+
+  <h2>{{ t('field.attachments') }}</h2>
+  <ul class="files">
+    {% for att in claim.attachments %}<li><a href="/c/{{ claim.token }}/files/{{ att.id }}" target="_blank">{{ att.original_filename }}</a></li>{% endfor %}
+  </ul>
+
+  {% if editable %}
+  <p>{{ t('public.intro') }}</p>
+  <form method="post">
+    <label>{{ t('field.amount') }}
+      <input name="amount" inputmode="decimal" placeholder="12,50" value="{{ form.amount }}" required>
+      {% if errors.amount %}<span class="error">{{ t(errors.amount) }}</span>{% endif %}
+    </label>
+    <label>{{ t('field.description') }}
+      <textarea name="description" rows="3" required>{{ form.description }}</textarea>
+      {% if errors.description %}<span class="error">{{ t(errors.description) }}</span>{% endif %}
+    </label>
+    <label>{{ t('field.iban') }}
+      <input name="iban" placeholder="NL00 BANK 0123 4567 89" value="{{ form.iban|iban }}" required>
+      {% if errors.iban %}<span class="error">{{ t(errors.iban) }}</span>{% endif %}
+    </label>
+    <label>{{ t('field.account_holder') }}
+      <input name="account_holder" value="{{ form.account_holder }}" required>
+      {% if errors.account_holder %}<span class="error">{{ t(errors.account_holder) }}</span>{% endif %}
+    </label>
+    <label class="check"><input type="checkbox" name="remember" value="true" checked> {{ t('public.remember') }}</label>
+    <button class="primary">{{ t('public.submit') if claim.status == 'received' else t('action.save') }}</button>
+  </form>
+  {% else %}
+  <dl class="details">
+    <dt>{{ t('field.amount') }}</dt><dd>{{ claim.amount_display }}</dd>
+    <dt>{{ t('field.description') }}</dt><dd>{{ claim.description }}</dd>
+    <dt>{{ t('field.iban') }}</dt><dd>{{ claim.iban|iban }}</dd>
+    <dt>{{ t('field.account_holder') }}</dt><dd>{{ claim.account_holder }}</dd>
+  </dl>
+  {% endif %}
+</section>
+{% endblock %}

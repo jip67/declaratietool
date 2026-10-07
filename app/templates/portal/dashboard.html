@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}{{ t('nav.claims') }}{% endblock %}
+{% block content %}
+<section class="card wide">
+  <div class="row">
+    <h1>{{ t('nav.claims') }}</h1>
+    <a class="button primary" href="/portal/claims/new">{{ t('nav.new_claim') }}</a>
+  </div>
+  <nav class="tabs">
+    <a href="?view=mine" {% if view == 'mine' %}class="active"{% endif %}>{{ t('view.mine') }} ({{ my_count }})</a>
+    <a href="?view=open" {% if view == 'open' %}class="active"{% endif %}>{{ t('view.open') }}</a>
+    {% for s in Status %}<a href="?view={{ s.value }}" {% if view == s.value %}class="active"{% endif %}>{{ t('status.' ~ s.value) }}</a>{% endfor %}
+    <a href="?view=all" {% if view == 'all' %}class="active"{% endif %}>{{ t('view.all') }}</a>
+  </nav>
+  {% if claims %}
+  <table class="list">
+    <thead><tr>
+      <th>{{ t('field.reference') }}</th><th>{{ t('field.date') }}</th><th>{{ t('field.submitter') }}</th>
+      <th>{{ t('field.description') }}</th><th class="num">{{ t('field.amount') }}</th><th>{{ t('field.status') }}</th>
+    </tr></thead>
+    <tbody>
+    {% for claim in claims %}
+      <tr class="{% if is_my_task(claim, user) %}mine{% endif %}">
+        <td><a href="/portal/claims/{{ claim.id }}">{{ claim.reference }}</a></td>
+        <td>{{ claim.created_at|localtime }}</td>
+        <td>{{ claim.submitter.name or claim.submitter.email }}</td>
+        <td>{{ claim.description|truncate(60) }}</td>
+        <td class="num">{{ claim.amount_display }}</td>
+        <td>{% include "_status.html" %}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="muted">{{ t('view.empty') }}</p>
+  {% endif %}
+</section>
+{% endblock %}

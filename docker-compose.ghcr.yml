@@ -1,0 +1,13 @@
+# Optioneel: gebruik het kant-en-klare image dat GitHub Actions bouwt, in plaats van
+# zelf te bouwen op de server.
+#
+#   IMAGE=ghcr.io/<jouw-github-naam>/declaratietool:latest
+#   docker compose -f docker-compose.yml -f docker-compose.ghcr.yml pull
+#   docker compose -f docker-compose.yml -f docker-compose.ghcr.yml up -d
+
+services:
+  app:
+    image: ${IMAGE:?Zet IMAGE in .env}
+    build: !reset null
+  worker:
+    image: ${IMAGE:?Zet IMAGE in .env}

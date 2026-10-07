@@ -1,0 +1,13 @@
+fastapi==0.142.3
+uvicorn[standard]==0.54.0
+SQLAlchemy==2.1.4
+psycopg[binary]==3.3.6
+alembic==1.20.0
+pydantic-settings==2.15.0
+Jinja2==3.1.6
+python-multipart==0.0.32
+itsdangerous==2.2.0
+pillow==12.3.0
+pillow-heif==1.8.0
+pypdf==6.19.0
+reportlab==5.0.1

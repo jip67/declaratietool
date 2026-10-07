@@ -1,0 +1,8 @@
+{% set order = ['received', 'submitted', 'approved', 'payment_prepared', 'paid'] %}
+<ol class="steps">
+{% for s in order %}
+  {% set idx = order.index(claim.status) if claim.status in order else -1 %}
+  <li class="{% if loop.index0 < idx or claim.status == 'paid' %}done{% elif loop.index0 == idx %}current{% endif %}">{{ t('step.' ~ s) }}</li>
+{% endfor %}
+</ol>
+{% if claim.status == 'rejected' %}<p class="error">{{ t('status.rejected') }}{% if claim.rejection_reason %}: {{ claim.rejection_reason }}{% endif %}</p>{% endif %}

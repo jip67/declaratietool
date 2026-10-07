@@ -1,0 +1,76 @@
+# Start met:  docker compose up -d
+# Bijwerken:  git pull && docker compose up -d --build
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: declaratie
+      POSTGRES_USER: declaratie
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Zet POSTGRES_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U declaratie -d declaratie"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    image: declaratietool:local
+    restart: unless-stopped
+    command: web
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://declaratie:${POSTGRES_PASSWORD}@db:5432/declaratie
+    volumes:
+      - uploads:/data/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  worker:
+    image: declaratietool:local
+    restart: unless-stopped
+    command: worker
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://declaratie:${POSTGRES_PASSWORD}@db:5432/declaratie
+    volumes:
+      - uploads:/data/uploads
+    depends_on:
+      app:
+        condition: service_healthy  # wacht tot de database is bijgewerkt
+
+  # Reverse proxy met automatisch https-certificaat (Let's Encrypt) voor je eigen domein.
+  # Draai je al een andere proxy (Traefik, Nginx Proxy Manager, ...)? Laat deze dan weg
+  # met:  docker compose up -d db app worker
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    environment:
+      DOMAIN: ${DOMAIN:?Zet DOMAIN in .env}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+
+volumes:
+  pgdata:
+  uploads:
+  caddy_data:
+  caddy_config:

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{{ t('nav.new_claim') }}{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>{{ t('nav.new_claim') }}</h1>
+  <p class="muted">{{ t('portal.new_intro') }}</p>
+  <form method="post" enctype="multipart/form-data">
+    <label>{{ t('field.submitter_email') }}<input type="email" name="email" value="{{ form.email }}" required>
+      {% if errors.email %}<span class="error">{{ t(errors.email) }}</span>{% endif %}</label>
+    <label>{{ t('field.submitter_name') }}<input name="name" value="{{ form.name }}"></label>
+    <label>{{ t('field.attachments') }}<input type="file" name="files" accept="application/pdf,image/*" multiple required>
+      {% if errors.files %}<span class="error">{{ t(errors.files) }}</span>{% endif %}</label>
+    <fieldset>
+      <legend>{{ t('portal.optional_details') }}</legend>
+      <label>{{ t('field.amount') }}<input name="amount" inputmode="decimal" value="{{ form.amount }}">
+        {% if errors.amount %}<span class="error">{{ t(errors.amount) }}</span>{% endif %}</label>
+      <label>{{ t('field.description') }}<textarea name="description" rows="3">{{ form.description }}</textarea>
+        {% if errors.description %}<span class="error">{{ t(errors.description) }}</span>{% endif %}</label>
+      <label>{{ t('field.iban') }}<input name="iban" value="{{ form.iban }}">
+        {% if errors.iban %}<span class="error">{{ t(errors.iban) }}</span>{% endif %}</label>
+      <label>{{ t('field.account_holder') }}<input name="account_holder" value="{{ form.account_holder }}">
+        {% if errors.account_holder %}<span class="error">{{ t(errors.account_holder) }}</span>{% endif %}</label>
+    </fieldset>
+    <button class="primary">{{ t('action.create') }}</button>
+  </form>
+</section>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}{{ claim.reference }}{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="row"><h1>{{ claim.reference }}</h1>{% include "_status.html" %}</div>
+  {% include "_steps.html" %}
+  {% if error %}<p class="error">{{ t('error.' ~ error) }}</p>{% endif %}
+
+  {% if my_task or (user.has_role(Role.ADMIN) and claim.status in ['submitted', 'approved', 'payment_prepared']) %}
+  <div class="task">
+    {% set role = ROLE_FOR_STATUS[Status(claim.status)] %}
+    <p><strong>{{ t('task.yours') }}:</strong> {{ t('task.' ~ role.value) }}</p>
+    <form method="post" action="/portal/claims/{{ claim.id }}/action" class="inline">
+      {% if claim.status == 'submitted' %}<input type="hidden" name="action" value="approve"><button class="primary">{{ t('action.approve') }}</button>
+      {% elif claim.status == 'approved' %}<input type="hidden" name="action" value="prepare"><button class="primary">{{ t('action.prepare') }}</button>
+      {% elif claim.status == 'payment_prepared' %}<input type="hidden" name="action" value="pay"><button class="primary">{{ t('action.pay') }}</button>{% endif %}
+    </form>
+  </div>
+  {% endif %}
+
+  <dl class="details">
+    <dt>{{ t('field.submitter') }}</dt><dd>{{ claim.submitter.name }} &lt;{{ claim.submitter.email }}&gt;</dd>
+    <dt>{{ t('field.amount') }}</dt><dd>{{ claim.amount_display }}</dd>
+    <dt>{{ t('field.description') }}</dt><dd>{{ claim.description or '-' }}</dd>
+    <dt>{{ t('field.iban') }}</dt><dd>{{ claim.iban|iban or '-' }}</dd>
+    <dt>{{ t('field.account_holder') }}</dt><dd>{{ claim.account_holder or '-' }}</dd>
+    <dt>{{ t('field.source') }}</dt><dd>{{ t('source.' ~ claim.source) }}</dd>
+  </dl>
+
+  {% if claim.status in ['received', 'submitted'] %}
+  <p class="muted">{{ t('portal.edit_hint') }} <a href="{{ link }}" target="_blank">{{ t('portal.open_form') }}</a></p>
+  {% endif %}
+
+  <h2>{{ t('field.attachments') }}</h2>
+  <ul class="files">
+  {% for att in claim.attachments %}
+    <li>
+      <a href="/portal/files/{{ att.id }}" target="_blank">{{ att.original_filename }}</a>
+      {% if att.stamped_path %} · <a href="/portal/files/{{ att.id }}?stamped=1" target="_blank">{{ t('portal.stamped') }}</a>{% endif %}
+    </li>
+  {% endfor %}
+  </ul>
+
+  {% if claim.status not in ['paid', 'rejected'] %}
+  <details class="reject">
+    <summary>{{ t('action.reject') }}</summary>
+    <form method="post" action="/portal/claims/{{ claim.id }}/action">
+      <input type="hidden" name="action" value="reject">
+      <label>{{ t('field.reason') }}<textarea name="reason" rows="2" required></textarea></label>
+      <button class="danger">{{ t('action.reject') }}</button>
+    </form>
+  </details>
+  {% endif %}
+
+  <h2>{{ t('portal.history') }}</h2>
+  <ul class="history">
+  {% for ev in claim.events %}
+    <li><span class="muted">{{ ev.at|localtime }}</span> {{ t('event.' ~ ev.action) }}{% if ev.user %} · {{ ev.user.name }}{% endif %}{% if ev.note and ev.action == 'rejected' %}: {{ ev.note }}{% endif %}</li>
+  {% endfor %}
+  </ul>
+</section>
+{% endblock %}

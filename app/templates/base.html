@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="{{ lang }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ settings.app_name }}{% endblock %} · {{ settings.organisation_name }}</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="{% if user %}/portal{% else %}#{% endif %}">{{ settings.app_name }}</a>
+  <span class="org">{{ settings.organisation_name }}</span>
+  {% if user %}
+  <nav>
+    <a href="/portal?view=mine">{{ t('nav.my_tasks') }}</a>
+    <a href="/portal">{{ t('nav.claims') }}</a>
+    <a href="/portal/claims/new">{{ t('nav.new_claim') }}</a>
+    {% if user.has_role(Role.ADMIN) %}<a href="/portal/users">{{ t('nav.users') }}</a>{% endif %}
+    <a href="/account">{{ user.name }}</a>
+    <form method="post" action="/logout" class="inline"><button class="link">{{ t('nav.logout') }}</button></form>
+  </nav>
+  {% else %}
+  <nav class="langs">
+    {% for code in languages %}<a href="?lang={{ code }}" {% if code == lang %}class="active"{% endif %}>{{ code|upper }}</a>{% endfor %}
+  </nav>
+  {% endif %}
+</header>
+<main>
+{% block content %}{% endblock %}
+</main>
+</body>
+</html>
