@@ -1,0 +1,79 @@
+# Stack voor Portainer (of elke Docker-host met een eigen reverse proxy).
+# Gebruikt het kant-en-klare image van GitHub, zonder Caddy.
+# Vul de variabelen in onder "Environment variables" in Portainer.
+# Zie docs/portainer.md.
+
+x-app-env: &app-env
+  APP_NAME: ${APP_NAME:-Declaratietool}
+  ORGANISATION_NAME: ${ORGANISATION_NAME:-Mijn vereniging}
+  BASE_URL: ${BASE_URL:?Zet BASE_URL, bijv. https://declaraties.example.org}
+  SECRET_KEY: ${SECRET_KEY:?Zet SECRET_KEY}
+  DEFAULT_LANGUAGE: ${DEFAULT_LANGUAGE:-nl}
+  TIMEZONE: ${TIMEZONE:-Europe/Amsterdam}
+  REFERENCE_PREFIX: ${REFERENCE_PREFIX:-D}
+  MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-15}
+  DATABASE_URL: postgresql+psycopg://declaratie:${POSTGRES_PASSWORD}@db:5432/declaratie
+  IMAP_HOST: ${IMAP_HOST:-}
+  IMAP_PORT: ${IMAP_PORT:-993}
+  IMAP_USER: ${IMAP_USER:-}
+  IMAP_PASSWORD: ${IMAP_PASSWORD:-}
+  IMAP_FOLDER: ${IMAP_FOLDER:-INBOX}
+  IMAP_POLL_SECONDS: ${IMAP_POLL_SECONDS:-60}
+  SMTP_HOST: ${SMTP_HOST:-}
+  SMTP_PORT: ${SMTP_PORT:-587}
+  SMTP_USER: ${SMTP_USER:-}
+  SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+  SMTP_STARTTLS: ${SMTP_STARTTLS:-true}
+  SMTP_SSL: ${SMTP_SSL:-false}
+  MAIL_FROM: ${MAIL_FROM:-declaraties@example.org}
+  REMINDER_HOUR: ${REMINDER_HOUR:-9}
+  SUBMITTER_REMINDER_DAYS: ${SUBMITTER_REMINDER_DAYS:-14}
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: declaratie
+      POSTGRES_USER: declaratie
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Zet POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U declaratie -d declaratie"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    image: ${IMAGE:-ghcr.io/jip67/declaratietool:latest}
+    restart: unless-stopped
+    command: web
+    environment: *app-env
+    volumes:
+      - uploads:/data/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  worker:
+    image: ${IMAGE:-ghcr.io/jip67/declaratietool:latest}
+    restart: unless-stopped
+    command: worker
+    environment: *app-env
+    volumes:
+      - uploads:/data/uploads
+    depends_on:
+      app:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  uploads:

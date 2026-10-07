@@ -54,6 +54,7 @@ git pull && docker compose up -d --build
 
 - [Stappenplan](docs/stappenplan.md): van nul tot werkende tool, inclusief domein en mail
 - [Installatie en bijwerken](docs/installatie.md)
+- [Installeren met Portainer](docs/portainer.md) (met je eigen reverse proxy)
 - [Configuratie](docs/configuratie.md): alle instellingen in `.env`
 - [Gebruik](docs/gebruik.md): wat elke rol doet
 - [Ontwikkelen](docs/ontwikkeling.md): lokaal draaien, tests, een taal toevoegen

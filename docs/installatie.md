@@ -65,6 +65,9 @@ Is je repository privé, log dan eerst in met `docker login ghcr.io` en een GitH
 
 ## Al een reverse proxy?
 
+Gebruik je Portainer, volg dan [portainer.md](portainer.md).
+
+
 Gebruik je al Traefik, Nginx Proxy Manager of iets vergelijkbaars, start dan zonder Caddy:
 
 ```bash
