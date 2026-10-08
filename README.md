@@ -53,6 +53,7 @@ git pull && docker compose up -d --build
 ## Documentatie
 
 - [Stappenplan](docs/stappenplan.md): van nul tot werkende tool, inclusief domein en mail
+- [Installeren op een VPS bij OVH](docs/ovh-vps.md): stap voor stap, met installatiescript
 - [Installatie en bijwerken](docs/installatie.md)
 - [Installeren met Portainer](docs/portainer.md) (met je eigen reverse proxy)
 - [Configuratie](docs/configuratie.md): alle instellingen in `.env`

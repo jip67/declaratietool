@@ -17,6 +17,8 @@ Van idee naar een werkende declaratietool op je eigen domein. Stappen met ✅ zi
 
 ## Fase 2: zelf regelen (eenmalig)
 
+Gebruik je OVH, volg dan [ovh-vps.md](ovh-vps.md): die handleiding en het installatiescript `deploy/install-vps.sh` doen stap 2.2 tot en met 2.5 voor je.
+
 ### 2.1 Code op GitHub
 1. Maak een (lege) repository aan, bijvoorbeeld `declaratietool`.
 2. Zet deze code erin. Bij een publieke repository kunnen anderen de tool ook gebruiken.
