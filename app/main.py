@@ -36,7 +36,7 @@ def create_app() -> FastAPI:
 
     @app.get("/", include_in_schema=False)
     def index():
-        return RedirectResponse("/portal", status_code=303)
+        return RedirectResponse("/indienen", status_code=303)
 
     @app.get("/health", include_in_schema=False)
     def health():

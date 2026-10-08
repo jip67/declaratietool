@@ -1,23 +1,18 @@
 {
   "lang.nl": "Nederlands",
   "lang.en": "English",
-
   "nav.my_tasks": "My tasks",
   "nav.claims": "Expense claims",
   "nav.new_claim": "New claim",
   "nav.users": "Users",
   "nav.logout": "Log out",
-
   "login.title": "Log in",
   "login.submit": "Log in",
-
   "account.title": "My account",
   "account.change_password": "Change password",
   "account.current_password": "Current password",
   "account.new_password": "New password (at least 10 characters)",
-
   "users.add": "Add user",
-
   "field.reference": "Reference",
   "field.date": "Date",
   "field.submitter": "Submitter",
@@ -38,45 +33,37 @@
   "field.language": "Language",
   "field.roles": "Roles",
   "field.active": "Active",
-
   "source.email": "email",
   "source.portal": "portal",
-
   "role.chair": "Chair",
   "role.treasurer": "Treasurer",
   "role.secretary": "Secretary",
   "role.admin": "Administrator",
-
   "status.received": "Waiting for submitter details",
   "status.submitted": "Waiting for approval",
   "status.approved": "Approved, prepare payment",
   "status.payment_prepared": "Payment prepared, waiting for authorisation",
   "status.paid": "Paid",
   "status.rejected": "Rejected",
-
   "step.received": "Received",
   "step.submitted": "Details complete",
   "step.approved": "Approved",
   "step.payment_prepared": "Payment prepared",
   "step.paid": "Paid",
-
   "view.mine": "My tasks",
   "view.open": "Open",
   "view.all": "All",
   "view.empty": "No claims found.",
-
   "task.yours": "Your task",
   "task.chair": "approve and initial",
   "task.treasurer": "prepare the payment at the bank",
   "task.secretary": "authorise the payment at the bank",
-
   "action.save": "Save",
   "action.create": "Create",
   "action.approve": "Approve and initial",
   "action.prepare": "Payment has been prepared",
   "action.pay": "Payment has been authorised",
   "action.reject": "Reject",
-
   "event.created": "Claim received",
   "event.submitted": "Details submitted",
   "event.details_updated": "Details changed",
@@ -84,20 +71,17 @@
   "event.payment_prepared": "Payment prepared",
   "event.paid": "Payment authorised",
   "event.rejected": "Rejected",
-
   "portal.history": "History",
   "portal.stamped": "initialled (pdf)",
   "portal.edit_hint": "Details can be changed until the chair has approved.",
   "portal.open_form": "Open the submitter's form",
   "portal.new_intro": "Create a claim on someone's behalf. If you fill in all details it goes straight to the chair. If you leave them empty, the submitter receives an email with a link to complete them.",
   "portal.optional_details": "Details (optional)",
-
   "public.title": "Expense claim {reference}",
   "public.intro": "Please fill in the details below. Your claim will then be sent to the chair for approval.",
   "public.remember": "Remember my bank account and account holder for next time",
   "public.submit": "Submit claim",
   "public.saved": "Thank you! Your details have been saved. You will receive an email at every step.",
-
   "error.required": "This field is required.",
   "error.iban": "This is not a valid IBAN.",
   "error.amount": "Enter a valid amount, for example 12.50.",
@@ -113,11 +97,8 @@
   "error.wrong_status": "This step is not (or no longer) possible for this claim.",
   "error.claim_locked": "This claim can no longer be changed.",
   "error.reason_required": "Please give a reason.",
-
   "msg.saved": "Saved.",
-
   "stamp.title": "APPROVED",
-
   "mail.received.subject": "Expense claim {reference} received",
   "mail.received.body": "Dear {name},\n\nWe have received your expense claim ({count} attachment(s)).\n\nPlease use this link to enter the amount, a description, your bank account and account holder:\n{link}\n\nThe claim can only be approved after that. You will receive an email at every step.\n\nKind regards,\n{org}",
   "mail.no_attachment.subject": "Expense claim not received: no attachment",
@@ -130,5 +111,15 @@
   "mail.reminder.subject": "Reminder: {count} expense claim(s) waiting for you",
   "mail.reminder.body": "Dear {name},\n\nThese expense claims are still waiting for you:\n\n{list}\n\nOverview: {link}",
   "mail.reminder_submitter.subject": "Reminder: complete your expense claim {reference}",
-  "mail.reminder_submitter.body": "Dear {name},\n\nYour expense claim is still waiting for your details. Please complete them at:\n{link}\n\nKind regards,\n{org}"
+  "mail.reminder_submitter.body": "Dear {name},\n\nYour expense claim is still waiting for your details. Please complete them at:\n{link}\n\nKind regards,\n{org}",
+  "nav.submit": "Submit a claim",
+  "nav.login": "Board login",
+  "source.upload": "upload page",
+  "upload.title": "Submit an expense claim",
+  "upload.intro": "Upload a photo or PDF of your receipt or invoice. You will then receive an email with a link to enter the amount, description and bank details.",
+  "upload.files_hint": "You can select several files. On your phone you can take a photo directly.",
+  "upload.submit": "Send",
+  "upload.done": "Thank you! Your receipt has been received. Check your email ({email}) for the link to complete your claim.",
+  "upload.another": "Submit another claim",
+  "error.too_many": "Too many submissions. Please try again in an hour."
 }

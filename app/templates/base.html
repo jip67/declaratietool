@@ -8,7 +8,7 @@
 </head>
 <body>
 <header class="topbar">
-  <a class="brand" href="{% if user %}/portal{% else %}#{% endif %}">{{ settings.app_name }}</a>
+  <a class="brand" href="{% if user %}/portal{% else %}/indienen{% endif %}">{{ settings.app_name }}</a>
   <span class="org">{{ settings.organisation_name }}</span>
   {% if user %}
   <nav>
@@ -21,6 +21,8 @@
   </nav>
   {% else %}
   <nav class="langs">
+    <a href="/indienen">{{ t('nav.submit') }}</a>
+    <a href="/login">{{ t('nav.login') }}</a>
     {% for code in languages %}<a href="?lang={{ code }}" {% if code == lang %}class="active"{% endif %}>{{ code|upper }}</a>{% endfor %}
   </nav>
   {% endif %}

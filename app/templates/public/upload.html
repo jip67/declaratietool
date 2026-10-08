@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ t('upload.title') }}{% endblock %}
+{% block content %}
+<section class="card narrow">
+  <h1>{{ t('upload.title') }}</h1>
+  {% if done %}
+    <p class="success">{{ t('upload.done', email=email or '') }}</p>
+    <p><a href="/indienen">{{ t('upload.another') }}</a></p>
+  {% else %}
+  <p>{{ t('upload.intro') }}</p>
+  {% if errors.form %}<p class="error">{{ t(errors.form) }}</p>{% endif %}
+  <form method="post" enctype="multipart/form-data">
+    <label>{{ t('field.email') }}
+      <input type="email" name="email" value="{{ form.email }}" required autocomplete="email">
+      {% if errors.email %}<span class="error">{{ t(errors.email) }}</span>{% endif %}
+    </label>
+    <label>{{ t('field.name') }}
+      <input name="name" value="{{ form.name }}" autocomplete="name">
+    </label>
+    <label>{{ t('field.attachments') }}
+      <input type="file" name="files" accept="application/pdf,image/*" multiple required>
+      <span class="muted">{{ t('upload.files_hint') }}</span>
+      {% if errors.files %}<span class="error">{{ t(errors.files) }}</span>{% endif %}
+    </label>
+    <label class="hp" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
+    <button class="primary">{{ t('upload.submit') }}</button>
+  </form>
+  {% endif %}
+</section>
+{% endblock %}

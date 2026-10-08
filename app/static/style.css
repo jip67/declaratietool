@@ -65,3 +65,4 @@ form.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,
   table.list td { display: block; border: 0; padding: .1rem 0; }
   table.list .num { text-align: left; }
 }
+.hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }

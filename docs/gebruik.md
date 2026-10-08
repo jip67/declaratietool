@@ -2,7 +2,7 @@
 
 ## Indiener
 
-1. Mail een foto of pdf van de bon naar het declaratie-adres. Meerdere bonnen in één mail worden één declaratie. Het onderwerp van de mail wordt alvast als omschrijving ingevuld.
+1. Mail een foto of pdf van de bon naar het declaratie-adres, **of** upload hem op de website (`https://<jouw-domein>/indienen`). Uploaden werkt ook als er (nog) geen mailbox voor binnenkomende mail is ingesteld. Meerdere bonnen in één mail worden één declaratie. Het onderwerp van de mail wordt alvast als omschrijving ingevuld.
 2. Je krijgt een bevestiging met een persoonlijke link.
 3. Vul via die link het bedrag, de omschrijving, je IBAN en de tenaamstelling in. Vink "onthouden" aan, dan staan je rekeninggegevens er de volgende keer al.
 4. Je krijgt een mail bij elke stap: goedgekeurd, betaling klaargezet, betaald (of afgewezen, met reden). Via dezelfde link kun je altijd de status bekijken.

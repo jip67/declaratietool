@@ -34,6 +34,8 @@ Alle instellingen staan in `.env` (zie `.env.example`). Na een wijziging: `docke
 
 Elke **ongelezen** mail in de map wordt verwerkt en daarna als gelezen gemarkeerd. Foto's (jpg, png, heic, webp) en pdf's worden bijlagen; kleine plaatjes in de tekst (logo's in handtekeningen) worden overgeslagen. Automatische antwoorden (afwezigheidsmeldingen) worden genegeerd.
 
+Gebruik je een mailprovider zonder IMAP (zoals Proton Mail), laat `IMAP_HOST` dan leeg. Indieners uploaden hun bon dan via `https://<jouw-domein>/indienen`; de rest werkt hetzelfde.
+
 ## Uitgaande mail (SMTP)
 
 | Instelling | Standaard | Betekenis |
@@ -44,6 +46,8 @@ Elke **ongelezen** mail in de map wordt verwerkt en daarna als gelezen gemarkeer
 | `SMTP_SSL` | false | Direct SSL (poort 465); zet dan `SMTP_STARTTLS=false` |
 | `SMTP_USER` / `SMTP_PASSWORD` | | Inloggegevens |
 | `MAIL_FROM` | | Afzenderadres; meestal hetzelfde als de declaratie-mailbox |
+
+Voorbeeld voor Proton Mail (met een SMTP-token uit de Proton-instellingen): `SMTP_HOST=smtp.protonmail.ch`, `SMTP_PORT=587`, `SMTP_STARTTLS=true`, `SMTP_SSL=false`, `SMTP_USER` en `MAIL_FROM` het adres, `SMTP_PASSWORD` het token.
 
 ## Herinneringen
 

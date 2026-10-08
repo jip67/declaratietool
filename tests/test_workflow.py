@@ -176,3 +176,31 @@ def test_login_lockout(client, staff):
         assert client.post("/login", data={"email": "voorzitter@example.org", "password": "fout"}).status_code == 401
     r = client.post("/login", data={"email": "voorzitter@example.org", "password": "geheim12345"})
     assert r.status_code == 429
+
+
+def test_upload_page(db, client):
+    from app.routes import public
+
+    public._uploads.clear()
+    r = client.post(
+        "/indienen",
+        data={"email": "Kees@Example.org", "name": "Kees"},
+        files=[("files", ("bon.jpg", jpeg_bytes(), "image/jpeg"))],
+    )
+    assert r.status_code == 200 and "kees@example.org" in r.text
+    claim = db.scalar(select(Claim))
+    assert claim.source == "upload" and claim.status == Status.RECEIVED.value
+    # De link staat alleen in de mail, niet op de pagina.
+    assert claim.token not in r.text
+    assert f"/c/{claim.token}" in sent_to("kees@example.org")[-1].get_content()
+
+
+def test_upload_requires_file_and_blocks_bots(db, client):
+    from app.routes import public
+
+    public._uploads.clear()
+    assert client.post("/indienen", data={"email": "a@b.nl"}).status_code == 422
+    r = client.post("/indienen", data={"email": "a@b.nl", "website": "spam"},
+                    files=[("files", ("bon.jpg", jpeg_bytes(), "image/jpeg"))])
+    assert r.status_code == 200
+    assert db.scalar(select(Claim)) is None

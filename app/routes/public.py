@@ -1,11 +1,15 @@
-"""Pagina's voor de indiener (zonder inloggen, via de persoonlijke link)."""
+"""Pagina's voor de indiener (zonder inloggen): bon uploaden en gegevens aanvullen via de persoonlijke link."""
 
-from fastapi import APIRouter, Depends, Form, HTTPException, Request
+from collections import defaultdict
+from datetime import UTC, datetime, timedelta
+
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse, RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from .. import storage, workflow
+from ..config import get_settings
 from ..db import get_db
 from ..models import Attachment, Claim, Status
 from ..security import is_valid_iban, parse_amount
@@ -97,3 +101,68 @@ def claim_file(token: str, attachment_id: int, db: Session = Depends(get_db)):
     if att is None or att.claim_id != claim.id:
         raise HTTPException(status_code=404)
     return FileResponse(storage.absolute(att.stored_path), media_type=att.content_type, filename=att.original_filename)
+
+
+# ---------------------------------------------------------------- uploaden zonder mail
+
+# Eenvoudige rem op misbruik: maximaal zoveel inzendingen per IP-adres per uur.
+UPLOADS_PER_HOUR = 10
+_uploads: dict[str, list[datetime]] = defaultdict(list)
+
+
+def _too_many(ip: str) -> bool:
+    cutoff = datetime.now(UTC) - timedelta(hours=1)
+    _uploads[ip] = [t for t in _uploads[ip] if t > cutoff]
+    return len(_uploads[ip]) >= UPLOADS_PER_HOUR
+
+
+@router.get("/indienen")
+def upload_page(request: Request):
+    lang = request_language(request)
+    return render(request, "public/upload.html", lang, form={}, errors={}, done=False)
+
+
+@router.post("/indienen")
+async def upload_submit(
+    request: Request,
+    email: str = Form(""),
+    name: str = Form(""),
+    website: str = Form(""),  # honeypot: echte mensen zien dit veld niet
+    files: list[UploadFile] = File(default=[]),
+    db: Session = Depends(get_db),
+):
+    lang = request_language(request)
+    form = {"email": email, "name": name}
+    if website:
+        # Waarschijnlijk een bot: doe alsof het gelukt is.
+        return render(request, "public/upload.html", lang, form={}, errors={}, done=True)
+    ip = request.client.host if request.client else "?"
+    errors = {}
+    if _too_many(ip):
+        errors["form"] = "error.too_many"
+    if "@" not in email or len(email) > 255:
+        errors["email"] = "error.email"
+    max_bytes = get_settings().max_upload_mb * 1024 * 1024
+    uploads = []
+    for upload in files:
+        if not upload.filename:
+            continue
+        data = await upload.read()
+        ctype = storage.guess_type(upload.filename, upload.content_type)
+        if ctype is None or len(data) > max_bytes:
+            errors["files"] = "error.file_type"
+            continue
+        uploads.append((upload.filename, ctype, data))
+    if not uploads and "files" not in errors:
+        errors["files"] = "error.file_required"
+    if errors:
+        return render(request, "public/upload.html", lang, status_code=422, form=form, errors=errors, done=False)
+
+    _uploads[ip].append(datetime.now(UTC))
+    submitter = workflow.get_or_create_submitter(db, email, name, lang)
+    claim = workflow.create_claim(db, submitter, uploads, source="upload")
+    db.commit()
+    # De link gaat alleen per mail naar de indiener, zodat niemand met andermans
+    # e-mailadres de onthouden rekeninggegevens kan inzien.
+    workflow.notify_received(claim)
+    return render(request, "public/upload.html", lang, form={}, errors={}, done=True, email=submitter.email)
