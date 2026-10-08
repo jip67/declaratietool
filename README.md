@@ -57,6 +57,7 @@ git pull && docker compose up -d --build
 - [Installatie en bijwerken](docs/installatie.md)
 - [Installeren met Portainer](docs/portainer.md) (met je eigen reverse proxy)
 - [Configuratie](docs/configuratie.md): alle instellingen in `.env`
+- [Beveiliging](docs/beveiliging.md): wat de tool zelf doet en hoe je de server dichtzet
 - [Gebruik](docs/gebruik.md): wat elke rol doet
 - [Ontwikkelen](docs/ontwikkeling.md): lokaal draaien, tests, een taal toevoegen
 
