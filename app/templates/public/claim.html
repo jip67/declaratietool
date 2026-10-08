@@ -7,9 +7,11 @@
   {% if saved %}<p class="success">{{ t('public.saved') }}</p>{% endif %}
 
   <h2>{{ t('field.attachments') }}</h2>
-  <ul class="files">
-    {% for att in claim.attachments %}<li><a href="/c/{{ claim.token }}/files/{{ att.id }}" target="_blank">{{ att.original_filename }}</a></li>{% endfor %}
-  </ul>
+  {% for att in claim.attachments %}
+    {% with name=att.original_filename, url='/c/' ~ claim.token ~ '/files/' ~ att.id, kind=att.content_type|preview_kind, stamped_url=None %}
+      {% include "_attachment.html" %}
+    {% endwith %}
+  {% endfor %}
 
   {% if editable %}
   <p>{{ t('public.intro') }}</p>

@@ -1,0 +1,16 @@
+{# Eén bijlage met voorbeeld. Verwacht: name, url, kind ('image', 'pdf' of none) en optioneel stamped_url. #}
+<figure class="attachment">
+  {% set preview_url = stamped_url or url %}
+  {% if stamped_url or kind == 'pdf' %}
+    <iframe class="preview pdf" src="{{ preview_url }}#view=FitH" title="{{ name }}" loading="lazy"></iframe>
+  {% elif kind == 'image' %}
+    <a href="{{ url }}" target="_blank"><img class="preview" src="{{ url }}" alt="{{ name }}" loading="lazy"></a>
+  {% else %}
+    <p class="muted no-preview">{{ t('preview.unavailable') }}</p>
+  {% endif %}
+  <figcaption>
+    <a href="{{ url }}" target="_blank">{{ name }}</a>
+    {% if stamped_url %} · <a href="{{ stamped_url }}" target="_blank">{{ t('portal.stamped') }}</a> <span class="muted">({{ t('preview.showing_stamped') }})</span>{% endif %}
+    · <a href="{{ preview_url }}" target="_blank">{{ t('preview.open_new') }}</a>
+  </figcaption>
+</figure>

@@ -32,14 +32,12 @@
   {% endif %}
 
   <h2>{{ t('field.attachments') }}</h2>
-  <ul class="files">
   {% for att in claim.attachments %}
-    <li>
-      <a href="/portal/files/{{ att.id }}" target="_blank">{{ att.original_filename }}</a>
-      {% if att.stamped_path %} · <a href="/portal/files/{{ att.id }}?stamped=1" target="_blank">{{ t('portal.stamped') }}</a>{% endif %}
-    </li>
+    {% with name=att.original_filename, url='/portal/files/' ~ att.id, kind=att.content_type|preview_kind,
+             stamped_url=('/portal/files/' ~ att.id ~ '?stamped=1') if att.stamped_path else None %}
+      {% include "_attachment.html" %}
+    {% endwith %}
   {% endfor %}
-  </ul>
 
   {% if claim.status not in ['paid', 'rejected'] %}
   <details class="reject">

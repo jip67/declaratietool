@@ -121,5 +121,18 @@
   "upload.submit": "Versturen",
   "upload.done": "Dank je! Je bon is ontvangen. Kijk in je mail ({email}) voor de link om je declaratie af te maken.",
   "upload.another": "Nog een declaratie indienen",
-  "error.too_many": "Te veel inzendingen. Probeer het over een uur opnieuw."
+  "error.too_many": "Te veel inzendingen. Probeer het over een uur opnieuw.",
+  "nav.help": "Help",
+  "help.title": "Hulp en uitleg",
+  "help.yours": "Gemarkeerd: de onderdelen die bij jouw rol(len) horen.",
+  "help.section.indiener": "Indienen",
+  "help.section.voorzitter": "Voorzitter",
+  "help.section.boekhouder": "Boekhouder",
+  "help.section.secretaris": "Secretaris",
+  "help.section.namens": "Namens iemand",
+  "help.section.beheer": "Beheer",
+  "help.section.vragen": "Vragen",
+  "preview.unavailable": "Deze bijlage kan niet op de pagina worden getoond. Open hem via de link hieronder.",
+  "preview.open_new": "openen in nieuw venster",
+  "preview.showing_stamped": "hierboven getoond"
 }

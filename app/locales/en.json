@@ -121,5 +121,18 @@
   "upload.submit": "Send",
   "upload.done": "Thank you! Your receipt has been received. Check your email ({email}) for the link to complete your claim.",
   "upload.another": "Submit another claim",
-  "error.too_many": "Too many submissions. Please try again in an hour."
+  "error.too_many": "Too many submissions. Please try again in an hour.",
+  "nav.help": "Help",
+  "help.title": "Help",
+  "help.yours": "Highlighted: the sections for your role(s).",
+  "help.section.indiener": "Submitting",
+  "help.section.voorzitter": "Chair",
+  "help.section.boekhouder": "Treasurer",
+  "help.section.secretaris": "Secretary",
+  "help.section.namens": "On someone's behalf",
+  "help.section.beheer": "Administration",
+  "help.section.vragen": "FAQ",
+  "preview.unavailable": "This attachment can't be shown on the page. Open it via the link below.",
+  "preview.open_new": "open in new window",
+  "preview.showing_stamped": "shown above"
 }

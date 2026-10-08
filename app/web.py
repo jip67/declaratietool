@@ -3,6 +3,7 @@
 from pathlib import Path
 
 from fastapi import Depends, HTTPException, Request
+from fastapi.responses import FileResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
@@ -16,6 +17,31 @@ from .workflow import local_time
 templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
 templates.env.filters["localtime"] = local_time
 templates.env.filters["iban"] = format_iban
+
+# Bijlagen die een browser zelf kan tonen; HEIC/HEIF lukt alleen in Safari.
+PREVIEW_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp"}
+
+
+def preview_kind(content_type: str) -> str | None:
+    if content_type == "application/pdf":
+        return "pdf"
+    if content_type in PREVIEW_IMAGE_TYPES:
+        return "image"
+    return None
+
+
+templates.env.filters["preview_kind"] = preview_kind
+
+
+def file_response(path: Path, media_type: str, filename: str) -> FileResponse:
+    """Stuur een bijlage zo dat de browser hem op de pagina kan tonen (inline) in plaats van te downloaden."""
+    return FileResponse(
+        path,
+        media_type=media_type,
+        filename=filename,
+        content_disposition_type="inline",
+        headers={"X-Content-Type-Options": "nosniff"},
+    )
 
 
 class LoginRequired(Exception):
@@ -37,12 +63,16 @@ def require_admin(user: User = Depends(current_user)) -> User:
 
 
 def request_language(request: Request, preferred: str | None = None) -> str:
-    return pick_language(
-        request.query_params.get("lang"),
-        preferred,
-        request.session.get("lang"),
-        accept_language=request.headers.get("accept-language"),
-    )
+    """Kies de taal: expliciete keuze via ?lang=, dan de opgeslagen keuze, dan de standaardtaal.
+
+    De taal van de browser telt bewust niet mee, zodat iedereen standaard
+    DEFAULT_LANGUAGE (Nederlands) ziet en zelf kan wisselen.
+    """
+    chosen = request.query_params.get("lang")
+    if chosen in available_languages():
+        request.session["lang"] = chosen
+        return chosen
+    return pick_language(preferred, request.session.get("lang"))
 
 
 def render(request: Request, name: str, lang: str, status_code: int = 200, **context):

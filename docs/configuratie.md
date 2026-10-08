@@ -11,7 +11,7 @@ Alle instellingen staan in `.env` (zie `.env.example`). Na een wijziging: `docke
 | `DOMAIN` | | Domein voor Caddy, zonder `https://` |
 | `BASE_URL` | http://localhost:8000 | Volledig adres van de tool; wordt gebruikt in links in mails |
 | `SECRET_KEY` | | Geheime sleutel voor inlogsessies (`openssl rand -hex 32`) |
-| `DEFAULT_LANGUAGE` | nl | Standaardtaal (`nl` of `en`) |
+| `DEFAULT_LANGUAGE` | nl | Standaardtaal (`nl` of `en`). Iedereen ziet eerst deze taal, ongeacht de browsertaal; bezoekers wisselen met NL/EN rechtsboven, medewerkers onder hun account. |
 | `TIMEZONE` | Europe/Amsterdam | Tijdzone voor datums en herinneringen |
 | `REFERENCE_PREFIX` | D | Voorvoegsel van het kenmerk (`D2026-0001`) |
 | `MAX_UPLOAD_MB` | 15 | Maximale grootte per bijlage |

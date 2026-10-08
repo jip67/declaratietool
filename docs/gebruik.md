@@ -45,3 +45,11 @@ Elke ochtend (instelbaar) krijgt iedereen met openstaande taken één mail met e
 Gebruikers met de rol **Beheerder** zien de pagina **Gebruikers**. Daar voeg je mensen toe, wijs je rollen toe, zet je accounts uit en stel je een nieuw wachtwoord in. Iedereen kan onder zijn eigen naam (rechtsboven) zijn taal en wachtwoord wijzigen.
 
 Bij een bestuurswissel: maak een account voor de nieuwe bestuurder met de juiste rol en zet het oude account uit. De geschiedenis van eerdere declaraties blijft bewaard.
+
+## Hulp
+
+Via **Help** rechtsboven staat deze uitleg ook in de tool zelf, in het Nederlands en Engels. Ingelogde medewerkers zien de onderdelen voor hun eigen rol gemarkeerd.
+
+## Bijlagen bekijken
+
+Bonnen en facturen staan direct op de pagina van de declaratie: foto's als afbeelding, pdf's in een ingebouwde viewer. Na goedkeuring zie je in het portaal de geparafeerde versie. HEIC-foto's (iPhone) kunnen de meeste browsers niet op de pagina tonen; open die via de link.
