@@ -1,7 +1,7 @@
 """Portaal voor voorzitter, boekhouder, secretaris en beheerder."""
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
-from fastapi.responses import FileResponse, RedirectResponse
+from fastapi.responses import RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -11,7 +11,7 @@ from ..db import get_db
 from ..i18n import available_languages
 from ..models import OPEN_STATUSES, ROLE_FOR_STATUS, Attachment, Claim, Role, Status, User
 from ..security import hash_password
-from ..web import current_user, render, require_admin
+from ..web import current_user, file_response, render, require_admin
 from .public import validate_details
 
 router = APIRouter(prefix="/portal")
@@ -153,8 +153,8 @@ def portal_file(attachment_id: int, stamped: bool = False, user: User = Depends(
         raise HTTPException(status_code=404)
     if stamped and att.stamped_path:
         name = att.original_filename.rsplit(".", 1)[0] + "-paraaf.pdf"
-        return FileResponse(storage.absolute(att.stamped_path), media_type="application/pdf", filename=name)
-    return FileResponse(storage.absolute(att.stored_path), media_type=att.content_type, filename=att.original_filename)
+        return file_response(storage.absolute(att.stamped_path), "application/pdf", name)
+    return file_response(storage.absolute(att.stored_path), att.content_type, att.original_filename)
 
 
 # ---------------------------------------------------------------- gebruikersbeheer

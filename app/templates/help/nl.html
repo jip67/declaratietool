@@ -1,0 +1,59 @@
+{% set mailbox = settings.imap_user if '@' in settings.imap_user else '' %}
+<h2 id="indiener">Een declaratie indienen</h2>
+<ol>
+  <li>Maak een foto of pdf van je bon of factuur.</li>
+  <li>{% if mailbox %}Mail de bon naar <a href="mailto:{{ mailbox }}">{{ mailbox }}</a>, of upload hem{% else %}Upload de bon{% endif %} via <a href="/indienen">Declaratie indienen</a>. Meerdere bonnen in één mail of upload worden één declaratie.</li>
+  <li>Je krijgt een bevestiging per mail met een persoonlijke link.</li>
+  <li>Vul via die link het bedrag, een omschrijving, je IBAN en de tenaamstelling in. Laat "onthouden" aangevinkt, dan staan je rekeninggegevens er de volgende keer al (je kunt ze altijd aanpassen).</li>
+  <li>Bij elke stap krijg je een mail: goedgekeurd, betaling klaargezet, betaald, of afgewezen met de reden. Via dezelfde link zie je altijd de status.</li>
+</ol>
+<p>Je kunt je gegevens aanpassen tot de voorzitter de declaratie heeft goedgekeurd. Geen mail ontvangen? Kijk in je map met ongewenste mail.</p>
+
+<h2 id="voorzitter">Voorzitter: goedkeuren en paraferen</h2>
+<ol>
+  <li>Je krijgt een mail als er een declaratie op je wacht. Open hem in het portaal, of kijk onder <strong>Mijn taken</strong>.</li>
+  <li>De bon staat direct op de pagina. Controleer bedrag en omschrijving.</li>
+  <li>Klik op <strong>Goedkeuren en paraferen</strong>. Elke bon krijgt een stempel met je naam, de datum en het kenmerk; de geparafeerde pdf staat daarna bij de declaratie.</li>
+  <li>Klopt er iets niet? Kies <strong>Afwijzen</strong> en vul een reden in. De indiener krijgt die reden te zien.</li>
+</ol>
+
+<h2 id="boekhouder">Boekhouder: betaling klaarzetten</h2>
+<ol>
+  <li>Na goedkeuring krijg je een mail met bedrag, IBAN, tenaamstelling, omschrijving en kenmerk, met de geparafeerde bonnen als bijlage.</li>
+  <li>Zet de betaling klaar bij de bank en gebruik het kenmerk in de omschrijving.</li>
+  <li>Klik in het portaal op <strong>Betaling is klaargezet</strong>. De secretaris krijgt dan bericht.</li>
+</ol>
+
+<h2 id="secretaris">Secretaris: betaling akkoord geven</h2>
+<ol>
+  <li>Je krijgt een mail zodra de boekhouder de betaling heeft klaargezet.</li>
+  <li>Geef de betaling akkoord bij de bank.</li>
+  <li>Klik in het portaal op <strong>Betaling is akkoord gegeven</strong>. De declaratie staat dan op betaald en de indiener krijgt bericht.</li>
+</ol>
+
+<h2 id="namens">Een declaratie aanmaken voor iemand anders</h2>
+<p>Iedere medewerker kan via <strong>Nieuwe declaratie</strong> een declaratie invoeren, bijvoorbeeld voor een bon op papier.</p>
+<ul>
+  <li>Vul het e-mailadres van de indiener in en voeg de bon(nen) toe.</li>
+  <li>Vul je ook bedrag, omschrijving, IBAN en tenaamstelling in, dan gaat de declaratie meteen naar de voorzitter.</li>
+  <li>Laat je die leeg, dan krijgt de indiener een mail met een link om ze zelf in te vullen.</li>
+</ul>
+
+<h2 id="beheer">Beheer</h2>
+<ul>
+  <li>Met de rol Beheerder zie je de pagina <strong>Gebruikers</strong>. Daar voeg je mensen toe, geef je rollen, zet je accounts uit en stel je een nieuw wachtwoord in.</li>
+  <li>Bij een bestuurswissel maak je een account voor de nieuwe bestuurder en zet je het oude uit. De geschiedenis blijft bewaard.</li>
+  <li>Iedereen kan onder zijn eigen naam (rechtsboven) zijn taal en wachtwoord wijzigen.</li>
+</ul>
+
+<h2 id="vragen">Veelgestelde vragen</h2>
+<dl class="faq">
+  <dt>Welke bestanden kan ik insturen?</dt>
+  <dd>Pdf, jpg, png, webp en heic (iPhone-foto's), maximaal {{ settings.max_upload_mb }} MB per bestand. Heic-foto's kun je openen via de link als de browser ze niet op de pagina kan tonen.</dd>
+  <dt>Ik krijg herinneringen. Waarom?</dt>
+  <dd>Elke ochtend krijgt iedereen met een openstaande taak één overzichtsmail. Indieners die hun gegevens nog niet hebben ingevuld krijgen ook een herinnering.</dd>
+  <dt>Hoe wissel ik van taal?</dt>
+  <dd>Zonder inloggen via NL/EN rechtsboven; ingelogd onder je eigen naam (rechtsboven).</dd>
+  <dt>Wachtwoord vergeten?</dt>
+  <dd>Vraag een beheerder om via <strong>Gebruikers</strong> een nieuw wachtwoord in te stellen.</dd>
+</dl>

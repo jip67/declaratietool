@@ -1,0 +1,59 @@
+{% set mailbox = settings.imap_user if '@' in settings.imap_user else '' %}
+<h2 id="indiener">Submitting a claim</h2>
+<ol>
+  <li>Take a photo or make a pdf of your receipt or invoice.</li>
+  <li>{% if mailbox %}Email the receipt to <a href="mailto:{{ mailbox }}">{{ mailbox }}</a>, or upload it{% else %}Upload the receipt{% endif %} via <a href="/indienen">Submit a claim</a>. Several receipts in one email or upload become one claim.</li>
+  <li>You receive a confirmation email with a personal link.</li>
+  <li>Use that link to fill in the amount, a description, your IBAN and the account holder. Keep "remember" ticked and your bank details will be filled in next time (you can always change them).</li>
+  <li>You get an email at every step: approved, payment prepared, paid, or rejected with the reason. The same link always shows the status.</li>
+</ol>
+<p>You can change your details until the chair has approved the claim. No email? Check your spam folder.</p>
+
+<h2 id="voorzitter">Chair: approve and initial</h2>
+<ol>
+  <li>You get an email when a claim is waiting for you. Open it in the portal, or look under <strong>My tasks</strong>.</li>
+  <li>The receipt is shown right on the page. Check the amount and description.</li>
+  <li>Click <strong>Approve and initial</strong>. Every receipt gets a stamp with your name, the date and the reference; the initialled pdf is then attached to the claim.</li>
+  <li>Something wrong? Choose <strong>Reject</strong> and give a reason. The submitter will see that reason.</li>
+</ol>
+
+<h2 id="boekhouder">Treasurer: prepare the payment</h2>
+<ol>
+  <li>After approval you get an email with amount, IBAN, account holder, description and reference, with the initialled receipts attached.</li>
+  <li>Prepare the payment at the bank and use the reference in the payment description.</li>
+  <li>Click <strong>Payment has been prepared</strong> in the portal. The secretary is then notified.</li>
+</ol>
+
+<h2 id="secretaris">Secretary: authorise the payment</h2>
+<ol>
+  <li>You get an email as soon as the treasurer has prepared the payment.</li>
+  <li>Authorise the payment at the bank.</li>
+  <li>Click <strong>Payment has been authorised</strong> in the portal. The claim is then paid and the submitter is notified.</li>
+</ol>
+
+<h2 id="namens">Creating a claim for someone else</h2>
+<p>Every staff member can enter a claim via <strong>New claim</strong>, for example for a paper receipt.</p>
+<ul>
+  <li>Enter the submitter's email address and add the receipt(s).</li>
+  <li>If you also fill in amount, description, IBAN and account holder, the claim goes straight to the chair.</li>
+  <li>If you leave them empty, the submitter receives an email with a link to complete them.</li>
+</ul>
+
+<h2 id="beheer">Administration</h2>
+<ul>
+  <li>With the Administrator role you see the <strong>Users</strong> page. There you add people, assign roles, deactivate accounts and set a new password.</li>
+  <li>When the board changes, create an account for the new board member and deactivate the old one. History is kept.</li>
+  <li>Everyone can change their language and password under their own name (top right).</li>
+</ul>
+
+<h2 id="vragen">Frequently asked questions</h2>
+<dl class="faq">
+  <dt>Which files can I send?</dt>
+  <dd>Pdf, jpg, png, webp and heic (iPhone photos), up to {{ settings.max_upload_mb }} MB per file. If the browser can't show a heic photo on the page, open it via the link.</dd>
+  <dt>Why do I get reminders?</dt>
+  <dd>Every morning everyone with an open task gets one summary email. Submitters who haven't completed their details also get a reminder.</dd>
+  <dt>How do I change the language?</dt>
+  <dd>Without logging in via NL/EN at the top right; when logged in under your own name (top right).</dd>
+  <dt>Forgot your password?</dt>
+  <dd>Ask an administrator to set a new password via <strong>Users</strong>.</dd>
+</dl>

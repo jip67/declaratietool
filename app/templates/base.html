@@ -16,6 +16,7 @@
     <a href="/portal">{{ t('nav.claims') }}</a>
     <a href="/portal/claims/new">{{ t('nav.new_claim') }}</a>
     {% if user.has_role(Role.ADMIN) %}<a href="/portal/users">{{ t('nav.users') }}</a>{% endif %}
+    <a href="/help">{{ t('nav.help') }}</a>
     <a href="/account">{{ user.name }}</a>
     <form method="post" action="/logout" class="inline"><button class="link">{{ t('nav.logout') }}</button></form>
   </nav>
@@ -23,6 +24,7 @@
   <nav class="langs">
     <a href="/indienen">{{ t('nav.submit') }}</a>
     <a href="/login">{{ t('nav.login') }}</a>
+    <a href="/help">{{ t('nav.help') }}</a>
     {% for code in languages %}<a href="?lang={{ code }}" {% if code == lang %}class="active"{% endif %}>{{ code|upper }}</a>{% endfor %}
   </nav>
   {% endif %}

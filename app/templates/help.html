@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}{{ t('help.title') }}{% endblock %}
+{% block content %}
+<section class="card help">
+  <h1>{{ t('help.title') }}</h1>
+  <ul class="toc">
+    {% set sections = [('indiener', none), ('voorzitter', Role.CHAIR), ('boekhouder', Role.TREASURER),
+                       ('secretaris', Role.SECRETARY), ('namens', none), ('beheer', Role.ADMIN), ('vragen', none)] %}
+    {% for anchor, role in sections %}
+    <li><a href="#{{ anchor }}" {% if user and role and user.has_role(role) %}class="mine"{% endif %}>{{ t('help.section.' ~ anchor) }}</a></li>
+    {% endfor %}
+  </ul>
+  {% if user %}<p class="muted">{{ t('help.yours') }}</p>{% endif %}
+  {% include help_body %}
+</section>
+{% endblock %}

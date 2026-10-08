@@ -66,3 +66,17 @@ form.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,
   table.list .num { text-align: left; }
 }
 .hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+.attachment { margin: 0 0 1.25rem; }
+.attachment .preview { display: block; width: 100%; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+.attachment img.preview { width: auto; max-width: 100%; max-height: 80vh; object-fit: contain; }
+.attachment iframe.preview { height: 80vh; min-height: 420px; }
+.attachment figcaption { margin-top: .35rem; font-size: .9rem; }
+.attachment .no-preview { border: 1px dashed var(--line); border-radius: 8px; padding: 1rem; margin: 0; }
+.help h2 { scroll-margin-top: 1rem; }
+.help .toc { display: flex; flex-wrap: wrap; gap: .4rem; list-style: none; padding: 0; margin: 0 0 1rem; }
+.help .toc a { display: inline-block; padding: .25rem .7rem; border: 1px solid var(--line); border-radius: 999px; text-decoration: none; font-size: .9rem; }
+.help .toc a.mine { background: var(--primary); color: var(--primary-text); border-color: var(--primary); }
+.help li { margin-bottom: .3rem; }
+.help-link { font-size: .9rem; }
+.faq dt { font-weight: 600; margin-top: .75rem; }
+.faq dd { margin: .15rem 0 0; }

@@ -4,7 +4,7 @@ from collections import defaultdict
 from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
-from fastapi.responses import FileResponse, RedirectResponse
+from fastapi.responses import RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -13,7 +13,7 @@ from ..config import get_settings
 from ..db import get_db
 from ..models import Attachment, Claim, Status
 from ..security import is_valid_iban, parse_amount
-from ..web import render, request_language
+from ..web import file_response, render, request_language
 
 router = APIRouter()
 
@@ -100,7 +100,7 @@ def claim_file(token: str, attachment_id: int, db: Session = Depends(get_db)):
     att = db.get(Attachment, attachment_id)
     if att is None or att.claim_id != claim.id:
         raise HTTPException(status_code=404)
-    return FileResponse(storage.absolute(att.stored_path), media_type=att.content_type, filename=att.original_filename)
+    return file_response(storage.absolute(att.stored_path), att.content_type, att.original_filename)
 
 
 # ---------------------------------------------------------------- uploaden zonder mail

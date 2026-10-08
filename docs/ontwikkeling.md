@@ -68,3 +68,5 @@ De taal verschijnt vanzelf in de taalkeuze. Indieners krijgen mails in hun eigen
 - Sessiecookies zijn ondertekend, `HttpOnly`, `SameSite=Lax` en bij https `Secure`.
 - De link voor de indiener bevat een willekeurig token van 32 tekens; wie de link heeft, kan de declaratie zien en aanvullen tot de voorzitter heeft goedgekeurd.
 - Bijlagen worden alleen getoond aan ingelogde medewerkers of via de link van de indiener.
+
+De helppagina (`/help`) staat per taal in `app/templates/help/<taal>.html`. Ontbreekt die voor een nieuwe taal, dan wordt de helptekst in de standaardtaal getoond.

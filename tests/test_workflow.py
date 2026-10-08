@@ -204,3 +204,32 @@ def test_upload_requires_file_and_blocks_bots(db, client):
                     files=[("files", ("bon.jpg", jpeg_bytes(), "image/jpeg"))])
     assert r.status_code == 200
     assert db.scalar(select(Claim)) is None
+
+
+def test_dutch_is_default_regardless_of_browser(db, client):
+    r = client.get("/indienen", headers={"Accept-Language": "en-US,en;q=0.9"})
+    assert 'lang="nl"' in r.text
+    # Een gekozen taal blijft onthouden.
+    client.get("/indienen?lang=en")
+    assert 'lang="en"' in client.get("/indienen").text
+
+
+def test_attachment_preview(db, client, staff):
+    intake.process_message(db, make_mail([("bon.jpg", "image/jpeg", jpeg_bytes()), ("factuur.pdf", "application/pdf", pdf_bytes())]))
+    claim = db.scalar(select(Claim))
+    page = client.get(f"/c/{claim.token}").text
+    assert '<img class="preview"' in page and '<iframe class="preview pdf"' in page
+    att = claim.attachments[0]
+    r = client.get(f"/c/{claim.token}/files/{att.id}")
+    assert r.headers["content-disposition"].startswith("inline")
+    login(client, "voorzitter@example.org")
+    assert '<img class="preview"' in client.get(f"/portal/claims/{claim.id}").text
+    assert client.get(f"/portal/files/{att.id}").headers["content-disposition"].startswith("inline")
+
+
+def test_help_page(client, staff):
+    assert "Een declaratie indienen" in client.get("/help").text
+    assert "Submitting a claim" in client.get("/help?lang=en").text
+    login(client, "voorzitter@example.org")
+    r = client.get("/help")
+    assert '<a href="#voorzitter" class="mine">' in r.text and "Uitloggen" in r.text
