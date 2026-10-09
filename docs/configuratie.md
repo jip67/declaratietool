@@ -6,7 +6,7 @@ Alle instellingen staan in `.env` (zie `.env.example`). Na een wijziging: `docke
 
 | Instelling | Standaard | Betekenis |
 | --- | --- | --- |
-| `APP_NAME` | Declaratietool | Naam in de kop en als afzendernaam van mails |
+| `APP_NAME` | Declaratietool | Naam in de kop, en afzendernaam van mails als `MAIL_FROM_NAME` leeg is |
 | `ORGANISATION_NAME` | Mijn vereniging | Naam van je vereniging, onder mails |
 | `DOMAIN` | | Domein voor Caddy, zonder `https://` |
 | `BASE_URL` | http://localhost:8000 | Volledig adres van de tool; wordt gebruikt in links in mails |
@@ -60,6 +60,7 @@ Gebruik je een mailprovider zonder IMAP (zoals Proton Mail), laat `IMAP_HOST` da
 | `SMTP_SSL` | false | Direct SSL (poort 465); zet dan `SMTP_STARTTLS=false` |
 | `SMTP_USER` / `SMTP_PASSWORD` | | Inloggegevens |
 | `MAIL_FROM` | | Afzenderadres; meestal hetzelfde als de declaratie-mailbox |
+| `MAIL_FROM_NAME` | | Afzendernaam die ontvangers zien, bijv. `Declaraties Zambesidreef`; leeg = `APP_NAME`. Ook in te stellen via Mailinstellingen |
 
 Voorbeeld voor Proton Mail (met een SMTP-token uit de Proton-instellingen): `SMTP_HOST=smtp.protonmail.ch`, `SMTP_PORT=587`, `SMTP_STARTTLS=true`, `SMTP_SSL=false`, `SMTP_USER` en `MAIL_FROM` het adres, `SMTP_PASSWORD` het token.
 

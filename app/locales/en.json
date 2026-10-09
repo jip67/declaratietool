@@ -173,6 +173,7 @@
   "mail.folder": "Folder",
   "mail.starttls": "Use STARTTLS (usually port 587)",
   "mail.ssl": "Use direct SSL (usually port 465)",
+  "mail.mail_from_name": "From name",
   "mail.mail_from": "From address",
   "mail.from_db": "(set in the portal)",
   "mail.from_env": "(from .env)",

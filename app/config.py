@@ -42,6 +42,8 @@ class Settings(BaseSettings):
     smtp_starttls: bool = True
     smtp_ssl: bool = False
     mail_from: str = "declaraties@example.org"
+    # Naam die ontvangers als afzender zien; leeg = APP_NAME.
+    mail_from_name: str = ""
 
     # Herinneringen
     reminder_hour: int = 9

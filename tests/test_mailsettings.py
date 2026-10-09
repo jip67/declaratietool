@@ -123,6 +123,14 @@ def test_mailer_uses_saved_settings_without_restart(db, client, staff, monkeypat
     assert (server.host, server.port) == ("smtp.vereniging.nl", 587)
     assert ("login", "bot@vereniging.nl", "smtp-geheim") in server.calls
     assert server.sent[0]["From"].addresses[0].addr_spec == "declaraties@vereniging.nl"
+    assert server.sent[0]["From"].addresses[0].display_name == "Declaratietool"
+
+
+def test_sender_name_from_settings(client, staff):
+    login(client, "boekhouder@example.org")
+    client.post("/portal/mail", data=form(mail_from_name="Declaraties Zambesidreef"))
+    msg = mailer.build_message(mailer.Mail(to=["iemand@example.org"], subject="Hallo", body="Test"))
+    assert str(msg["From"]) == "Declaraties Zambesidreef <declaraties@vereniging.nl>"
 
 
 def test_smtp_test_button_uses_form_and_saved_password(db, client, staff, monkeypatch):

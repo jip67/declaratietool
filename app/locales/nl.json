@@ -173,6 +173,7 @@
   "mail.folder": "Map",
   "mail.starttls": "STARTTLS gebruiken (meestal poort 587)",
   "mail.ssl": "Direct SSL gebruiken (meestal poort 465)",
+  "mail.mail_from_name": "Afzendernaam",
   "mail.mail_from": "Afzenderadres",
   "mail.from_db": "(ingesteld in het portaal)",
   "mail.from_env": "(uit .env)",
