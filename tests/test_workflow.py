@@ -244,6 +244,7 @@ def test_attachment_preview(db, client, staff):
     claim = db.scalar(select(Claim))
     page = client.get(f"/c/{claim.token}").text
     assert '<img class="preview"' in page and '<iframe class="preview pdf"' in page
+    assert page.count('<details class="preview-toggle">') == 2, "voorbeelden zijn standaard ingeklapt"
     att = claim.attachments[0]
     r = client.get(f"/c/{claim.token}/files/{att.id}")
     assert r.headers["content-disposition"].startswith("inline")

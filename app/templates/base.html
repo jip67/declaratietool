@@ -12,7 +12,9 @@
   <a class="brand" href="{% if user %}/portal{% else %}/login{% endif %}">{{ settings.app_name }}</a>
   <span class="org">{{ settings.organisation_name }}</span>
   {% if user %}
-  <nav>
+  <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-hidden="true">
+  <label for="nav-toggle" class="nav-button" aria-label="{{ t('nav.menu') }}"><span class="burger" aria-hidden="true"></span> {{ t('nav.menu') }}</label>
+  <nav class="mainnav">
     {% if user.is_staff %}<a href="/portal?view=mine">{{ t('nav.my_tasks') }}</a>{% endif %}
     <a href="/portal">{{ t('nav.claims') }}</a>
     <a href="/portal/claims/new">{{ t('nav.new_claim') }}</a>

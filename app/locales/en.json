@@ -125,9 +125,11 @@
   "help.section.namens": "On someone's behalf",
   "help.section.beheer": "Administration",
   "help.section.vragen": "FAQ",
-  "preview.unavailable": "This attachment can't be shown on the page. Open it via the link below.",
+  "preview.unavailable": "No preview available; open the attachment via the link.",
+  "preview.show": "Show preview",
+  "preview.hide": "Hide preview",
   "preview.open_new": "open in new window",
-  "preview.showing_stamped": "shown above",
+  "preview.showing_stamped": "shown in preview",
   "nav.update": "Update",
   "update.not_configured": "Updating from the portal is not set up on this server. Run the install script deploy/install-vps.sh once more, or update from the command line (see docs/bijwerken.md).",
   "update.running": "Updating. This can take a few minutes, during which the tool is briefly unavailable. This page refreshes by itself. If you see an error, refresh it yourself after a minute.",
@@ -223,5 +225,6 @@
   "log.retention": "Entries are deleted automatically after {days} days.",
   "log.retention_off": "Entries are not deleted automatically.",
   "nav.settings": "Settings",
+  "nav.menu": "Menu",
   "users.read_only": "Only an administrator can add or change users."
 }

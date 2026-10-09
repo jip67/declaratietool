@@ -15,7 +15,7 @@
   </nav>
   {% endif %}
   {% if claims %}
-  <table class="list">
+  <table class="list claims">
     <thead><tr>
       <th>{{ t('field.reference') }}</th><th>{{ t('field.date') }}</th><th>{{ t('field.submitter') }}</th>
       <th>{{ t('field.description') }}</th><th class="num">{{ t('field.amount') }}</th><th>{{ t('field.status') }}</th>
@@ -23,12 +23,12 @@
     <tbody>
     {% for claim in claims %}
       <tr class="{% if is_my_task(claim, user) %}mine{% endif %}">
-        <td><a href="/portal/claims/{{ claim.id }}">{{ claim.reference }}</a></td>
-        <td>{{ claim.created_at|localtime }}</td>
-        <td>{{ claim.submitter.name or claim.submitter.email }}</td>
-        <td>{{ claim.description|truncate(60) }}</td>
-        <td class="num">{{ claim.amount_display }}</td>
-        <td>{% include "_status.html" %}</td>
+        <td class="c-ref"><a href="/portal/claims/{{ claim.id }}">{{ claim.reference }}</a></td>
+        <td class="c-date">{{ claim.created_at|localtime }}</td>
+        <td class="c-sub">{{ claim.submitter.name or claim.submitter.email }}</td>
+        <td class="c-desc">{{ claim.description|truncate(60) }}</td>
+        <td class="num c-amount">{{ claim.amount_display }}</td>
+        <td class="c-status">{% include "_status.html" %}</td>
       </tr>
     {% endfor %}
     </tbody>

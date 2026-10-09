@@ -10,10 +10,10 @@
     <tbody>
     {% for u in users %}
       <tr>
-        <td>{{ u.name }}</td>
-        <td>{{ u.email }}</td>
-        <td>{% for r in u.role_list %}{{ t('role.' ~ r.value) }}{% if not loop.last %}, {% endif %}{% endfor %}</td>
-        <td>{{ t('users.yes') if u.active else t('users.no') }}</td>
+        <td data-label="{{ t('field.name') }}">{{ u.name }}</td>
+        <td data-label="{{ t('field.email') }}">{{ u.email }}</td>
+        <td data-label="{{ t('field.roles') }}">{% for r in u.role_list %}{{ t('role.' ~ r.value) }}{% if not loop.last %}, {% endif %}{% endfor %}</td>
+        <td data-label="{{ t('field.active') }}">{{ t('users.yes') if u.active else t('users.no') }}</td>
         <td>{% if is_admin %}<a class="button" href="/portal/users/{{ u.id }}">{{ t('action.edit') }}</a>{% endif %}</td>
       </tr>
     {% endfor %}
