@@ -15,7 +15,7 @@ from ..models import (
     OPEN_STATUSES, ROLE_FOR_STATUS, Attachment, Claim, Event, IncomingMail, LoginAttempt, Role, Status, Submitter, User,
 )
 from ..security import hash_password
-from ..web import current_user, file_response, render, require_admin
+from ..web import current_user, file_response, render, require_admin, require_staff
 from .public import validate_details
 
 router = APIRouter(prefix="/portal")
@@ -189,7 +189,7 @@ def list_users(db: Session) -> list[User]:
 
 
 @router.get("/users")
-def users_page(request: Request, user: User = Depends(require_admin), db: Session = Depends(get_db)):
+def users_page(request: Request, user: User = Depends(require_staff), db: Session = Depends(get_db)):
     users = list_users(db)
     error = request.query_params.get("error")
     return render(
@@ -452,7 +452,7 @@ def log_page(
     tab: str = "logins",
     q: str = "",
     page: int = 1,
-    user: User = Depends(require_admin),
+    user: User = Depends(require_staff),
     db: Session = Depends(get_db),
 ):
     if tab not in LOG_TABS:

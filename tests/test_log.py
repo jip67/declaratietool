@@ -55,8 +55,14 @@ def test_failed_mail_recorded_once_per_day(db):
     assert [(r.subject, r.result) for r in rows] == [("Kapot", "error")]
 
 
-def test_only_admin_sees_log(client, staff):
+def test_staff_sees_log_but_member_does_not(db, client, staff):
     login(client, "voorzitter@example.org")
+    assert client.get("/portal/log").status_code == 200
+    assert "/portal/log" in client.get("/portal").text
+    client.post("/logout")
+    db.add(User(email="lid@example.org", name="Lies Lid", password_hash=hash_password("geheim12345"), roles="member"))
+    db.commit()
+    login(client, "lid@example.org")
     assert client.get("/portal/log").status_code == 403
     assert "/portal/log" not in client.get("/portal").text
 

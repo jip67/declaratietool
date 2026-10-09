@@ -56,6 +56,13 @@ def current_user(request: Request, db: Session = Depends(get_db)) -> User:
     return user
 
 
+def require_staff(user: User = Depends(current_user)) -> User:
+    """Bestuursleden en beheerders; gewone gebruikers (rol Gebruiker) niet."""
+    if not user.is_staff:
+        raise HTTPException(status_code=403)
+    return user
+
+
 def require_admin(user: User = Depends(current_user)) -> User:
     if not user.has_role(Role.ADMIN):
         raise HTTPException(status_code=403)

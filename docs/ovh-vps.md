@@ -79,7 +79,7 @@ Laat je het mailwachtwoord leeg, dan draait de tool zonder mail. De links voor i
 ## 7. Testen
 
 1. Open `https://declaraties.mijnvereniging.nl` en log in.
-2. Voeg onder **Gebruikers** de voorzitter en de secretaris toe.
+2. Voeg onder **Instellingen → Gebruikers** de voorzitter en de secretaris toe.
 3. Mail vanaf je eigen adres een foto van een bon naar het declaratie-adres en loop alle stappen door.
 
 ## Bijwerken

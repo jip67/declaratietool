@@ -14,6 +14,14 @@ a { color: var(--primary); }
 .org { color: var(--muted); }
 .topbar nav { margin-left: auto; display: flex; flex-wrap: wrap; gap: .9rem; align-items: center; }
 .topbar nav a { text-decoration: none; }
+.menu { position: relative; }
+.menu summary { cursor: pointer; color: var(--primary); list-style: none; }
+.menu summary::-webkit-details-marker { display: none; }
+.menu summary::after { content: " ▾"; font-size: .8em; }
+.menu[open] summary::after { content: " ▴"; }
+.menu-items { position: absolute; right: 0; top: calc(100% + .5rem); z-index: 10; display: flex; flex-direction: column; min-width: 12rem; background: var(--card); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.12); padding: .35rem 0; }
+.menu-items a { padding: .45rem .9rem; white-space: nowrap; }
+.menu-items a:hover { background: var(--line); }
 .langs a.active { font-weight: 700; }
 main { padding: 1rem; }
 .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 1.25rem; max-width: 760px; margin: 0 auto 1rem; }

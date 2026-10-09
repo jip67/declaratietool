@@ -38,12 +38,12 @@ docker compose exec app python -m app.cli create-user \
 
 Rollen: `admin` (gebruikers beheren), `chair` (voorzitter), `treasurer` (boekhouder), `secretary` (secretaris). Iemand kan meerdere rollen hebben.
 
-Log in op `https://<jouw-domein>` en voeg onder **Gebruikers** de voorzitter en secretaris toe.
+Log in op `https://<jouw-domein>` en voeg onder **Instellingen → Gebruikers** de voorzitter en secretaris toe.
 
 ## Bijwerken
 
 Nieuwe versies komen via GitHub. Met het installatiescript kan een beheerder bijwerken via
-**Bijwerken** in het portaal; zie [bijwerken.md](bijwerken.md). Met de hand, op de server:
+**Instellingen → Bijwerken** in het portaal; zie [bijwerken.md](bijwerken.md). Met de hand, op de server:
 
 ```bash
 cd declaratietool

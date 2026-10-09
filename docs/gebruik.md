@@ -42,9 +42,17 @@ Elke ochtend (instelbaar) krijgt iedereen met openstaande taken één mail met e
 
 ## Beheer
 
-Gebruikers met de rol **Beheerder** zien de pagina **Gebruikers**. Daar voeg je mensen toe. Met **Bewerken** pas je naam, e-mailadres, taal en rollen aan, zet je een account uit of stel je een nieuw wachtwoord in. Onderaan die pagina kun je een gebruiker **verwijderen**. Komt iemand al voor in de geschiedenis van een declaratie (bijvoorbeeld omdat hij iets heeft goedgekeurd), dan wordt het account niet gewist maar uitgeschakeld en geanonimiseerd, zodat het logboek blijft kloppen. Je eigen account kun je niet verwijderen of uitzetten, en je houdt altijd de rol Beheerder. Geef leden die zelf declaraties willen indienen de rol **Gebruiker**: zij kunnen inloggen, een declaratie aanmaken en alleen hun eigen declaraties en de status daarvan zien. Iedereen kan onder zijn eigen naam (rechtsboven) zijn taal en wachtwoord wijzigen.
+Rechtsboven staat het menu **Instellingen**. Wat je daarin ziet hangt af van je rol:
 
-Onder **Logboek** (alleen voor beheerders) staan drie tabbladen:
+| Rol | Gebruikers | Logboek | Mailinstellingen | Bijwerken |
+| --- | --- | --- | --- | --- |
+| Gebruiker | – | – | – | – |
+| Voorzitter, boekhouder, secretaris | bekijken | ja | – | – |
+| Beheerder | bekijken en wijzigen | ja | ja | ja |
+
+Gebruikers met de rol **Beheerder** voegen op de pagina **Gebruikers** mensen toe. Met **Bewerken** pas je naam, e-mailadres, taal en rollen aan, zet je een account uit of stel je een nieuw wachtwoord in. Onderaan die pagina kun je een gebruiker **verwijderen**. Komt iemand al voor in de geschiedenis van een declaratie (bijvoorbeeld omdat hij iets heeft goedgekeurd), dan wordt het account niet gewist maar uitgeschakeld en geanonimiseerd, zodat het logboek blijft kloppen. Je eigen account kun je niet verwijderen of uitzetten, en je houdt altijd de rol Beheerder. Geef leden die zelf declaraties willen indienen de rol **Gebruiker**: zij kunnen inloggen, een declaratie aanmaken en alleen hun eigen declaraties en de status daarvan zien. Iedereen kan onder zijn eigen naam (rechtsboven) zijn taal en wachtwoord wijzigen.
+
+Onder **Logboek** (voor bestuursleden en beheerders) staan drie tabbladen:
 
 - **Inlogs**: wie wanneer heeft ingelogd, vanaf welk IP-adres en met welke browser.
 - **Mislukte inlogpogingen**: met de reden (onbekend e-mailadres, verkeerd wachtwoord, account staat uit of tijdelijk geblokkeerd na te veel pogingen). Veel pogingen vanaf één onbekend IP-adres wijzen op iemand die wachtwoorden probeert te raden.
@@ -54,7 +62,7 @@ Je kunt zoeken op e-mailadres, IP-adres, afzender of onderwerp. Regels ouder dan
 
 Bij een bestuurswissel: maak een account voor de nieuwe bestuurder met de juiste rol en zet het oude account uit. De geschiedenis van eerdere declaraties blijft bewaard.
 
-Beheerders vinden onder **Mailinstellingen** de gegevens van de mailbox (SMTP voor versturen, IMAP voor ophalen). Daar pas je ze aan zonder `.env` te wijzigen en test je de verbinding met één klik; zie [Configuratie](configuratie.md#mailinstellingen-in-het-portaal).
+Beheerders vinden onder **Instellingen → Mailinstellingen** de gegevens van de mailbox (SMTP voor versturen, IMAP voor ophalen). Daar pas je ze aan zonder `.env` te wijzigen en test je de verbinding met één klik; zie [Configuratie](configuratie.md#mailinstellingen-in-het-portaal).
 
 ## Hulp
 

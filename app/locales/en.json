@@ -221,5 +221,7 @@
   "log.page": "Page {page} of {pages}",
   "log.empty": "Nothing recorded yet.",
   "log.retention": "Entries are deleted automatically after {days} days.",
-  "log.retention_off": "Entries are not deleted automatically."
+  "log.retention_off": "Entries are not deleted automatically.",
+  "nav.settings": "Settings",
+  "users.read_only": "Only an administrator can add or change users."
 }

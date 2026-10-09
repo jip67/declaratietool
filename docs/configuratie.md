@@ -24,7 +24,7 @@ Alle instellingen staan in `.env` (zie `.env.example`). Na een wijziging: `docke
 
 ## Mailinstellingen in het portaal
 
-De mailinstellingen (SMTP en IMAP) kun je ook in de tool zelf invullen: log in als beheerder en kies **Mailinstellingen**. Dan hoef je `.env` niet aan te passen.
+De mailinstellingen (SMTP en IMAP) kun je ook in de tool zelf invullen: log in als beheerder en kies **Instellingen → Mailinstellingen**. Dan hoef je `.env` niet aan te passen.
 
 - Wat je in het portaal opslaat gaat vóór de waarden in `.env`; `.env` blijft de terugval. Achter elk veld staat waar de huidige waarde vandaan komt.
 - Wijzigingen gelden meteen, ook voor het ophalen van mail. Een herstart is niet nodig.
