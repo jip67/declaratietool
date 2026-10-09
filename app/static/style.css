@@ -194,7 +194,7 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--p
 table.list th { font-size: .75rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; }
 table.list .c-ref a { font-weight: 600; text-decoration: none; }
 table.list .c-amount { font-weight: 600; font-variant-numeric: tabular-nums; }
-tr.mine td:first-child { box-shadow: inset 3px 0 0 var(--primary); }
+@media (min-width: 641px) { tr.mine td:first-child { box-shadow: inset 3px 0 0 var(--primary); } }
 .task { border: 0; background: var(--mine); border-radius: 12px; padding: 1rem 1.25rem; }
 dl.details { background: var(--bg); border-radius: 12px; padding: 1rem 1.25rem; }
 .attachment .thumb-row { border-radius: 12px; }
@@ -256,4 +256,11 @@ table.list .c-ref { white-space: nowrap; }
   .has-sidebar .topbar .menu-items a { color: rgba(255,255,255,.85); padding: .4rem .8rem; border-radius: 10px; font-size: .95rem; }
   .has-sidebar .topbar .menu-items a:hover { background: rgba(255,255,255,.16); color: #fff; }
   .has-sidebar main { padding: 2rem; }
+}
+.topbar nav a .count { display: inline-block; min-width: 1.4rem; padding: 0 .4rem; margin-left: .3rem; border-radius: 999px; background: #fff; color: var(--head1); font-size: .75rem; font-weight: 700; text-align: center; line-height: 1.4rem; }
+.has-sidebar .topbar nav > a.active { background: rgba(255,255,255,.22); color: #fff; font-weight: 600; }
+@media (min-width: 641px) {
+  /* Op desktop staat 'Nieuwe declaratie' al in de zijbalk */
+  .has-sidebar .page-new { display: none; }
+  .has-sidebar .topbar nav > a .count { float: right; }
 }
