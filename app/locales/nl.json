@@ -223,5 +223,6 @@
   "log.retention": "Regels worden na {days} dagen automatisch verwijderd.",
   "log.retention_off": "Regels worden niet automatisch verwijderd.",
   "nav.settings": "Instellingen",
+  "nav.menu": "Menu",
   "users.read_only": "Alleen een beheerder kan gebruikers toevoegen of wijzigen."
 }

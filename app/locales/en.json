@@ -223,5 +223,6 @@
   "log.retention": "Entries are deleted automatically after {days} days.",
   "log.retention_off": "Entries are not deleted automatically.",
   "nav.settings": "Settings",
+  "nav.menu": "Menu",
   "users.read_only": "Only an administrator can add or change users."
 }

@@ -7,6 +7,7 @@
           --primary: #5b8def; --danger: #f97066; --success: #47cd89; --mine: #2d2a1c; }
 }
 * { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
 body { margin: 0; font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); }
 a { color: var(--primary); }
 .topbar { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; padding: .75rem 1rem; background: var(--card); border-bottom: 1px solid var(--line); }
@@ -69,11 +70,64 @@ dl.details dd { margin: 0; white-space: pre-wrap; }
 .reject summary { cursor: pointer; color: var(--danger); }
 ul.files, ul.history { padding-left: 1.2rem; }
 form.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0 1rem; align-items: end; }
+.nav-toggle, .nav-button { display: none; }
 @media (max-width: 640px) {
+  /* Kopbalk: hamburgermenu in plaats van drie regels links */
+  .topbar { gap: .25rem .75rem; padding: .6rem 1rem; }
+  .org { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .9rem; }
+  .nav-button { display: inline-flex; align-items: center; gap: .45rem; margin-left: auto; padding: .4rem .7rem; border: 1px solid var(--line); border-radius: 6px; color: var(--primary); cursor: pointer; user-select: none; }
+  .burger, .burger::before, .burger::after { display: block; width: 18px; height: 2px; background: currentColor; border-radius: 1px; position: relative; }
+  .burger::before, .burger::after { content: ""; position: absolute; left: 0; }
+  .burger::before { top: -6px; } .burger::after { top: 6px; }
+  .topbar nav.mainnav { display: none; flex-basis: 100%; flex-direction: column; align-items: stretch; gap: 0; margin: .4rem 0 0; border-top: 1px solid var(--line); }
+  .nav-toggle:checked ~ nav.mainnav { display: flex; }
+  .nav-toggle:focus-visible + .nav-button { outline: 2px solid var(--primary); outline-offset: 2px; }
+  nav.mainnav > a, nav.mainnav .menu summary, nav.mainnav form button.link { display: block; width: 100%; text-align: left; padding: .7rem .25rem; border-bottom: 1px solid var(--line); border-radius: 0; }
+  nav.mainnav form.inline { display: block; }
+  nav.mainnav .menu-items { position: static; min-width: 0; border: 0; border-radius: 0; box-shadow: none; padding: 0 0 0 1rem; background: none; }
+  nav.mainnav .menu-items a { padding: .65rem .25rem; border-bottom: 1px solid var(--line); }
+
+  main { padding: .75rem .5rem; }
+  .card { padding: 1rem; border-radius: 8px; }
+  h1 { font-size: 1.25rem; }
+
+  /* Filtertabs: één regel om horizontaal te vegen */
+  .tabs { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; margin-left: -1rem; margin-right: -1rem; padding: 0 1rem .2rem; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tabs a { flex: none; white-space: nowrap; }
+
+  /* Tabellen als kaartjes, met kolomnaam voor elke waarde */
   table.list thead { display: none; }
-  table.list tr { display: block; border-bottom: 1px solid var(--line); padding: .4rem 0; }
-  table.list td { display: block; border: 0; padding: .1rem 0; }
+  table.list tr { display: block; border-bottom: 1px solid var(--line); padding: .6rem 0; }
+  table.list td { display: block; border: 0; padding: .1rem 0; overflow-wrap: anywhere; }
+  table.list td[data-label] { display: grid; grid-template-columns: 7.5rem 1fr; gap: .75rem; }
+  table.list td[data-label]::before { content: attr(data-label); color: var(--muted); font-size: .85rem; }
+  table.list td:empty { display: none; }
   table.list .num { text-align: left; }
+  table.list td .button { margin-top: .4rem; }
+
+  /* Declaratielijst: referentie en bedrag bovenaan, omschrijving, dan indiener en datum */
+  table.claims tr { display: grid; grid-template-columns: 1fr auto; grid-template-areas: "ref amount" "desc desc" "sub sub" "date status"; gap: .15rem .75rem; padding: .7rem .5rem; margin: 0 -.5rem; }
+  table.claims td { padding: 0; }
+  table.claims .c-ref { grid-area: ref; font-weight: 600; }
+  table.claims .c-amount { grid-area: amount; text-align: right; font-weight: 600; }
+  table.claims .c-desc { grid-area: desc; }
+  table.claims .c-sub { grid-area: sub; color: var(--muted); font-size: .9rem; }
+  table.claims .c-date { grid-area: date; color: var(--muted); font-size: .85rem; align-self: center; }
+  table.claims .c-status { grid-area: status; text-align: right; }
+
+  /* Gegevens onder elkaar in plaats van twee smalle kolommen */
+  dl.details { grid-template-columns: 1fr; gap: 0; }
+  dl.details dt { font-size: .85rem; margin-top: .6rem; }
+  dl.details dd { overflow-wrap: anywhere; }
+
+  /* Kleinere voorbeelden, zodat het formulier niet ver weg staat */
+  .attachment iframe.preview { height: 50vh; min-height: 280px; }
+  .attachment img.preview { max-height: 50vh; }
+  form > button.primary { width: 100%; padding: .7rem 1rem; }
+  form.search input { max-width: none; flex: 1; }
+  .row h1 { margin-bottom: .25rem; }
+  .actions button, .actions .button, .task button { width: 100%; }
 }
 .hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
 .attachment { margin: 0 0 1.25rem; }

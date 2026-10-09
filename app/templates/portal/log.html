@@ -21,11 +21,11 @@
     {% for r in rows %}
       {% set kind = r.result.split(':')[0] %}
       <tr>
-        <td>{{ r.at|localtime }}</td>
-        <td>{{ r.sender }}</td>
-        <td>{{ r.subject }}</td>
-        <td class="num">{{ r.attachments }}</td>
-        <td>
+        <td data-label="{{ t('log.when') }}">{{ r.at|localtime }}</td>
+        <td data-label="{{ t('log.sender') }}">{{ r.sender }}</td>
+        <td data-label="{{ t('log.subject') }}">{{ r.subject }}</td>
+        <td class="num" data-label="{{ t('log.attachments') }}">{{ r.attachments }}</td>
+        <td data-label="{{ t('log.result') }}">
           {% if kind == 'created' %}
             {{ t('log.result.created') }}
             {% if r.claim %}<a href="/portal/claims/{{ r.claim.id }}">{{ r.claim.reference }}</a>{% else %}{{ r.result.split(':', 1)[1] }}{% endif %}
@@ -41,12 +41,12 @@
     <tbody>
     {% for r in rows %}
       <tr>
-        <td>{{ r.at|localtime }}</td>
-        <td>{{ r.email }}</td>
-        <td>{{ r.user.name if r.user else '' }}</td>
-        {% if tab == 'failed' %}<td>{{ t('log.reason.' ~ r.reason) }}</td>{% endif %}
-        <td><code>{{ r.ip }}</code></td>
-        <td class="muted" title="{{ r.user_agent }}">{{ r.user_agent|truncate(40) }}</td>
+        <td data-label="{{ t('log.when') }}">{{ r.at|localtime }}</td>
+        <td data-label="{{ t('field.email') }}">{{ r.email }}</td>
+        <td data-label="{{ t('field.name') }}">{{ r.user.name if r.user else '' }}</td>
+        {% if tab == 'failed' %}<td data-label="{{ t('log.reason') }}">{{ t('log.reason.' ~ r.reason) }}</td>{% endif %}
+        <td data-label="{{ t('log.ip') }}"><code>{{ r.ip }}</code></td>
+        <td class="muted" data-label="{{ t('log.browser') }}" title="{{ r.user_agent }}">{{ r.user_agent|truncate(40) }}</td>
       </tr>
     {% endfor %}
     </tbody>
