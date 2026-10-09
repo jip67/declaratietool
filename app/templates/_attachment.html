@@ -1,16 +1,35 @@
-{# Eén bijlage met voorbeeld. Verwacht: name, url, kind ('image', 'pdf' of none) en optioneel stamped_url. #}
+{# Eén bijlage als miniatuur; tik erop om het voorbeeld te openen. Verwacht: name, url, kind ('image', 'pdf' of none) en optioneel stamped_url. #}
 <figure class="attachment">
   {% set preview_url = stamped_url or url %}
-  {% if stamped_url or kind == 'pdf' %}
-    <iframe class="preview pdf" src="{{ preview_url }}#view=FitH" title="{{ name }}" loading="lazy"></iframe>
-  {% elif kind == 'image' %}
-    <a href="{{ url }}" target="_blank"><img class="preview" src="{{ url }}" alt="{{ name }}" loading="lazy"></a>
+  {% set ext = (name.rsplit('.', 1)[-1] if '.' in name else '')|upper|truncate(4, True, '') %}
+  {% if stamped_url or kind in ('pdf', 'image') %}
+  <details class="preview-toggle">
+    <summary class="thumb-row">
+      {% if kind == 'image' and not stamped_url %}
+        <img class="thumb" src="{{ url }}" alt="" loading="lazy">
+      {% else %}
+        <span class="thumb file" aria-hidden="true">{{ ext or 'PDF' }}</span>
+      {% endif %}
+      <span class="thumb-text">
+        <span class="thumb-name">{{ name }}</span>
+        <span class="thumb-hint show">{{ t('preview.show') }}</span>
+        <span class="thumb-hint hide">{{ t('preview.hide') }}</span>
+      </span>
+    </summary>
+    {% if stamped_url or kind == 'pdf' %}
+      <iframe class="preview pdf" src="{{ preview_url }}#view=FitH" title="{{ name }}" loading="lazy"></iframe>
+    {% else %}
+      <a href="{{ url }}" target="_blank"><img class="preview" src="{{ url }}" alt="{{ name }}" loading="lazy"></a>
+    {% endif %}
+  </details>
   {% else %}
-    <p class="muted no-preview">{{ t('preview.unavailable') }}</p>
+  <div class="thumb-row">
+    <span class="thumb file" aria-hidden="true">{{ ext or '?' }}</span>
+    <span class="thumb-text"><span class="thumb-name">{{ name }}</span><span class="thumb-hint muted">{{ t('preview.unavailable') }}</span></span>
+  </div>
   {% endif %}
   <figcaption>
-    <a href="{{ url }}" target="_blank">{{ name }}</a>
+    <a href="{{ url }}" target="_blank">{{ t('preview.open_new') }}</a>
     {% if stamped_url %} · <a href="{{ stamped_url }}" target="_blank">{{ t('portal.stamped') }}</a> <span class="muted">({{ t('preview.showing_stamped') }})</span>{% endif %}
-    · <a href="{{ preview_url }}" target="_blank">{{ t('preview.open_new') }}</a>
   </figcaption>
 </figure>
