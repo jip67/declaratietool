@@ -6,7 +6,7 @@ Start met: python -m app.worker
 import logging
 import time
 
-from . import intake, mailconfig, reminders
+from . import activity, intake, mailconfig, reminders
 from .config import get_settings
 from .db import new_session
 
@@ -30,6 +30,11 @@ def main() -> None:
         except Exception:
             db.rollback()
             log.exception("Herinneringen versturen mislukt")
+        try:
+            activity.purge(db)
+        except Exception:
+            db.rollback()
+            log.exception("Logboek opruimen mislukt")
         finally:
             db.close()
         time.sleep(settings.imap_poll_seconds)

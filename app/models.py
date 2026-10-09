@@ -188,3 +188,38 @@ class KeyValue(Base):
 
     key: Mapped[str] = mapped_column(String(64), primary_key=True)
     value: Mapped[str] = mapped_column(Text, default="")
+
+
+class LoginAttempt(Base):
+    """Logboek voor de beheerder: geslaagde en mislukte inlogpogingen."""
+
+    __tablename__ = "login_attempts"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, index=True)
+    email: Mapped[str] = mapped_column(String(255), default="")
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    success: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
+    # Waarom het mislukte: unknown_user | wrong_password | inactive | locked
+    reason: Mapped[str] = mapped_column(String(32), default="")
+    ip: Mapped[str] = mapped_column(String(64), default="")
+    user_agent: Mapped[str] = mapped_column(String(255), default="")
+
+    user: Mapped[User | None] = relationship()
+
+
+class IncomingMail(Base):
+    """Logboek voor de beheerder: binnengekomen mail en wat ermee gebeurde."""
+
+    __tablename__ = "incoming_mails"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, index=True)
+    sender: Mapped[str] = mapped_column(String(255), default="")
+    subject: Mapped[str] = mapped_column(String(255), default="")
+    attachments: Mapped[int] = mapped_column(Integer, default=0)
+    # Uitkomst zoals intake.process_message die teruggeeft, bijv. created:D-2026-001 of rejected:no_attachment
+    result: Mapped[str] = mapped_column(String(64), default="")
+    claim_id: Mapped[int | None] = mapped_column(ForeignKey("claims.id", ondelete="SET NULL"), nullable=True)
+
+    claim: Mapped[Claim | None] = relationship()

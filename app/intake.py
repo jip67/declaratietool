@@ -8,7 +8,7 @@ from email.utils import parseaddr
 
 from sqlalchemy.orm import Session
 
-from . import mailconfig, mailer, workflow
+from . import activity, mailconfig, mailer, workflow
 from .config import get_settings
 from .i18n import pick_language, translate
 from .storage import guess_type
@@ -45,18 +45,44 @@ def is_automatic(msg: Message) -> bool:
     return auto != "no" or precedence in ("bulk", "junk", "auto_reply") or bool(msg.get("X-Autoreply"))
 
 
+def parse(raw: bytes) -> Message:
+    return email.message_from_bytes(raw, policy=default_policy)
+
+
+def sender_and_subject(msg: Message) -> tuple[str, str]:
+    """Afzender en onderwerp voor het logboek; vangt kapotte kopregels af."""
+    try:
+        sender = str(msg.get("From", "") or "")
+        subject = str(msg.get("Subject", "") or "")
+    except Exception:
+        return "", ""
+    return sender.strip(), " ".join(subject.split())
+
+
 def process_message(db: Session, raw: bytes) -> str:
-    """Verwerkt één mail. Geeft terug wat er gebeurde (voor logging en tests)."""
-    msg = email.message_from_bytes(raw, policy=default_policy)
+    """Verwerkt één mail en legt hem vast in het logboek. Geeft terug wat er gebeurde."""
+    msg = parse(raw)
+    files = extract_files(msg)
+    result, claim = _process(db, msg, files)
+    sender, subject = sender_and_subject(msg)
+    try:
+        activity.record_mail(db, sender, subject, len(files), result, claim)
+    except Exception:
+        # De declaratie is al opgeslagen; een mislukte logregel mag niet tot een dubbele leiden.
+        db.rollback()
+        log.exception("Mail kon niet in het logboek worden gezet")
+    return result
+
+
+def _process(db: Session, msg: Message, files: list[tuple[str, str, bytes]]):
     name, address = parseaddr(msg.get("From", ""))
     address = address.strip().lower()
     settings = get_settings()
     if not address or "@" not in address:
-        return "ignored:no_sender"
+        return "ignored:no_sender", None
     if address == mailconfig.load(db).mail_from.lower() or is_automatic(msg):
-        return "ignored:automatic"
+        return "ignored:automatic", None
 
-    files = extract_files(msg)
     lang = pick_language(accept_language=msg.get("Content-Language"))
     if not files:
         mailer.send(
@@ -66,7 +92,7 @@ def process_message(db: Session, raw: bytes) -> str:
                 body=translate("mail.no_attachment.body", lang, org=settings.organisation_name),
             )
         )
-        return "rejected:no_attachment"
+        return "rejected:no_attachment", None
 
     submitter = workflow.get_or_create_submitter(db, address, name, lang)
     claim = workflow.create_claim(db, submitter, files, source="email")
@@ -76,7 +102,7 @@ def process_message(db: Session, raw: bytes) -> str:
     db.commit()
     workflow.notify_received(claim)
     log.info("Declaratie %s aangemaakt vanuit mail van %s", claim.reference, address)
-    return f"created:{claim.reference}"
+    return f"created:{claim.reference}", claim
 
 
 def poll_mailbox(session_factory) -> int:
@@ -101,8 +127,20 @@ def poll_mailbox(session_factory) -> int:
             except Exception:
                 db.rollback()
                 log.exception("Verwerken van mail %s mislukt", num)
+                _record_failure(db, parts[0][1])
                 # Markeer als ongelezen zodat het later opnieuw geprobeerd wordt.
                 imap.store(num, "-FLAGS", "\\Seen")
             finally:
                 db.close()
     return processed
+
+
+def _record_failure(db: Session, raw: bytes) -> None:
+    """Legt een mislukte mail één keer per dag vast; hij wordt elke ronde opnieuw geprobeerd."""
+    try:
+        sender, subject = sender_and_subject(parse(raw))
+        if not activity.recent_error(db, sender, subject):
+            activity.record_mail(db, sender, subject, 0, "error")
+    except Exception:
+        db.rollback()
+        log.exception("Mail kon niet in het logboek worden gezet")
