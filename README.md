@@ -44,7 +44,7 @@ docker compose exec app python -m app.cli create-user \
 
 Open daarna `https://<jouw-domein>` en log in. Voeg via **Gebruikers** de voorzitter en secretaris toe.
 
-Bijwerken naar de nieuwste versie:
+Bijwerken naar de nieuwste versie kan met de knop **Bijwerken** in het portaal (zie [bijwerken.md](docs/bijwerken.md)), of met de hand:
 
 ```bash
 git pull && docker compose up -d --build
@@ -55,6 +55,7 @@ git pull && docker compose up -d --build
 - [Stappenplan](docs/stappenplan.md): van nul tot werkende tool, inclusief domein en mail
 - [Installeren op een VPS bij OVH](docs/ovh-vps.md): stap voor stap, met installatiescript
 - [Installatie en bijwerken](docs/installatie.md)
+- [Bijwerken via het portaal](docs/bijwerken.md): de knop voor de beheerder en hoe die werkt
 - [Installeren met Portainer](docs/portainer.md) (met je eigen reverse proxy)
 - [Configuratie](docs/configuratie.md): alle instellingen in `.env`
 - [Beveiliging](docs/beveiliging.md): wat de tool zelf doet en hoe je de server dichtzet

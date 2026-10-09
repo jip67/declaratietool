@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}{{ t('nav.update') }}{% endblock %}
+{% block head %}{% if busy %}<meta http-equiv="refresh" content="5">{% endif %}{% endblock %}
+{% macro commit(c) %}{% if c %}<code>{{ c.sha[:7] }}</code> {{ c.subject }} <span class="muted">({{ c.date|localtime }})</span>{% else %}<span class="muted">{{ t('update.unknown') }}</span>{% endif %}{% endmacro %}
+{% block content %}
+<section class="card">
+  <h1>{{ t('nav.update') }}</h1>
+  {% if error %}<p class="error">{{ t('error.' ~ error) }}</p>{% endif %}
+
+  {% if not available %}
+  <p>{{ t('update.not_configured') }}</p>
+  {% else %}
+
+  {% if pending == 'update' or status.state == 'running' %}
+  <p class="task">{{ t('update.running') }}</p>
+  {% elif pending %}
+  <p class="task">{{ t('update.checking') }}</p>
+  {% elif status.state == 'failed' %}
+  <p class="error">{{ t('update.failed') }}</p>
+  {% elif status.state == 'ok' %}
+  <p class="success">{{ t('update.done') }}</p>
+  {% endif %}
+
+  <dl class="details">
+    <dt>{{ t('update.installed') }}</dt><dd>{{ commit(status.current) }}</dd>
+    <dt>{{ t('update.latest') }}</dt><dd>{{ commit(status.latest) }}</dd>
+    <dt>{{ t('update.checked_at') }}</dt><dd>{{ status.updated_at|localtime or t('update.unknown') }}</dd>
+    {% if running_version %}<dt>{{ t('update.running_version') }}</dt><dd><code>{{ running_version[:7] }}</code></dd>{% endif %}
+  </dl>
+  {% if running_version and status.current and not busy and running_version != status.current.sha %}
+  <p class="error">{{ t('update.version_mismatch') }}</p>
+  {% endif %}
+  {% if status.message == 'fetch_failed' %}<p class="error">{{ t('update.fetch_failed') }}</p>{% endif %}
+
+  {% if update_available %}
+  <h2>{{ t('update.new_changes') }}</h2>
+  <ul class="history">
+    {% for c in status.new_commits %}<li><code>{{ c.sha }}</code> {{ c.subject }}</li>{% endfor %}
+  </ul>
+  {% elif status.current and not busy %}
+  <p class="success">{{ t('update.up_to_date') }}</p>
+  {% endif %}
+
+  <div class="actions">
+    <form method="post" action="/portal/update"><input type="hidden" name="action" value="check"><button {% if busy %}disabled{% endif %}>{{ t('update.check_now') }}</button></form>
+    <form method="post" action="/portal/update"><input type="hidden" name="action" value="update"><button class="{% if update_available %}primary{% endif %}" {% if busy %}disabled{% endif %}>{{ t('update.update_now') }}</button></form>
+  </div>
+  <p class="muted">{{ t('update.note') }}</p>
+
+  {% if log %}
+  <details {% if status.state == 'failed' %}open{% endif %}>
+    <summary>{{ t('update.log') }}</summary>
+    <pre class="log">{{ log }}</pre>
+  </details>
+  {% endif %}
+  {% endif %}
+</section>
+{% endblock %}

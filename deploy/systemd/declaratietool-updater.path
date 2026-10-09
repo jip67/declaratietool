@@ -1,0 +1,10 @@
+# Start de updater zodra de app een verzoek neerlegt.
+[Unit]
+Description=Wacht op een verzoek uit het portaal om de declaratietool bij te werken
+
+[Path]
+PathExists=/opt/declaratietool/update/requests/request
+Unit=declaratietool-updater.service
+
+[Install]
+WantedBy=multi-user.target

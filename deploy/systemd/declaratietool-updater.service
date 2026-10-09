@@ -1,0 +1,11 @@
+# Voert een verzoek uit de knop "Bijwerken" in het portaal uit (zie docs/bijwerken.md).
+# install-vps.sh zet dit bestand in /etc/systemd/system met het juiste pad.
+[Unit]
+Description=Declaratietool bijwerken of controleren op een nieuwe versie
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/declaratietool/deploy/updater.sh
+TimeoutStartSec=30min

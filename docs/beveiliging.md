@@ -17,7 +17,8 @@
   opgeslagen en de browser mag ze niet als webpagina uitvoeren (`nosniff`, Content-Security-Policy).
 - **Pagina's** worden geëscaped (geen ingevoegde scripts) en mogen niet op andere sites ingebed worden.
 - **Uploadformulier** heeft een limiet per IP-adres en een onzichtbaar veld tegen spambots.
-- **De app draait niet als root** in de container.
+- **De app draait niet als root** in de container en heeft geen toegang tot Docker. De knop Bijwerken
+  legt alleen een verzoek neer voor een aparte updater op de server (zie [bijwerken.md](bijwerken.md)).
 - **Updates**: Dependabot stelt een pull request voor zodra er een beveiligingsupdate van een pakket is.
 
 ## De server dichtzetten
@@ -70,7 +71,7 @@ docker compose ps                # in /opt/declaratietool: db en app zonder publ
 ## Bijhouden
 
 - Bijwerken naar de nieuwste versie (ook voor beveiligingsupdates van de tool):
-  `cd /opt/declaratietool && git pull && docker compose up -d --build --pull always`
+  de knop **Bijwerken** in het portaal, of `sudo /opt/declaratietool/deploy/updater.sh update`
 - Gebruik voor de accounts in de tool lange wachtwoorden (minstens 10 tekens, liever een zin).
 - Maak een back-up van de database en bijlagen, zodat je bij een probleem terug kunt.
   Zie [installatie.md](installatie.md).

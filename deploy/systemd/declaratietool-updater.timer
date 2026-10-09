@@ -1,0 +1,12 @@
+# Kijkt elk uur of er een nieuwe versie op GitHub staat (er wordt niets bijgewerkt).
+[Unit]
+Description=Elk uur controleren op een nieuwe versie van de declaratietool
+
+[Timer]
+OnBootSec=2min
+OnCalendar=hourly
+RandomizedDelaySec=5min
+Unit=declaratietool-updater.service
+
+[Install]
+WantedBy=timers.target

@@ -84,6 +84,8 @@ Laat je het mailwachtwoord leeg, dan draait de tool zonder mail. De links voor i
 
 ## Bijwerken
 
+Het makkelijkst via **Bijwerken** in het portaal (zie [bijwerken.md](bijwerken.md)). Of op de server:
+
 ```bash
 cd /opt/declaratietool
 git pull
