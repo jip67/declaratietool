@@ -148,5 +148,15 @@
   "update.note": "De server kijkt elk uur zelf of er een nieuwe versie is. Bijwerken gebeurt alleen als je op de knop drukt.",
   "update.log": "Logboek van de laatste update",
   "error.update.not_configured": "Bijwerken via het portaal is op deze server niet ingesteld.",
-  "error.update.busy": "Er loopt al een controle of update. Wacht tot die klaar is."
+  "error.update.busy": "Er loopt al een controle of update. Wacht tot die klaar is.",
+  "users.edit": "Gebruiker bewerken",
+  "users.yes": "Ja",
+  "users.no": "Nee",
+  "action.edit": "Bewerken",
+  "action.delete_user": "Gebruiker verwijderen",
+  "users.self_note": "Je eigen account blijft actief en houdt de rol Beheerder, zodat je jezelf niet kunt buitensluiten.",
+  "users.delete_plain": "Dit account wordt definitief verwijderd.",
+  "users.delete_history": "Deze gebruiker komt voor in de geschiedenis van declaraties. Het account wordt daarom niet gewist maar uitgeschakeld en geanonimiseerd, zodat het logboek klopt.",
+  "users.delete_confirm": "Ja, verwijderen",
+  "error.delete_self": "Je kunt je eigen account niet verwijderen."
 }

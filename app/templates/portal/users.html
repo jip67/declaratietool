@@ -5,21 +5,19 @@
   <h1>{{ t('nav.users') }}</h1>
   {% if error %}<p class="error">{{ t(error) }}</p>{% endif %}
   <table class="list">
-    <thead><tr><th>{{ t('field.name') }}</th><th>{{ t('field.email') }}</th><th>{{ t('field.roles') }}</th><th>{{ t('field.active') }}</th><th>{{ t('field.new_password') }}</th><th></th></tr></thead>
+    <thead><tr><th>{{ t('field.name') }}</th><th>{{ t('field.email') }}</th><th>{{ t('field.roles') }}</th><th>{{ t('field.active') }}</th><th></th></tr></thead>
     <tbody>
     {% for u in users %}
       <tr>
         <td>{{ u.name }}</td>
         <td>{{ u.email }}</td>
-        <td>{% for r in Role %}<label class="check"><input type="checkbox" form="user-{{ u.id }}" name="roles" value="{{ r.value }}" {% if u.has_role(r) %}checked{% endif %}> {{ t('role.' ~ r.value) }}</label>{% endfor %}</td>
-        <td><input form="user-{{ u.id }}" type="checkbox" name="active" value="true" {% if u.active %}checked{% endif %}></td>
-        <td><input form="user-{{ u.id }}" type="password" name="password" minlength="10" autocomplete="new-password"></td>
-        <td><button form="user-{{ u.id }}">{{ t('action.save') }}</button></td>
+        <td>{% for r in u.role_list %}{{ t('role.' ~ r.value) }}{% if not loop.last %}, {% endif %}{% endfor %}</td>
+        <td>{{ t('users.yes') if u.active else t('users.no') }}</td>
+        <td><a class="button" href="/portal/users/{{ u.id }}">{{ t('action.edit') }}</a></td>
       </tr>
     {% endfor %}
     </tbody>
   </table>
-  {% for u in users %}<form id="user-{{ u.id }}" method="post" action="/portal/users/{{ u.id }}"></form>{% endfor %}
 
   <h2>{{ t('users.add') }}</h2>
   <form method="post" action="/portal/users" class="grid">

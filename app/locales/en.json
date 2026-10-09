@@ -148,5 +148,15 @@
   "update.note": "The server checks for a new version every hour. It only updates when you press the button.",
   "update.log": "Log of the last update",
   "error.update.not_configured": "Updating from the portal is not set up on this server.",
-  "error.update.busy": "A check or update is already running. Wait until it has finished."
+  "error.update.busy": "A check or update is already running. Wait until it has finished.",
+  "users.edit": "Edit user",
+  "users.yes": "Yes",
+  "users.no": "No",
+  "action.edit": "Edit",
+  "action.delete_user": "Delete user",
+  "users.self_note": "Your own account stays active and keeps the Administrator role, so you cannot lock yourself out.",
+  "users.delete_plain": "This account will be deleted permanently.",
+  "users.delete_history": "This user appears in the history of claims. The account is therefore not erased but disabled and anonymised, so the log stays correct.",
+  "users.delete_confirm": "Yes, delete",
+  "error.delete_self": "You cannot delete your own account."
 }
