@@ -9,7 +9,7 @@ from .. import storage, workflow
 from ..config import get_settings
 from ..db import get_db
 from ..i18n import available_languages
-from ..models import OPEN_STATUSES, ROLE_FOR_STATUS, Attachment, Claim, Role, Status, User
+from ..models import OPEN_STATUSES, ROLE_FOR_STATUS, Attachment, Claim, Role, Status, Submitter, User
 from ..security import hash_password
 from ..web import current_user, file_response, render, require_admin
 from .public import validate_details
@@ -17,9 +17,14 @@ from .public import validate_details
 router = APIRouter(prefix="/portal")
 
 
-def _claim(db: Session, claim_id: int) -> Claim:
+def can_see(claim: Claim, user: User) -> bool:
+    """Medewerkers zien alles; een gebruiker alleen zijn eigen declaraties."""
+    return user.is_staff or claim.submitter.email == user.email
+
+
+def _claim(db: Session, claim_id: int, user: User) -> Claim:
     claim = db.get(Claim, claim_id)
-    if claim is None:
+    if claim is None or not can_see(claim, user):
         raise HTTPException(status_code=404)
     return claim
 
@@ -32,6 +37,12 @@ def is_my_task(claim: Claim, user: User) -> bool:
 @router.get("")
 def dashboard(request: Request, view: str = "open", user: User = Depends(current_user), db: Session = Depends(get_db)):
     query = select(Claim).order_by(Claim.created_at.desc())
+    if not user.is_staff:
+        claims = db.scalars(query.join(Claim.submitter).where(Submitter.email == user.email).limit(500)).all()
+        return render(
+            request, "portal/dashboard.html", user.language,
+            user=user, claims=claims, view="all", my_count=0, is_my_task=is_my_task,
+        )
     if view == "open":
         query = query.where(Claim.status.in_([s.value for s in OPEN_STATUSES]))
     elif view in {s.value for s in Status}:
@@ -64,6 +75,9 @@ async def new_claim(
     user: User = Depends(current_user),
     db: Session = Depends(get_db),
 ):
+    if not user.is_staff:
+        # Een gebruiker dient altijd voor zichzelf in.
+        email, name = user.email, user.name
     form = {"email": email, "name": name, "iban": iban, "account_holder": account_holder,
             "description": description, "amount": amount}
     errors = {}
@@ -106,7 +120,7 @@ async def new_claim(
 
 @router.get("/claims/{claim_id}")
 def claim_detail(claim_id: int, request: Request, user: User = Depends(current_user), db: Session = Depends(get_db)):
-    claim = _claim(db, claim_id)
+    claim = _claim(db, claim_id, user)
     return render(
         request, "portal/claim.html", user.language,
         user=user, claim=claim, my_task=is_my_task(claim, user),
@@ -129,7 +143,9 @@ def claim_action(
     user: User = Depends(current_user),
     db: Session = Depends(get_db),
 ):
-    claim = _claim(db, claim_id)
+    if not user.is_staff:
+        raise HTTPException(status_code=403)
+    claim = _claim(db, claim_id, user)
     try:
         if action == "reject":
             if not reason.strip():
@@ -149,7 +165,7 @@ def claim_action(
 @router.get("/files/{attachment_id}")
 def portal_file(attachment_id: int, stamped: bool = False, user: User = Depends(current_user), db: Session = Depends(get_db)):
     att = db.get(Attachment, attachment_id)
-    if att is None:
+    if att is None or not can_see(att.claim, user):
         raise HTTPException(status_code=404)
     if stamped and att.stamped_path:
         name = att.original_filename.rsplit(".", 1)[0] + "-paraaf.pdf"

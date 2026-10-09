@@ -23,10 +23,9 @@ def env(tmp_path, monkeypatch):
     reset_engine()
     Base.metadata.create_all(get_engine())
     mailer.outbox.clear()
-    from app.routes import auth, public
+    from app.routes import auth
 
     auth._failures.clear()
-    public._uploads.clear()
     yield
     reset_engine()
     get_settings.cache_clear()

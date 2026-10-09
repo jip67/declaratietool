@@ -1,0 +1,16 @@
+# Stelt automatisch een pull request voor als er een (beveiligings)update is
+# van een Python-pakket, het Docker-basisimage of een GitHub Action.
+version: 2
+updates:
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

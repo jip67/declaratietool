@@ -8,6 +8,7 @@
 # Het script:
 #   - werkt het systeem bij en zet automatische beveiligingsupdates aan
 #   - zet een firewall aan (alleen SSH, http en https open)
+#   - installeert fail2ban, dat IP-adressen blokkeert die SSH-wachtwoorden proberen te raden
 #   - installeert Docker
 #   - haalt de code op naar /opt/declaratietool
 #   - maakt een .env met veilige willekeurige wachtwoorden en vraagt je domein en mailgegevens
@@ -49,7 +50,7 @@ say "Systeem bijwerken"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -q
 apt-get upgrade -y -q
-apt-get install -y -q ca-certificates curl git ufw unattended-upgrades openssl
+apt-get install -y -q ca-certificates curl git ufw unattended-upgrades openssl fail2ban python3-systemd
 dpkg-reconfigure -f noninteractive unattended-upgrades
 
 say "Firewall instellen (SSH, http, https)"
@@ -58,6 +59,18 @@ ufw allow 80/tcp >/dev/null
 ufw allow 443/tcp >/dev/null
 ufw --force enable >/dev/null
 ufw status | sed 's/^/    /'
+
+say "fail2ban instellen (blokkeert wachtwoord-raders op SSH)"
+cat >/etc/fail2ban/jail.d/declaratietool.local <<'JAIL'
+[sshd]
+enabled  = true
+backend  = systemd
+maxretry = 5
+findtime = 10m
+bantime  = 1h
+JAIL
+systemctl enable fail2ban >/dev/null
+systemctl restart fail2ban
 
 if ! command -v docker >/dev/null; then
   say "Docker installeren"
@@ -162,4 +175,7 @@ Handige opdrachten (in $INSTALL_DIR):
   nano .env && docker compose up -d          instellingen wijzigen
 
 Log één keer uit en weer in, dan kun je docker zonder sudo gebruiken.
+
+Beveiliging: log bij voorkeur in met een SSH-sleutel in plaats van een wachtwoord.
+Zie docs/beveiliging.md voor de stappen.
 EOF

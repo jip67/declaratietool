@@ -16,16 +16,18 @@ from ..web import current_user, render, request_language
 
 router = APIRouter()
 
-# Eenvoudige bescherming tegen wachtwoorden raden: na 5 mislukte pogingen 15 minuten wachten.
+# Eenvoudige bescherming tegen wachtwoorden raden: na 5 mislukte pogingen op een account,
+# of 20 vanaf één IP-adres (meerdere accounts proberen), 15 minuten wachten.
 MAX_ATTEMPTS = 5
+MAX_ATTEMPTS_PER_IP = 20
 LOCKOUT = timedelta(minutes=15)
 _failures: dict[str, list[datetime]] = defaultdict(list)
 
 
-def _locked(key: str) -> bool:
+def _locked(key: str, limit: int = MAX_ATTEMPTS) -> bool:
     cutoff = datetime.now(UTC) - LOCKOUT
     _failures[key] = [t for t in _failures[key] if t > cutoff]
-    return len(_failures[key]) >= MAX_ATTEMPTS
+    return len(_failures[key]) >= limit
 
 
 def _safe_next(target: str | None) -> str:
@@ -48,7 +50,8 @@ def login(
     db: Session = Depends(get_db),
 ):
     key = email.strip().lower()
-    if _locked(key):
+    ip_key = "ip:" + (request.client.host if request.client else "?")
+    if _locked(key) or _locked(ip_key, MAX_ATTEMPTS_PER_IP):
         return render(
             request, "login.html", request_language(request), status_code=429,
             next=_safe_next(next), error="error.login_locked",
@@ -56,6 +59,7 @@ def login(
     user = db.scalar(select(User).where(User.email == key))
     if user is None or not user.active or not verify_password(password, user.password_hash):
         _failures[key].append(datetime.now(UTC))
+        _failures[ip_key].append(datetime.now(UTC))
         return render(
             request, "login.html", request_language(request), status_code=401,
             next=_safe_next(next), error="error.login",

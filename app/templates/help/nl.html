@@ -2,7 +2,7 @@
 <h2 id="indiener">Een declaratie indienen</h2>
 <ol>
   <li>Maak een foto of pdf van je bon of factuur.</li>
-  <li>{% if mailbox %}Mail de bon naar <a href="mailto:{{ mailbox }}">{{ mailbox }}</a>, of upload hem{% else %}Upload de bon{% endif %} via <a href="/indienen">Declaratie indienen</a>. Meerdere bonnen in één mail of upload worden één declaratie.</li>
+  <li>{% if mailbox %}Mail de bon naar <a href="mailto:{{ mailbox }}">{{ mailbox }}</a>, of{% else %}Log in en{% endif %} voeg hem in het portaal toe via <a href="/portal/claims/new">Nieuwe declaratie</a>. Meerdere bonnen in één mail worden één declaratie.</li>
   <li>Je krijgt een bevestiging per mail met een persoonlijke link.</li>
   <li>Vul via die link het bedrag, een omschrijving, je IBAN en de tenaamstelling in. Laat "onthouden" aangevinkt, dan staan je rekeninggegevens er de volgende keer al (je kunt ze altijd aanpassen).</li>
   <li>Bij elke stap krijg je een mail: goedgekeurd, betaling klaargezet, betaald, of afgewezen met de reden. Via dezelfde link zie je altijd de status.</li>
@@ -42,6 +42,7 @@
 <h2 id="beheer">Beheer</h2>
 <ul>
   <li>Met de rol Beheerder zie je de pagina <strong>Gebruikers</strong>. Daar voeg je mensen toe, geef je rollen, zet je accounts uit en stel je een nieuw wachtwoord in.</li>
+  <li>Geef leden die zelf declaraties willen indienen de rol <strong>Gebruiker</strong>. Zij kunnen inloggen, een declaratie aanmaken en zien alleen hun eigen declaraties.</li>
   <li>Bij een bestuurswissel maak je een account voor de nieuwe bestuurder en zet je het oude uit. De geschiedenis blijft bewaard.</li>
   <li>Iedereen kan onder zijn eigen naam (rechtsboven) zijn taal en wachtwoord wijzigen.</li>
 </ul>

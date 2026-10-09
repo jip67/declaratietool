@@ -2,7 +2,7 @@
 
 ## Indiener
 
-1. Mail een foto of pdf van de bon naar het declaratie-adres, **of** upload hem op de website (`https://<jouw-domein>/indienen`). Uploaden werkt ook als er (nog) geen mailbox voor binnenkomende mail is ingesteld. Meerdere bonnen in één mail worden één declaratie. Het onderwerp van de mail wordt alvast als omschrijving ingevuld.
+1. Mail een foto of pdf van de bon naar het declaratie-adres. Heb je een account met de rol **Gebruiker**, dan kun je ook inloggen en de bon toevoegen via **Nieuwe declaratie**. Meerdere bonnen in één mail worden één declaratie. Het onderwerp van de mail wordt alvast als omschrijving ingevuld.
 2. Je krijgt een bevestiging met een persoonlijke link.
 3. Vul via die link het bedrag, de omschrijving, je IBAN en de tenaamstelling in. Vink "onthouden" aan, dan staan je rekeninggegevens er de volgende keer al.
 4. Je krijgt een mail bij elke stap: goedgekeurd, betaling klaargezet, betaald (of afgewezen, met reden). Via dezelfde link kun je altijd de status bekijken.
@@ -42,7 +42,7 @@ Elke ochtend (instelbaar) krijgt iedereen met openstaande taken één mail met e
 
 ## Beheer
 
-Gebruikers met de rol **Beheerder** zien de pagina **Gebruikers**. Daar voeg je mensen toe, wijs je rollen toe, zet je accounts uit en stel je een nieuw wachtwoord in. Iedereen kan onder zijn eigen naam (rechtsboven) zijn taal en wachtwoord wijzigen.
+Gebruikers met de rol **Beheerder** zien de pagina **Gebruikers**. Daar voeg je mensen toe, wijs je rollen toe, zet je accounts uit en stel je een nieuw wachtwoord in. Geef leden die zelf declaraties willen indienen de rol **Gebruiker**: zij kunnen inloggen, een declaratie aanmaken en alleen hun eigen declaraties en de status daarvan zien. Iedereen kan onder zijn eigen naam (rechtsboven) zijn taal en wachtwoord wijzigen.
 
 Bij een bestuurswissel: maak een account voor de nieuwe bestuurder met de juiste rol en zet het oude account uit. De geschiedenis van eerdere declaraties blijft bewaard.
 
