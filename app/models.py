@@ -130,6 +130,9 @@ class Claim(Base):
     events: Mapped[list["Event"]] = relationship(
         back_populates="claim", cascade="all, delete-orphan", order_by="Event.id"
     )
+    comments: Mapped[list["Comment"]] = relationship(
+        back_populates="claim", cascade="all, delete-orphan", order_by="Comment.id"
+    )
     approved_by: Mapped[User | None] = relationship(foreign_keys=[approved_by_id])
 
     @property
@@ -178,6 +181,21 @@ class Event(Base):
     note: Mapped[str] = mapped_column(Text, default="")
 
     claim: Mapped[Claim] = relationship(back_populates="events")
+    user: Mapped[User | None] = relationship()
+
+
+class Comment(Base):
+    """Interne opmerking van een bestuurslid. Nooit zichtbaar voor de indiener of een gewone gebruiker."""
+
+    __tablename__ = "comments"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    claim_id: Mapped[int] = mapped_column(ForeignKey("claims.id", ondelete="CASCADE"), index=True)
+    at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    text: Mapped[str] = mapped_column(Text, default="")
+
+    claim: Mapped[Claim] = relationship(back_populates="comments")
     user: Mapped[User | None] = relationship()
 
 

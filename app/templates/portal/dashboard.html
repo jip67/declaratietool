@@ -7,6 +7,7 @@
     {# Op desktop staat deze knop al in de zijbalk; op mobiel zit het menu achter de menuknop. #}
     <a class="button primary page-new" href="/portal/claims/new">{{ t('nav.new_claim') }}</a>
   </div>
+  {% if request.query_params.get('deleted') == '1' %}<p class="success">{{ t('claim.deleted') }}</p>{% endif %}
   {% if user.is_staff %}
   <nav class="tabs">
     <a href="?view=open" {% if view == 'open' %}class="active"{% endif %}>{{ t('view.open') }}</a>

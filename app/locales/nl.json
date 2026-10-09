@@ -227,5 +227,22 @@
   "log.retention_off": "Regels worden niet automatisch verwijderd.",
   "nav.settings": "Instellingen",
   "nav.menu": "Menu",
-  "users.read_only": "Alleen een beheerder kan gebruikers toevoegen of wijzigen."
+  "users.read_only": "Alleen een beheerder kan gebruikers toevoegen of wijzigen.",
+  "claim.edit": "Declaratie bewerken",
+  "claim.edit_intro": "Als beheerder kun je de gegevens altijd aanpassen, ook na goedkeuring. De status verandert niet en er gaat geen mail naar de indiener. De wijziging komt in de geschiedenis.",
+  "claim.delete": "Declaratie wissen",
+  "claim.delete_warning": "De declaratie wordt definitief gewist, met alle bijlagen, de geschiedenis en de interne opmerkingen. Dit kan niet ongedaan worden gemaakt.",
+  "claim.delete_check": "Ja, ik weet zeker dat ik deze declaratie wil wissen",
+  "claim.delete_confirm": "Definitief wissen",
+  "claim.deleted": "De declaratie is gewist.",
+  "event.edited": "Gegevens aangepast door beheerder",
+  "comments.title": "Interne opmerkingen",
+  "comments.badge": "intern, niet zichtbaar voor indiener",
+  "comments.hint": "Alleen voorzitter, boekhouder, secretaris en beheerder zien deze opmerkingen. Ze staan niet op de pagina van de indiener en niet in mails.",
+  "comments.empty": "Nog geen opmerkingen.",
+  "comments.new": "Nieuwe opmerking",
+  "comments.add": "Opmerking toevoegen",
+  "comments.unknown_user": "onbekend",
+  "error.comment_required": "Vul een opmerking in.",
+  "error.delete_confirm": "Vink eerst aan dat je de declaratie echt wilt wissen."
 }

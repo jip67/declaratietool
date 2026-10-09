@@ -1,10 +1,11 @@
 """Portaal voor voorzitter, boekhouder, secretaris en beheerder."""
 
 import secrets
+import shutil
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import RedirectResponse
-from sqlalchemy import func, or_, select
+from sqlalchemy import func, or_, select, update
 from sqlalchemy.orm import Session
 
 from .. import mailconfig, storage, updates, workflow
@@ -12,9 +13,9 @@ from ..config import get_settings
 from ..db import get_db
 from ..i18n import available_languages
 from ..models import (
-    OPEN_STATUSES, Attachment, Claim, Event, IncomingMail, LoginAttempt, Role, Status, Submitter, User,
+    OPEN_STATUSES, Attachment, Claim, Comment, Event, IncomingMail, LoginAttempt, Role, Status, Submitter, User,
 )
-from ..security import hash_password
+from ..security import hash_password, is_valid_iban, normalize_iban, parse_amount
 from ..web import current_user, file_response, is_my_task, my_task_count, render, require_admin, require_staff
 from .public import validate_details
 
@@ -161,6 +162,122 @@ def claim_action(
     return RedirectResponse(f"/portal/claims/{claim_id}", status_code=303)
 
 
+# ---------------------------------------------------------------- interne opmerkingen
+
+COMMENT_MAX = 5000
+
+
+@router.post("/claims/{claim_id}/comments")
+def add_comment(
+    claim_id: int,
+    text: str = Form(""),
+    user: User = Depends(require_staff),
+    db: Session = Depends(get_db),
+):
+    """Interne opmerking van een bestuurslid; de indiener ziet deze nooit."""
+    claim = _claim(db, claim_id, user)
+    text = text.strip()[:COMMENT_MAX]
+    if not text:
+        return RedirectResponse(f"/portal/claims/{claim_id}?error=comment_required#comments", status_code=303)
+    db.add(Comment(claim=claim, user=user, text=text))
+    db.commit()
+    return RedirectResponse(f"/portal/claims/{claim_id}#comments", status_code=303)
+
+
+# ---------------------------------------------------------------- bewerken en wissen (beheerder)
+
+
+def _claim_form(claim: Claim) -> dict:
+    return {
+        "name": claim.submitter.name,
+        "description": claim.description,
+        "amount": f"{claim.amount_cents / 100:.2f}".replace(".", ",") if claim.amount_cents is not None else "",
+        "iban": claim.iban,
+        "account_holder": claim.account_holder,
+    }
+
+
+def _render_claim_edit(request: Request, user: User, claim: Claim, form: dict, errors: dict, status_code: int = 200):
+    return render(
+        request, "portal/claim_edit.html", user.language, status_code=status_code,
+        user=user, claim=claim, form=form, errors=errors,
+    )
+
+
+@router.get("/claims/{claim_id}/edit")
+def edit_claim_page(claim_id: int, request: Request, user: User = Depends(require_admin), db: Session = Depends(get_db)):
+    claim = _claim(db, claim_id, user)
+    return _render_claim_edit(request, user, claim, _claim_form(claim), {})
+
+
+@router.post("/claims/{claim_id}/edit")
+def edit_claim(
+    claim_id: int,
+    request: Request,
+    name: str = Form(""),
+    description: str = Form(""),
+    amount: str = Form(""),
+    iban: str = Form(""),
+    account_holder: str = Form(""),
+    user: User = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    """De beheerder past de gegevens van een declaratie aan, in elke status. De status verandert niet."""
+    claim = _claim(db, claim_id, user)
+    form = {"name": name, "description": description, "amount": amount, "iban": iban, "account_holder": account_holder}
+    if claim.status_enum == Status.RECEIVED:
+        # Nog niet compleet ingediend: lege velden mogen, ingevulde velden moeten kloppen.
+        errors = {}
+        if iban.strip() and not is_valid_iban(iban):
+            errors["iban"] = "error.iban"
+        cents = parse_amount(amount) if amount.strip() else None
+        if amount.strip() and cents is None:
+            errors["amount"] = "error.amount"
+    else:
+        errors, cents = validate_details(iban, account_holder, description, amount)
+    if errors:
+        return _render_claim_edit(request, user, claim, form, errors, status_code=422)
+    if name.strip():
+        claim.submitter.name = name.strip()
+    claim.description = description.strip()
+    claim.amount_cents = cents
+    claim.iban = normalize_iban(iban) if iban.strip() else ""
+    claim.account_holder = account_holder.strip()
+    workflow.log_event(db, claim, "edited", user)
+    db.commit()
+    return RedirectResponse(f"/portal/claims/{claim_id}", status_code=303)
+
+
+@router.post("/claims/{claim_id}/delete")
+def delete_claim(
+    claim_id: int,
+    confirm: str = Form(""),
+    user: User = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    """Wis een declaratie definitief, inclusief bijlagen, geschiedenis en interne opmerkingen."""
+    claim = _claim(db, claim_id, user)
+    if confirm != "yes":
+        return RedirectResponse(f"/portal/claims/{claim_id}?error=delete_confirm#delete", status_code=303)
+    paths = []
+    for att in claim.attachments:
+        for rel in (att.stored_path, att.stamped_path):
+            if rel:
+                try:
+                    paths.append(storage.absolute(rel))
+                except ValueError:
+                    pass
+    folder = storage.upload_root() / str(claim.id)
+    db.execute(update(IncomingMail).where(IncomingMail.claim_id == claim.id).values(claim_id=None))
+    db.delete(claim)
+    db.commit()
+    # Bestanden pas weghalen als de database-wijziging gelukt is.
+    for path in paths:
+        path.unlink(missing_ok=True)
+    shutil.rmtree(folder, ignore_errors=True)
+    return RedirectResponse("/portal?deleted=1", status_code=303)
+
+
 @router.get("/files/{attachment_id}")
 def portal_file(attachment_id: int, stamped: bool = False, user: User = Depends(current_user), db: Session = Depends(get_db)):
     att = db.get(Attachment, attachment_id)
@@ -246,6 +363,8 @@ def has_history(db: Session, target: User) -> bool:
     """Komt deze gebruiker voor in een declaratie of het logboek? Dan niet echt verwijderen."""
     fields = (Claim.created_by_id, Claim.approved_by_id, Claim.prepared_by_id, Claim.paid_by_id, Claim.rejected_by_id)
     if db.scalar(select(Claim.id).where(or_(*(f == target.id for f in fields))).limit(1)):
+        return True
+    if db.scalar(select(Comment.id).where(Comment.user_id == target.id).limit(1)):
         return True
     return db.scalar(select(Event.id).where(Event.user_id == target.id).limit(1)) is not None
 
