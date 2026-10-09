@@ -12,10 +12,10 @@ from ..config import get_settings
 from ..db import get_db
 from ..i18n import available_languages
 from ..models import (
-    OPEN_STATUSES, ROLE_FOR_STATUS, Attachment, Claim, Event, IncomingMail, LoginAttempt, Role, Status, Submitter, User,
+    OPEN_STATUSES, Attachment, Claim, Event, IncomingMail, LoginAttempt, Role, Status, Submitter, User,
 )
 from ..security import hash_password
-from ..web import current_user, file_response, render, require_admin, require_staff
+from ..web import current_user, file_response, is_my_task, my_task_count, render, require_admin, require_staff
 from .public import validate_details
 
 router = APIRouter(prefix="/portal")
@@ -31,11 +31,6 @@ def _claim(db: Session, claim_id: int, user: User) -> Claim:
     if claim is None or not can_see(claim, user):
         raise HTTPException(status_code=404)
     return claim
-
-
-def is_my_task(claim: Claim, user: User) -> bool:
-    role = ROLE_FOR_STATUS.get(claim.status_enum)
-    return role is not None and user.has_role(role)
 
 
 @router.get("")
@@ -54,7 +49,7 @@ def dashboard(request: Request, view: str = "open", user: User = Depends(current
     claims = db.scalars(query.limit(500)).all()
     if view == "mine":
         claims = [c for c in claims if is_my_task(c, user)]
-    my_count = sum(1 for c in db.scalars(select(Claim).where(Claim.status.in_([s.value for s in ROLE_FOR_STATUS]))) if is_my_task(c, user))
+    my_count = my_task_count(db, user)
     return render(
         request, "portal/dashboard.html", user.language,
         user=user, claims=claims, view=view, my_count=my_count, is_my_task=is_my_task,
