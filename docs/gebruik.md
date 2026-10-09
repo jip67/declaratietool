@@ -44,6 +44,14 @@ Elke ochtend (instelbaar) krijgt iedereen met openstaande taken één mail met e
 
 Gebruikers met de rol **Beheerder** zien de pagina **Gebruikers**. Daar voeg je mensen toe. Met **Bewerken** pas je naam, e-mailadres, taal en rollen aan, zet je een account uit of stel je een nieuw wachtwoord in. Onderaan die pagina kun je een gebruiker **verwijderen**. Komt iemand al voor in de geschiedenis van een declaratie (bijvoorbeeld omdat hij iets heeft goedgekeurd), dan wordt het account niet gewist maar uitgeschakeld en geanonimiseerd, zodat het logboek blijft kloppen. Je eigen account kun je niet verwijderen of uitzetten, en je houdt altijd de rol Beheerder. Geef leden die zelf declaraties willen indienen de rol **Gebruiker**: zij kunnen inloggen, een declaratie aanmaken en alleen hun eigen declaraties en de status daarvan zien. Iedereen kan onder zijn eigen naam (rechtsboven) zijn taal en wachtwoord wijzigen.
 
+Onder **Logboek** (alleen voor beheerders) staan drie tabbladen:
+
+- **Inlogs**: wie wanneer heeft ingelogd, vanaf welk IP-adres en met welke browser.
+- **Mislukte inlogpogingen**: met de reden (onbekend e-mailadres, verkeerd wachtwoord, account staat uit of tijdelijk geblokkeerd na te veel pogingen). Veel pogingen vanaf één onbekend IP-adres wijzen op iemand die wachtwoorden probeert te raden.
+- **Binnengekomen mail**: afzender, onderwerp, aantal bijlagen en wat de tool ermee deed (declaratie aangemaakt, geweigerd omdat er geen bijlage was, genegeerd als automatisch bericht, of mislukt).
+
+Je kunt zoeken op e-mailadres, IP-adres, afzender of onderwerp. Regels ouder dan `LOG_RETENTION_DAYS` (standaard 90 dagen) worden automatisch verwijderd.
+
 Bij een bestuurswissel: maak een account voor de nieuwe bestuurder met de juiste rol en zet het oude account uit. De geschiedenis van eerdere declaraties blijft bewaard.
 
 ## Hulp

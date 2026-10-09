@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}{{ t('nav.log') }}{% endblock %}
+{% macro link(p) %}?tab={{ tab }}&amp;q={{ q|urlencode }}&amp;page={{ p }}{% endmacro %}
+{% block content %}
+<section class="card wide">
+  <h1>{{ t('nav.log') }}</h1>
+  <nav class="tabs">
+    {% for name in tabs %}<a href="?tab={{ name }}" {% if tab == name %}class="active"{% endif %}>{{ t('log.tab.' ~ name) }}</a>{% endfor %}
+  </nav>
+  <form method="get" action="/portal/log" class="search">
+    <input type="hidden" name="tab" value="{{ tab }}">
+    <input type="search" name="q" value="{{ q }}" placeholder="{{ t('log.search_' ~ ('mails' if tab == 'mails' else 'logins')) }}" aria-label="{{ t('log.search') }}">
+    <button>{{ t('log.search') }}</button>
+  </form>
+
+  {% if rows %}
+  <table class="list">
+    {% if tab == 'mails' %}
+    <thead><tr><th>{{ t('log.when') }}</th><th>{{ t('log.sender') }}</th><th>{{ t('log.subject') }}</th><th class="num">{{ t('log.attachments') }}</th><th>{{ t('log.result') }}</th></tr></thead>
+    <tbody>
+    {% for r in rows %}
+      {% set kind = r.result.split(':')[0] %}
+      <tr>
+        <td>{{ r.at|localtime }}</td>
+        <td>{{ r.sender }}</td>
+        <td>{{ r.subject }}</td>
+        <td class="num">{{ r.attachments }}</td>
+        <td>
+          {% if kind == 'created' %}
+            {{ t('log.result.created') }}
+            {% if r.claim %}<a href="/portal/claims/{{ r.claim.id }}">{{ r.claim.reference }}</a>{% else %}{{ r.result.split(':', 1)[1] }}{% endif %}
+          {% else %}
+            <span class="{% if kind == 'error' %}error-text{% else %}muted{% endif %}">{{ t('log.result.' ~ r.result|replace(':', '_')) }}</span>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+    {% else %}
+    <thead><tr><th>{{ t('log.when') }}</th><th>{{ t('field.email') }}</th><th>{{ t('field.name') }}</th>{% if tab == 'failed' %}<th>{{ t('log.reason') }}</th>{% endif %}<th>{{ t('log.ip') }}</th><th>{{ t('log.browser') }}</th></tr></thead>
+    <tbody>
+    {% for r in rows %}
+      <tr>
+        <td>{{ r.at|localtime }}</td>
+        <td>{{ r.email }}</td>
+        <td>{{ r.user.name if r.user else '' }}</td>
+        {% if tab == 'failed' %}<td>{{ t('log.reason.' ~ r.reason) }}</td>{% endif %}
+        <td><code>{{ r.ip }}</code></td>
+        <td class="muted" title="{{ r.user_agent }}">{{ r.user_agent|truncate(40) }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+    {% endif %}
+  </table>
+  {% if pages > 1 %}
+  <nav class="pager">
+    {% if page > 1 %}<a class="button" href="{{ link(page - 1) }}">{{ t('log.newer') }}</a>{% endif %}
+    <span class="muted">{{ t('log.page', page=page, pages=pages) }}</span>
+    {% if page < pages %}<a class="button" href="{{ link(page + 1) }}">{{ t('log.older') }}</a>{% endif %}
+  </nav>
+  {% endif %}
+  {% else %}
+  <p class="muted">{{ t('log.empty') }}</p>
+  {% endif %}
+  <p class="muted">{% if retention_days > 0 %}{{ t('log.retention', days=retention_days) }}{% else %}{{ t('log.retention_off') }}{% endif %}</p>
+</section>
+{% endblock %}

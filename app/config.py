@@ -47,6 +47,9 @@ class Settings(BaseSettings):
     reminder_hour: int = 9
     submitter_reminder_days: int = 14
 
+    # Logboek (inlogpogingen en binnengekomen mail): na zoveel dagen opruimen; 0 = nooit.
+    log_retention_days: int = 90
+
     @property
     def secure_cookies(self) -> bool:
         return self.base_url.startswith("https://")

@@ -57,3 +57,9 @@ Voorbeeld voor Proton Mail (met een SMTP-token uit de Proton-instellingen): `SMT
 | `SUBMITTER_REMINDER_DAYS` | 14 | Hoe lang indieners herinnerd worden om hun gegevens aan te vullen |
 
 Medewerkers krijgen één mail met al hun openstaande taken. Wie een taak minder dan 12 uur geleden kreeg, wordt die dag nog niet herinnerd.
+
+## Logboek
+
+| Instelling | Standaard | Betekenis |
+| --- | --- | --- |
+| `LOG_RETENTION_DAYS` | 90 | Na hoeveel dagen inlogpogingen en binnengekomen mail uit het logboek verdwijnen; `0` bewaart alles |

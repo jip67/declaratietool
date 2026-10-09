@@ -4,14 +4,16 @@ import secrets
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import RedirectResponse
-from sqlalchemy import or_, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
 from .. import storage, updates, workflow
 from ..config import get_settings
 from ..db import get_db
 from ..i18n import available_languages
-from ..models import OPEN_STATUSES, ROLE_FOR_STATUS, Attachment, Claim, Event, Role, Status, Submitter, User
+from ..models import (
+    OPEN_STATUSES, ROLE_FOR_STATUS, Attachment, Claim, Event, IncomingMail, LoginAttempt, Role, Status, Submitter, User,
+)
 from ..security import hash_password
 from ..web import current_user, file_response, render, require_admin
 from .public import validate_details
@@ -353,3 +355,45 @@ def request_update(action: str = Form(...), user: User = Depends(require_admin))
         return RedirectResponse("/portal/update?error=update.busy", status_code=303)
     updates.request(action, user.email)
     return RedirectResponse("/portal/update", status_code=303)
+
+
+# ---------------------------------------------------------------- logboek
+
+LOG_TABS = ("logins", "failed", "mails")
+LOG_PAGE_SIZE = 50
+
+
+@router.get("/log")
+def log_page(
+    request: Request,
+    tab: str = "logins",
+    q: str = "",
+    page: int = 1,
+    user: User = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    if tab not in LOG_TABS:
+        tab = "logins"
+    q = q.strip()
+    page = max(page, 1)
+    if tab == "mails":
+        query = select(IncomingMail)
+        if q:
+            like = f"%{q}%"
+            query = query.where(or_(
+                IncomingMail.sender.ilike(like), IncomingMail.subject.ilike(like), IncomingMail.result.ilike(like),
+            ))
+        order = IncomingMail.at.desc()
+    else:
+        query = select(LoginAttempt).where(LoginAttempt.success.is_(tab == "logins"))
+        if q:
+            like = f"%{q}%"
+            query = query.where(or_(LoginAttempt.email.ilike(like), LoginAttempt.ip.ilike(like)))
+        order = LoginAttempt.at.desc()
+    total = db.scalar(select(func.count()).select_from(query.subquery()))
+    rows = db.scalars(query.order_by(order).offset((page - 1) * LOG_PAGE_SIZE).limit(LOG_PAGE_SIZE)).all()
+    return render(
+        request, "portal/log.html", user.language,
+        user=user, tab=tab, tabs=LOG_TABS, q=q, page=page, rows=rows, total=total,
+        pages=max(1, -(-total // LOG_PAGE_SIZE)), retention_days=get_settings().log_retention_days,
+    )
