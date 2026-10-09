@@ -2,12 +2,12 @@
 
 import logging
 import mimetypes
-import smtplib
 from dataclasses import dataclass, field
 from email.message import EmailMessage
 from email.utils import formataddr, make_msgid
 from pathlib import Path
 
+from . import mailconfig
 from .config import get_settings
 
 log = logging.getLogger(__name__)
@@ -31,13 +31,14 @@ class Mail:
     attachments: list[MailAttachment] = field(default_factory=list)
 
 
-def build_message(mail: Mail) -> EmailMessage:
+def build_message(mail: Mail, config: mailconfig.MailConfig | None = None) -> EmailMessage:
     settings = get_settings()
+    config = config or mailconfig.load()
     msg = EmailMessage()
-    msg["From"] = formataddr((settings.app_name, settings.mail_from))
+    msg["From"] = formataddr((settings.app_name, config.mail_from))
     msg["To"] = ", ".join(mail.to)
     msg["Subject"] = mail.subject
-    msg["Message-ID"] = make_msgid(domain=settings.mail_from.split("@")[-1])
+    msg["Message-ID"] = make_msgid(domain=config.mail_from.split("@")[-1])
     # Voorkomt dat auto-replies van ontvangers als nieuwe declaratie binnenkomen.
     msg["Auto-Submitted"] = "auto-generated"
     msg.set_content(mail.body)
@@ -53,22 +54,14 @@ def send(mail: Mail) -> None:
     if not recipients:
         return
     mail.to = recipients
-    settings = get_settings()
-    msg = build_message(mail)
+    config = mailconfig.load()
+    msg = build_message(mail, config)
     outbox.append(msg)
-    if not settings.smtp_host:
+    if not config.smtp_host:
         log.info("SMTP niet ingesteld; mail aan %s niet verstuurd: %s\n%s", recipients, mail.subject, mail.body)
         return
     try:
-        if settings.smtp_ssl:
-            server = smtplib.SMTP_SSL(settings.smtp_host, settings.smtp_port, timeout=30)
-        else:
-            server = smtplib.SMTP(settings.smtp_host, settings.smtp_port, timeout=30)
-        with server:
-            if settings.smtp_starttls and not settings.smtp_ssl:
-                server.starttls()
-            if settings.smtp_user:
-                server.login(settings.smtp_user, settings.smtp_password)
+        with mailconfig.smtp_connect(config) as server:
             server.send_message(msg)
     except Exception:  # mailfouten mogen de workflow niet blokkeren
         log.exception("Versturen van mail aan %s mislukt", recipients)

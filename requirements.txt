@@ -11,3 +11,4 @@ pillow==12.3.0
 pillow-heif==1.8.0
 pypdf==6.19.0
 reportlab==5.0.1
+cryptography==50.0.2

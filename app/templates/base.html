@@ -16,7 +16,7 @@
     {% if user.is_staff %}<a href="/portal?view=mine">{{ t('nav.my_tasks') }}</a>{% endif %}
     <a href="/portal">{{ t('nav.claims') }}</a>
     <a href="/portal/claims/new">{{ t('nav.new_claim') }}</a>
-    {% if user.has_role(Role.ADMIN) %}<a href="/portal/users">{{ t('nav.users') }}</a> <a href="/portal/log">{{ t('nav.log') }}</a> <a href="/portal/update">{{ t('nav.update') }}</a>{% endif %}
+    {% if user.has_role(Role.ADMIN) %}<a href="/portal/users">{{ t('nav.users') }}</a> <a href="/portal/log">{{ t('nav.log') }}</a> <a href="/portal/mail">{{ t('nav.mail') }}</a> <a href="/portal/update">{{ t('nav.update') }}</a>{% endif %}
     <a href="/help">{{ t('nav.help') }}</a>
     <a href="/account">{{ user.name }}</a>
     <form method="post" action="/logout" class="inline"><button class="link">{{ t('nav.logout') }}</button></form>

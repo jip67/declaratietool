@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}{{ t('nav.mail') }}{% endblock %}
+{% macro source(name) %}<span class="muted small">{{ t('mail.from_db') if name in current.from_db else t('mail.from_env') }}</span>{% endmacro %}
+{% macro text(name, label, type="text", placeholder="") %}
+<label>{{ t(label) }} {{ source(name) }}
+  <input type="{{ type }}" name="{{ name }}" value="{{ form[name] }}" {% if placeholder %}placeholder="{{ placeholder }}"{% endif %} autocomplete="off">
+  {% if errors[name] %}<span class="error">{{ t(errors[name]) }}</span>{% endif %}
+</label>
+{% endmacro %}
+{% macro secret(name) %}
+<label>{{ t('field.password') }} {{ source(name) }}
+  <input type="password" name="{{ name }}" value="" autocomplete="new-password"
+         placeholder="{{ t('mail.password_saved') if current[name] else t('mail.password_empty') }}">
+</label>
+{% endmacro %}
+{% block content %}
+<section class="card">
+  <h1>{{ t('nav.mail') }}</h1>
+  <p class="muted">{{ t('mail.intro') }}</p>
+  {% if message %}<p class="{{ message[0] }}">{{ t(message[1], detail=message[2]) }}</p>{% endif %}
+
+  <form method="post" action="/portal/mail">
+    {# Enter in een veld kiest de eerste knop: dat moet Opslaan zijn, niet een test. #}
+    <button class="visually-hidden" name="action" value="save" tabindex="-1" aria-hidden="true">{{ t('action.save') }}</button>
+    <fieldset>
+      <legend>{{ t('mail.smtp') }}</legend>
+      <p class="muted">{{ t('mail.smtp_help') }}</p>
+      {{ text('smtp_host', 'mail.host', placeholder='smtp.example.org') }}
+      {{ text('smtp_port', 'mail.port', type='number') }}
+      {{ text('smtp_user', 'mail.user') }}
+      {{ secret('smtp_password') }}
+      <label class="check"><input type="checkbox" name="smtp_starttls" {% if form.smtp_starttls %}checked{% endif %}> {{ t('mail.starttls') }}</label>
+      <label class="check"><input type="checkbox" name="smtp_ssl" {% if form.smtp_ssl %}checked{% endif %}> {{ t('mail.ssl') }}</label>
+      {{ text('mail_from', 'mail.mail_from', type='email', placeholder='declaraties@example.org') }}
+      <p><button name="action" value="test_smtp">{{ t('mail.test_smtp') }}</button></p>
+    </fieldset>
+
+    <fieldset>
+      <legend>{{ t('mail.imap') }}</legend>
+      <p class="muted">{{ t('mail.imap_help') }}</p>
+      {{ text('imap_host', 'mail.host', placeholder='imap.example.org') }}
+      {{ text('imap_port', 'mail.port', type='number') }}
+      {{ text('imap_user', 'mail.user') }}
+      {{ secret('imap_password') }}
+      {{ text('imap_folder', 'mail.folder') }}
+      <p><button name="action" value="test_imap">{{ t('mail.test_imap') }}</button></p>
+    </fieldset>
+
+    <p class="muted">{{ t('mail.test_note') }}</p>
+    {% if current.from_db %}<label class="check"><input type="checkbox" name="clear_passwords"> {{ t('mail.clear_passwords') }}</label>{% endif %}
+    <div class="actions"><button class="primary" name="action" value="save">{{ t('action.save') }}</button></div>
+  </form>
+
+  {% if current.from_db %}
+  <details class="reject">
+    <summary>{{ t('mail.reset') }}</summary>
+    <p>{{ t('mail.reset_help') }}</p>
+    <form method="post" action="/portal/mail"><button class="danger" name="action" value="reset">{{ t('mail.reset_confirm') }}</button></form>
+  </details>
+  {% endif %}
+</section>
+{% endblock %}

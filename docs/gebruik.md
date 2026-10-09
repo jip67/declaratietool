@@ -54,6 +54,8 @@ Je kunt zoeken op e-mailadres, IP-adres, afzender of onderwerp. Regels ouder dan
 
 Bij een bestuurswissel: maak een account voor de nieuwe bestuurder met de juiste rol en zet het oude account uit. De geschiedenis van eerdere declaraties blijft bewaard.
 
+Beheerders vinden onder **Mailinstellingen** de gegevens van de mailbox (SMTP voor versturen, IMAP voor ophalen). Daar pas je ze aan zonder `.env` te wijzigen en test je de verbinding met één klik; zie [Configuratie](configuratie.md#mailinstellingen-in-het-portaal).
+
 ## Hulp
 
 Via **Help** rechtsboven staat deze uitleg ook in de tool zelf, in het Nederlands en Engels. Ingelogde medewerkers zien de onderdelen voor hun eigen rol gemarkeerd.

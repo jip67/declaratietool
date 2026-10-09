@@ -34,6 +34,8 @@ form.inline { display: inline; }
 .error { color: var(--danger); font-weight: 400; }
 .success { color: var(--success); }
 .muted { color: var(--muted); }
+.small { font-size: .85rem; font-weight: 400; }
+.visually-hidden { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 .tabs { display: flex; flex-wrap: wrap; gap: .25rem; margin: 0 0 1rem; }
 .tabs a { padding: .3rem .7rem; border-radius: 999px; text-decoration: none; border: 1px solid var(--line); font-size: .9rem; }
 .tabs a.active { background: var(--primary); color: var(--primary-text); border-color: var(--primary); }

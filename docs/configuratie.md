@@ -22,6 +22,20 @@ Alle instellingen staan in `.env` (zie `.env.example`). Na een wijziging: `docke
 | --- | --- |
 | `POSTGRES_PASSWORD` | Wachtwoord van de database (alleen intern gebruikt) |
 
+## Mailinstellingen in het portaal
+
+De mailinstellingen (SMTP en IMAP) kun je ook in de tool zelf invullen: log in als beheerder en kies **Mailinstellingen**. Dan hoef je `.env` niet aan te passen.
+
+- Wat je in het portaal opslaat gaat vóór de waarden in `.env`; `.env` blijft de terugval. Achter elk veld staat waar de huidige waarde vandaan komt.
+- Wijzigingen gelden meteen, ook voor het ophalen van mail. Een herstart is niet nodig.
+- Wachtwoorden worden versleuteld in de database bewaard (met een sleutel afgeleid van `SECRET_KEY`) en nooit in de pagina getoond. Laat je het wachtwoordveld leeg, dan blijft het opgeslagen wachtwoord staan.
+- Met **Test SMTP-verbinding** en **Test IMAP-verbinding** probeer je de ingevulde gegevens uit voordat je ze opslaat. De SMTP-test verbindt en logt in zonder een mail te versturen; de IMAP-test logt in, opent de map en telt de ongelezen mails.
+- Met **Terug naar de instellingen uit .env** wis je alles wat in het portaal is opgeslagen.
+
+Verander je `SECRET_KEY`, dan kunnen opgeslagen wachtwoorden niet meer worden gelezen. De tool valt dan terug op het wachtwoord uit `.env`; vul het wachtwoord opnieuw in via Mailinstellingen.
+
+De tabellen hieronder beschrijven de waarden in `.env`. `IMAP_POLL_SECONDS` stel je alleen in `.env` in.
+
 ## Inkomende mail (IMAP)
 
 | Instelling | Standaard | Betekenis |

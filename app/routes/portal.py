@@ -7,7 +7,7 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
-from .. import storage, updates, workflow
+from .. import mailconfig, storage, updates, workflow
 from ..config import get_settings
 from ..db import get_db
 from ..i18n import available_languages
@@ -355,6 +355,89 @@ def request_update(action: str = Form(...), user: User = Depends(require_admin))
         return RedirectResponse("/portal/update?error=update.busy", status_code=303)
     updates.request(action, user.email)
     return RedirectResponse("/portal/update", status_code=303)
+
+
+# ---------------------------------------------------------------- mailinstellingen
+
+
+MAIL_ACTIONS = {"save", "test_smtp", "test_imap", "reset"}
+
+
+def _mail_form(form: dict) -> tuple[mailconfig.MailConfig, dict[str, str]]:
+    """Formulier -> MailConfig, plus fouten per veld."""
+    config = mailconfig.MailConfig()
+    errors = {}
+    for name in mailconfig.TEXT_FIELDS + mailconfig.SECRET_FIELDS:
+        value = str(form.get(name, ""))
+        setattr(config, name, value if name in mailconfig.SECRET_FIELDS else value.strip())
+    for name in mailconfig.INT_FIELDS:
+        try:
+            value = int(str(form.get(name, "")).strip())
+            if not 1 <= value <= 65535:
+                raise ValueError
+            setattr(config, name, value)
+        except ValueError:
+            errors[name] = "error.port"
+    for name in mailconfig.BOOL_FIELDS:
+        setattr(config, name, name in form)
+    config.imap_folder = config.imap_folder or "INBOX"
+    if config.mail_from and "@" not in config.mail_from:
+        errors["mail_from"] = "error.email"
+    return config, errors
+
+
+def _render_mail(request: Request, db: Session, user: User, form: mailconfig.MailConfig | None = None,
+                 errors: dict | None = None, message: tuple[str, str, str] | None = None, status_code: int = 200):
+    current = mailconfig.load(db)
+    return render(
+        request, "portal/mail.html", user.language, status_code=status_code,
+        user=user, form=form or current, current=current, errors=errors or {}, message=message,
+    )
+
+
+@router.get("/mail")
+def mail_page(request: Request, user: User = Depends(require_admin), db: Session = Depends(get_db)):
+    saved = request.query_params.get("saved")
+    message = ("success", "mail.saved", "") if saved == "1" else ("success", "mail.reset_done", "") if saved == "reset" else None
+    return _render_mail(request, db, user, message=message)
+
+
+@router.post("/mail")
+async def mail_save(request: Request, user: User = Depends(require_admin), db: Session = Depends(get_db)):
+    form = await request.form()
+    action = form.get("action", "save")
+    if action not in MAIL_ACTIONS:
+        raise HTTPException(status_code=400)
+    if action == "reset":
+        mailconfig.reset(db)
+        db.commit()
+        return RedirectResponse("/portal/mail?saved=reset", status_code=303)
+
+    config, errors = _mail_form(form)
+    if errors:
+        return _render_mail(request, db, user, form=config, errors=errors, status_code=422)
+    if action == "save":
+        mailconfig.save(db, config, keep_passwords="clear_passwords" not in form)
+        db.commit()
+        return RedirectResponse("/portal/mail?saved=1", status_code=303)
+
+    # Testen met wat in het formulier staat; een leeg wachtwoordveld betekent "het opgeslagen wachtwoord".
+    current = mailconfig.load(db)
+    for name in mailconfig.SECRET_FIELDS:
+        if not getattr(config, name):
+            setattr(config, name, getattr(current, name))
+    kind = "smtp" if action == "test_smtp" else "imap"
+    ok, detail = mailconfig.check_smtp(config) if kind == "smtp" else mailconfig.check_imap(config)
+    if ok:
+        message = ("success", f"mail.test_{kind}_ok", detail)
+    elif detail == "no_host":
+        message = ("error", f"mail.test_{kind}_no_host", "")
+    else:
+        message = ("error", f"mail.test_{kind}_failed", detail)
+    # Ingevulde wachtwoorden niet terug in de pagina zetten.
+    for name in mailconfig.SECRET_FIELDS:
+        setattr(config, name, "")
+    return _render_mail(request, db, user, form=config, message=message)
 
 
 # ---------------------------------------------------------------- logboek
