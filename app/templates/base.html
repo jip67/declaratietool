@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="/static/style.css">
   {% block head %}{% endblock %}
 </head>
-<body>
+<body{% if user %} class="has-sidebar"{% endif %}>
 <header class="topbar">
   <a class="brand" href="{% if user %}/portal{% else %}/login{% endif %}">{{ settings.app_name }}</a>
   <span class="org">{{ settings.organisation_name }}</span>
