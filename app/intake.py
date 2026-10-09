@@ -1,7 +1,6 @@
 """Inkomende mail ophalen (IMAP) en omzetten in declaraties."""
 
 import email
-import imaplib
 import logging
 from email.message import Message
 from email.policy import default as default_policy
@@ -9,7 +8,7 @@ from email.utils import parseaddr
 
 from sqlalchemy.orm import Session
 
-from . import mailer, workflow
+from . import mailconfig, mailer, workflow
 from .config import get_settings
 from .i18n import pick_language, translate
 from .storage import guess_type
@@ -54,7 +53,7 @@ def process_message(db: Session, raw: bytes) -> str:
     settings = get_settings()
     if not address or "@" not in address:
         return "ignored:no_sender"
-    if address == settings.mail_from.lower() or is_automatic(msg):
+    if address == mailconfig.load(db).mail_from.lower() or is_automatic(msg):
         return "ignored:automatic"
 
     files = extract_files(msg)
@@ -82,13 +81,11 @@ def process_message(db: Session, raw: bytes) -> str:
 
 def poll_mailbox(session_factory) -> int:
     """Haalt ongelezen mail op. Geeft het aantal verwerkte berichten terug."""
-    settings = get_settings()
-    if not settings.imap_host:
+    config = mailconfig.load()
+    if not config.imap_host:
         return 0
     processed = 0
-    with imaplib.IMAP4_SSL(settings.imap_host, settings.imap_port) as imap:
-        imap.login(settings.imap_user, settings.imap_password)
-        imap.select(settings.imap_folder)
+    with mailconfig.imap_connect(config) as imap:
         status, data = imap.search(None, "UNSEEN")
         if status != "OK":
             return 0

@@ -6,7 +6,7 @@ Start met: python -m app.worker
 import logging
 import time
 
-from . import intake, reminders
+from . import intake, mailconfig, reminders
 from .config import get_settings
 from .db import new_session
 
@@ -16,8 +16,8 @@ log = logging.getLogger("worker")
 def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
     settings = get_settings()
-    if not settings.imap_host:
-        log.warning("IMAP_HOST is niet ingesteld: er wordt geen mail opgehaald.")
+    if not mailconfig.load().imap_host:
+        log.warning("IMAP is niet ingesteld (.env of Mailinstellingen): er wordt geen mail opgehaald.")
     log.info("Worker gestart (mail elke %ss, herinneringen om %s:00)", settings.imap_poll_seconds, settings.reminder_hour)
     while True:
         try:
