@@ -23,7 +23,7 @@ from .models import KeyValue
 log = logging.getLogger(__name__)
 
 PREFIX = "mail."
-TEXT_FIELDS = ("smtp_host", "smtp_user", "mail_from", "imap_host", "imap_user", "imap_folder")
+TEXT_FIELDS = ("smtp_host", "smtp_user", "mail_from", "mail_from_name", "imap_host", "imap_user", "imap_folder")
 INT_FIELDS = ("smtp_port", "imap_port")
 BOOL_FIELDS = ("smtp_starttls", "smtp_ssl")
 SECRET_FIELDS = ("smtp_password", "imap_password")
@@ -41,6 +41,7 @@ class MailConfig:
     smtp_starttls: bool = True
     smtp_ssl: bool = False
     mail_from: str = ""
+    mail_from_name: str = ""
     imap_host: str = ""
     imap_port: int = 993
     imap_user: str = ""

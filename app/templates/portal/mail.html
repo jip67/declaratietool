@@ -31,6 +31,7 @@
       {{ secret('smtp_password') }}
       <label class="check"><input type="checkbox" name="smtp_starttls" {% if form.smtp_starttls %}checked{% endif %}> {{ t('mail.starttls') }}</label>
       <label class="check"><input type="checkbox" name="smtp_ssl" {% if form.smtp_ssl %}checked{% endif %}> {{ t('mail.ssl') }}</label>
+      {{ text('mail_from_name', 'mail.mail_from_name', placeholder=settings.app_name) }}
       {{ text('mail_from', 'mail.mail_from', type='email', placeholder='declaraties@example.org') }}
       <p><button name="action" value="test_smtp">{{ t('mail.test_smtp') }}</button></p>
     </fieldset>

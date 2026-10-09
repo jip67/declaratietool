@@ -35,7 +35,7 @@ def build_message(mail: Mail, config: mailconfig.MailConfig | None = None) -> Em
     settings = get_settings()
     config = config or mailconfig.load()
     msg = EmailMessage()
-    msg["From"] = formataddr((settings.app_name, config.mail_from))
+    msg["From"] = formataddr((config.mail_from_name or settings.app_name, config.mail_from))
     msg["To"] = ", ".join(mail.to)
     msg["Subject"] = mail.subject
     msg["Message-ID"] = make_msgid(domain=config.mail_from.split("@")[-1])
