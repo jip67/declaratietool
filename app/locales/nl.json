@@ -221,5 +221,7 @@
   "log.page": "Pagina {page} van {pages}",
   "log.empty": "Nog niets vastgelegd.",
   "log.retention": "Regels worden na {days} dagen automatisch verwijderd.",
-  "log.retention_off": "Regels worden niet automatisch verwijderd."
+  "log.retention_off": "Regels worden niet automatisch verwijderd.",
+  "nav.settings": "Instellingen",
+  "users.read_only": "Alleen een beheerder kan gebruikers toevoegen of wijzigen."
 }

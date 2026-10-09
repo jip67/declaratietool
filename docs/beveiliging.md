@@ -8,7 +8,7 @@
 - **Wachtwoorden** worden opgeslagen als scrypt-hash, nooit leesbaar.
 - **Wachtwoorden raden** wordt afgeremd: na 5 foute pogingen op één account, of 20 vanaf één IP-adres,
   moet je 15 minuten wachten.
-- **Logboek**: beheerders zien onder Logboek elke geslaagde en mislukte inlogpoging met tijd, IP-adres en
+- **Logboek**: bestuursleden en beheerders zien onder Instellingen → Logboek elke geslaagde en mislukte inlogpoging met tijd, IP-adres en
   reden, en alle binnengekomen mail. Na 90 dagen worden de regels automatisch verwijderd.
 - **Inlogsessie** zit in een ondertekend cookie (alleen via https, niet vanaf andere sites mee te sturen,
   verloopt na 12 uur). De tool weigert te starten als `SECRET_KEY` ontbreekt of te kort is.

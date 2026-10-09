@@ -84,7 +84,7 @@ In Portainer: **Containers → declaratietool-app-1 → Console → Connect** (`
 python -m app.cli create-user --email jij@example.nl --name "Jouw naam" --roles admin,treasurer
 ```
 
-Je typt het wachtwoord daarna in. Log in op je subdomein en voeg de andere bestuursleden toe onder **Gebruikers**.
+Je typt het wachtwoord daarna in. Log in op je subdomein en voeg de andere bestuursleden toe onder **Instellingen → Gebruikers**.
 
 ## Bijwerken
 

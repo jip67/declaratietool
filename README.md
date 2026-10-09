@@ -42,9 +42,9 @@ docker compose exec app python -m app.cli create-user \
     --email jij@example.org --name "Jouw naam" --roles admin,treasurer
 ```
 
-Open daarna `https://<jouw-domein>` en log in. Voeg via **Gebruikers** de voorzitter en secretaris toe.
+Open daarna `https://<jouw-domein>` en log in. Voeg via **Instellingen → Gebruikers** de voorzitter en secretaris toe.
 
-Bijwerken naar de nieuwste versie kan met de knop **Bijwerken** in het portaal (zie [bijwerken.md](docs/bijwerken.md)), of met de hand:
+Bijwerken naar de nieuwste versie kan met **Instellingen → Bijwerken** in het portaal (zie [bijwerken.md](docs/bijwerken.md)), of met de hand:
 
 ```bash
 git pull && docker compose up -d --build

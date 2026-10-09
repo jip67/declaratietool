@@ -116,3 +116,41 @@ def test_only_admin_can_edit_or_delete(db, client, staff):
     assert client.get(f"/portal/users/{member.id}").status_code == 403
     assert client.post(f"/portal/users/{member.id}/delete").status_code == 403
     assert client.get("/portal/users/9999").status_code == 403
+
+
+def test_settings_menu_per_role(db, client, staff):
+    add_user(db)
+    login(client, "lid@example.org")
+    page = client.get("/portal").text
+    assert "Instellingen" not in page and "/portal/users" not in page
+    assert client.get("/portal/users").status_code == 403
+    client.post("/logout")
+
+    login(client, "voorzitter@example.org")
+    page = client.get("/portal").text
+    assert "Instellingen" in page
+    assert "/portal/users" in page and "/portal/log" in page
+    assert "/portal/mail" not in page and "/portal/update" not in page
+    client.post("/logout")
+
+    login(client, "boekhouder@example.org")
+    page = client.get("/portal").text
+    for link in ("/portal/users", "/portal/log", "/portal/mail", "/portal/update"):
+        assert link in page
+
+
+def test_staff_sees_users_read_only(db, client, staff):
+    member = add_user(db)
+    login(client, "voorzitter@example.org")
+    page = client.get("/portal/users")
+    assert page.status_code == 200
+    assert "Lies Lid" in page.text
+    assert f"/portal/users/{member.id}" not in page.text
+    assert 'action="/portal/users"' not in page.text
+    assert client.get(f"/portal/users/{member.id}").status_code == 403
+    assert client.post(f"/portal/users/{member.id}", data={"name": "Gehackt"}).status_code == 403
+    assert client.post(f"/portal/users/{member.id}/delete").status_code == 403
+    r = client.post("/portal/users", data={"email": "x@example.org", "name": "X", "password": "geheim12345"})
+    assert r.status_code == 403
+    db.refresh(member)
+    assert member.name == "Lies Lid"
