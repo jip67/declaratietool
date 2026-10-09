@@ -3,6 +3,7 @@
 {% block content %}
 <section class="card">
   <div class="row"><h1>{{ claim.reference }}</h1>{% include "_status.html" %}</div>
+  {% if user.has_role(Role.ADMIN) %}<p class="admin-tools"><a class="button" href="/portal/claims/{{ claim.id }}/edit">{{ t('claim.edit') }}</a></p>{% endif %}
   {% include "_steps.html" %}
   {% if error %}<p class="error">{{ t('error.' ~ error) }}</p>{% endif %}
 
@@ -39,6 +40,24 @@
     {% endwith %}
   {% endfor %}
 
+  {% if user.is_staff %}
+  <section class="internal" id="comments">
+    <h2>{{ t('comments.title') }} <span class="badge-internal">{{ t('comments.badge') }}</span></h2>
+    <p class="muted">{{ t('comments.hint') }}</p>
+    {% if claim.comments %}
+    <ul class="comments">
+    {% for c in claim.comments %}
+      <li><span class="muted">{{ c.at|localtime }} · {{ c.user.name if c.user else t('comments.unknown_user') }}</span>{{ c.text }}</li>
+    {% endfor %}
+    </ul>
+    {% else %}<p class="muted">{{ t('comments.empty') }}</p>{% endif %}
+    <form method="post" action="/portal/claims/{{ claim.id }}/comments">
+      <label>{{ t('comments.new') }}<textarea name="text" rows="2" maxlength="5000" required></textarea></label>
+      <button>{{ t('comments.add') }}</button>
+    </form>
+  </section>
+  {% endif %}
+
   {% if user.is_staff and claim.status not in ['paid', 'rejected'] %}
   <details class="reject">
     <summary>{{ t('action.reject') }}</summary>
@@ -46,6 +65,17 @@
       <input type="hidden" name="action" value="reject">
       <label>{{ t('field.reason') }}<textarea name="reason" rows="2" required></textarea></label>
       <button class="danger">{{ t('action.reject') }}</button>
+    </form>
+  </details>
+  {% endif %}
+
+  {% if user.has_role(Role.ADMIN) %}
+  <details class="reject" id="delete">
+    <summary>{{ t('claim.delete') }}</summary>
+    <p>{{ t('claim.delete_warning') }}</p>
+    <form method="post" action="/portal/claims/{{ claim.id }}/delete">
+      <label class="check"><input type="checkbox" name="confirm" value="yes" required> {{ t('claim.delete_check') }}</label>
+      <button class="danger">{{ t('claim.delete_confirm') }}</button>
     </form>
   </details>
   {% endif %}

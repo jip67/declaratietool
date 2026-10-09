@@ -264,3 +264,14 @@ table.list .c-ref { white-space: nowrap; }
   .has-sidebar .page-new { display: none; }
   .has-sidebar .topbar nav > a .count { float: right; }
 }
+
+/* Interne opmerkingen: alleen voor het bestuur, duidelijk anders gekleurd. */
+.internal { margin-top: 1.5rem; padding: 1rem 1.25rem; border: 1px dashed var(--s-prepared, var(--primary)); border-radius: 12px; background: var(--mine); }
+.internal h2 { margin-top: 0; display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+.badge-internal { display: inline-block; padding: .15rem .6rem; border-radius: 999px; font-size: .75rem; font-weight: 600; color: var(--s-rejected); background: var(--s-rejected-bg); }
+ul.comments { list-style: none; padding: 0; margin: 0 0 1rem; }
+ul.comments li { padding: .5rem 0; border-bottom: 1px solid var(--line); white-space: pre-line; }
+ul.comments li .muted { display: block; font-size: .8rem; white-space: normal; }
+.admin-tools { margin: 0 0 1rem; }
+table.list .comment-flag { display: inline-flex; align-items: center; gap: .15rem; margin-left: .35rem; vertical-align: middle; color: var(--muted); font-size: .75rem; font-weight: 600; text-decoration: none; }
+table.list .comment-flag:hover { color: var(--primary); }

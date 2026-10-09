@@ -36,6 +36,16 @@ Alle medewerkers kunnen via **Nieuwe declaratie** zelf een declaratie invoeren, 
 - Vul je ook bedrag, omschrijving, IBAN en tenaamstelling in, dan gaat de declaratie direct naar de voorzitter.
 - Laat je die leeg, dan krijgt de indiener een mail met de link om ze zelf aan te vullen.
 
+## Interne opmerkingen
+
+Onderaan elke declaratie staat het blok **Interne opmerkingen**, met het label *intern, niet zichtbaar voor indiener*. Voorzitter, boekhouder, secretaris en beheerder kunnen daar extra informatie kwijt, bijvoorbeeld "bon nagevraagd bij de penningmeester". Elke opmerking krijgt naam en tijdstip. De indiener ziet ze nooit: niet op de pagina van de persoonlijke link, niet in mails en ook niet als hij inlogt met de rol Gebruiker.
+
+## Declaratie bewerken of wissen (beheerder)
+
+Een beheerder ziet bij elke declaratie de knop **Declaratie bewerken**. Daarmee pas je naam van de indiener, bedrag, omschrijving, IBAN en tenaamstelling aan, ook als de declaratie al is goedgekeurd of betaald. De status verandert niet en de indiener krijgt geen mail; in de geschiedenis staat "Gegevens aangepast door beheerder".
+
+Onderaan de declaratie staat **Declaratie wissen**. Na het aanvinken van de bevestiging wordt de declaratie definitief verwijderd, met de bijlagen (ook de geparafeerde versies) op schijf, de geschiedenis en de interne opmerkingen. Handig om testdata op te ruimen; het kan niet ongedaan worden gemaakt.
+
 ## Herinneringen
 
 Elke ochtend (instelbaar) krijgt iedereen met openstaande taken één mail met een overzicht. Indieners die hun gegevens nog niet hebben ingevuld krijgen ook een herinnering, standaard maximaal 14 dagen lang.
