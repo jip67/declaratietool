@@ -16,6 +16,10 @@ COPY app ./app
 COPY migrations ./migrations
 COPY alembic.ini docker-entrypoint.sh ./
 
+# Versie (git-commit) waarmee het image is gebouwd; getoond onder Bijwerken.
+ARG GIT_COMMIT=""
+ENV APP_VERSION=${GIT_COMMIT}
+
 RUN useradd --create-home --uid 1000 declaratie \
     && mkdir -p /data/uploads \
     && chown -R declaratie /data \

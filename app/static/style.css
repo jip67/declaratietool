@@ -80,3 +80,5 @@ form.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,
 .help-link { font-size: .9rem; }
 .faq dt { font-weight: 600; margin-top: .75rem; }
 .faq dd { margin: .15rem 0 0; }
+pre.log { max-height: 24rem; overflow: auto; padding: .75rem; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; font-size: .8rem; white-space: pre-wrap; }
+.actions { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1rem 0; }

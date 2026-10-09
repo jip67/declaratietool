@@ -5,7 +5,7 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from .. import storage, workflow
+from .. import storage, updates, workflow
 from ..config import get_settings
 from ..db import get_db
 from ..i18n import available_languages
@@ -247,3 +247,33 @@ def update_user(
         target.password_hash = hash_password(password)
     db.commit()
     return RedirectResponse("/portal/users", status_code=303)
+
+
+# ---------------------------------------------------------------- bijwerken
+
+
+UPDATE_ERRORS = {"update.not_configured", "update.busy"}
+
+
+@router.get("/update")
+def update_page(request: Request, user: User = Depends(require_admin)):
+    current = updates.status()
+    return render(
+        request, "portal/update.html", user.language,
+        user=user, available=updates.available(), status=current, pending=updates.pending(),
+        busy=updates.is_busy(current), update_available=updates.update_available(current),
+        running_version=updates.running_version(), log=updates.log_tail(),
+        error=request.query_params.get("error") if request.query_params.get("error") in UPDATE_ERRORS else None,
+    )
+
+
+@router.post("/update")
+def request_update(action: str = Form(...), user: User = Depends(require_admin)):
+    if action not in updates.ACTIONS:
+        raise HTTPException(status_code=400)
+    if not updates.available():
+        return RedirectResponse("/portal/update?error=update.not_configured", status_code=303)
+    if updates.is_busy():
+        return RedirectResponse("/portal/update?error=update.busy", status_code=303)
+    updates.request(action, user.email)
+    return RedirectResponse("/portal/update", status_code=303)

@@ -1,5 +1,6 @@
 # Start met:  docker compose up -d
 # Bijwerken:  git pull && docker compose up -d --build
+#             of op een server met install-vps.sh: de knop Bijwerken in het portaal
 
 services:
   db:
@@ -18,7 +19,10 @@ services:
       retries: 10
 
   app:
-    build: .
+    build:
+      context: .
+      args:
+        GIT_COMMIT: ${GIT_COMMIT:-}
     image: declaratietool:local
     restart: unless-stopped
     command: web
@@ -27,6 +31,9 @@ services:
       DATABASE_URL: postgresql+psycopg://declaratie:${POSTGRES_PASSWORD}@db:5432/declaratie
     volumes:
       - uploads:/data/uploads
+      # Voor de knop Bijwerken (zie docs/bijwerken.md): verzoeken schrijven, status lezen.
+      - ./update/requests:/data/update/requests
+      - ./update/status:/data/update/status:ro
     depends_on:
       db:
         condition: service_healthy

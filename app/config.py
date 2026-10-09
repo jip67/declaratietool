@@ -21,6 +21,10 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+psycopg://declaratie:declaratie@db:5432/declaratie"
     upload_dir: str = "/data/uploads"
     max_upload_mb: int = 15
+    # Gedeelde map met de updater op de server (zie docs/bijwerken.md)
+    update_dir: str = "/data/update"
+    # Versie van dit image, gezet bij het bouwen (Dockerfile)
+    app_version: str = ""
 
     # Inkomende mail (IMAP)
     imap_host: str = ""

@@ -142,8 +142,17 @@ else
   say "Bestaande .env gevonden, die blijft ongewijzigd"
 fi
 
+say "Bijwerkknop in het portaal instellen"
+# De app legt alleen een verzoek neer; deze systemd-units voeren het uit op de server.
+for unit in declaratietool-updater.service declaratietool-updater.path declaratietool-updater.timer; do
+  sed "s|/opt/declaratietool|$INSTALL_DIR|g" "deploy/systemd/$unit" >"/etc/systemd/system/$unit"
+done
+systemctl daemon-reload
+INSTALL_DIR=$INSTALL_DIR bash deploy/updater.sh check || true
+systemctl enable --now declaratietool-updater.path declaratietool-updater.timer >/dev/null
+
 say "Starten (de eerste keer duurt dit een paar minuten)"
-docker compose up -d --build
+GIT_COMMIT=$(git rev-parse HEAD) docker compose up -d --build
 
 echo -n "Wachten tot de tool klaar is"
 for _ in $(seq 1 60); do
@@ -171,7 +180,7 @@ Open https://$DOMAIN_NOW en log in. Voeg onder "Gebruikers" de voorzitter en sec
 Handige opdrachten (in $INSTALL_DIR):
   docker compose ps                          status
   docker compose logs -f app worker caddy    logboek
-  git pull && docker compose up -d --build   bijwerken naar de nieuwste versie
+  sudo deploy/updater.sh update              bijwerken (of via Bijwerken in het portaal)
   nano .env && docker compose up -d          instellingen wijzigen
 
 Log één keer uit en weer in, dan kun je docker zonder sudo gebruiken.

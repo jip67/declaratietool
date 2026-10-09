@@ -42,7 +42,8 @@ Log in op `https://<jouw-domein>` en voeg onder **Gebruikers** de voorzitter en 
 
 ## Bijwerken
 
-Nieuwe versies komen via GitHub. Op de server:
+Nieuwe versies komen via GitHub. Met het installatiescript kan een beheerder bijwerken via
+**Bijwerken** in het portaal; zie [bijwerken.md](bijwerken.md). Met de hand, op de server:
 
 ```bash
 cd declaratietool
