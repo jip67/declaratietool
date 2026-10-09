@@ -8,6 +8,7 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from .. import activity
 from ..db import get_db
 from ..i18n import available_languages
 from ..models import User
@@ -50,14 +51,24 @@ def login(
     db: Session = Depends(get_db),
 ):
     key = email.strip().lower()
-    ip_key = "ip:" + (request.client.host if request.client else "?")
+    ip = request.client.host if request.client else "?"
+    ip_key = "ip:" + ip
+    agent = request.headers.get("user-agent", "")
     if _locked(key) or _locked(ip_key, MAX_ATTEMPTS_PER_IP):
+        activity.record_login(db, key, ip, agent, reason="locked")
         return render(
             request, "login.html", request_language(request), status_code=429,
             next=_safe_next(next), error="error.login_locked",
         )
     user = db.scalar(select(User).where(User.email == key))
     if user is None or not user.active or not verify_password(password, user.password_hash):
+        if user is None:
+            reason = "unknown_user"
+        elif not user.active:
+            reason = "inactive"
+        else:
+            reason = "wrong_password"
+        activity.record_login(db, key, ip, agent, user=user, reason=reason)
         _failures[key].append(datetime.now(UTC))
         _failures[ip_key].append(datetime.now(UTC))
         return render(
@@ -65,6 +76,7 @@ def login(
             next=_safe_next(next), error="error.login",
         )
     _failures.pop(key, None)
+    activity.record_login(db, key, ip, agent, user=user)
     request.session.clear()
     request.session["user_id"] = user.id
     request.session["lang"] = user.language
