@@ -244,5 +244,6 @@
   "comments.add": "Opmerking toevoegen",
   "comments.unknown_user": "onbekend",
   "error.comment_required": "Vul een opmerking in.",
-  "error.delete_confirm": "Vink eerst aan dat je de declaratie echt wilt wissen."
+  "error.delete_confirm": "Vink eerst aan dat je de declaratie echt wilt wissen.",
+  "comments.tooltip": "{count} interne opmerking(en), niet zichtbaar voor indiener. Laatste:"
 }

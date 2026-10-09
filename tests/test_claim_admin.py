@@ -113,3 +113,19 @@ def test_internal_comments_only_for_staff(db, client, staff):
     page = client.get(f"/portal/claims/{claim.id}")
     assert page.status_code == 200 and "Geheime notitie" not in page.text
     assert client.post(f"/portal/claims/{claim.id}/comments", data={"text": "x"}).status_code == 403
+
+
+def test_dashboard_shows_comment_icon_for_staff_only(db, client, staff):
+    db.add(User(email="indiener@example.org", name="Ina", password_hash=hash_password("geheim12345"), roles="member"))
+    db.commit()
+    make_claim(client)
+    claim = db.scalar(select(Claim))
+    assert "comment-flag" not in client.get("/portal").text
+    client.post(f"/portal/claims/{claim.id}/comments", data={"text": "Eerste"})
+    client.post(f"/portal/claims/{claim.id}/comments", data={"text": "Bon nagevraagd"})
+    page = client.get("/portal").text
+    assert "comment-flag" in page and "2 interne opmerking(en)" in page and "Bon nagevraagd" in page
+    client.cookies.clear()
+    login(client, "indiener@example.org")
+    page = client.get("/portal").text
+    assert claim.reference in page and "comment-flag" not in page and "Bon nagevraagd" not in page

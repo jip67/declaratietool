@@ -244,5 +244,6 @@
   "comments.add": "Add note",
   "comments.unknown_user": "unknown",
   "error.comment_required": "Please enter a note.",
-  "error.delete_confirm": "Tick the box first to confirm you really want to delete the claim."
+  "error.delete_confirm": "Tick the box first to confirm you really want to delete the claim.",
+  "comments.tooltip": "{count} internal note(s), not visible to submitter. Latest:"
 }

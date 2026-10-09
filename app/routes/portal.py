@@ -54,7 +54,19 @@ def dashboard(request: Request, view: str = "open", user: User = Depends(current
     return render(
         request, "portal/dashboard.html", user.language,
         user=user, claims=claims, view=view, my_count=my_count, is_my_task=is_my_task,
+        comments=comment_summary(db, [c.id for c in claims]),
     )
+
+
+def comment_summary(db: Session, claim_ids: list[int]) -> dict[int, tuple[int, Comment]]:
+    """Per declaratie: aantal interne opmerkingen en de laatste, voor het icoontje in het overzicht."""
+    if not claim_ids:
+        return {}
+    summary: dict[int, tuple[int, Comment]] = {}
+    for comment in db.scalars(select(Comment).where(Comment.claim_id.in_(claim_ids)).order_by(Comment.id)):
+        count = summary.get(comment.claim_id, (0, comment))[0]
+        summary[comment.claim_id] = (count + 1, comment)
+    return summary
 
 
 @router.get("/claims/new")
