@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}{{ t('users.edit') }}{% endblock %}
+{% block content %}
+<section class="card narrow">
+  <p><a href="/portal/users">&larr; {{ t('nav.users') }}</a></p>
+  <h1>{{ t('users.edit') }}</h1>
+  {% if error %}<p class="error">{{ t(error) }}</p>{% endif %}
+  {% set is_self = target.id == user.id %}
+  <form method="post" action="/portal/users/{{ target.id }}">
+    <label>{{ t('field.name') }}<input name="name" value="{{ target.name }}" required></label>
+    <label>{{ t('field.email') }}<input type="email" name="email" value="{{ target.email }}" required></label>
+    <label>{{ t('field.language') }}
+      <select name="language">{% for code in languages %}<option value="{{ code }}" {% if code == target.language %}selected{% endif %}>{{ t('lang.' ~ code) }}</option>{% endfor %}</select>
+    </label>
+    <fieldset>
+      <legend>{{ t('field.roles') }}</legend>
+      {% for r in Role %}<label class="check"><input type="checkbox" name="roles" value="{{ r.value }}" {% if target.has_role(r) %}checked{% endif %}> {{ t('role.' ~ r.value) }}</label>{% endfor %}
+    </fieldset>
+    <label class="check"><input type="checkbox" name="active" value="true" {% if target.active %}checked{% endif %}> {{ t('field.active') }}</label>
+    {% if is_self %}<p class="muted">{{ t('users.self_note') }}</p>{% endif %}
+    <label>{{ t('field.new_password') }}<input type="password" name="password" minlength="10" autocomplete="new-password"></label>
+    <button class="primary">{{ t('action.save') }}</button>
+  </form>
+
+  {% if not is_self %}
+  <details class="reject">
+    <summary>{{ t('action.delete_user') }}</summary>
+    <p>{{ t('users.delete_history' if has_history else 'users.delete_plain') }}</p>
+    <form method="post" action="/portal/users/{{ target.id }}/delete">
+      <button class="danger">{{ t('users.delete_confirm') }}</button>
+    </form>
+  </details>
+  {% endif %}
+</section>
+{% endblock %}

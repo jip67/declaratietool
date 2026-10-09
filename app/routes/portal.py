@@ -1,15 +1,17 @@
 """Portaal voor voorzitter, boekhouder, secretaris en beheerder."""
 
+import secrets
+
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import RedirectResponse
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
 from .. import storage, updates, workflow
 from ..config import get_settings
 from ..db import get_db
 from ..i18n import available_languages
-from ..models import OPEN_STATUSES, ROLE_FOR_STATUS, Attachment, Claim, Role, Status, Submitter, User
+from ..models import OPEN_STATUSES, ROLE_FOR_STATUS, Attachment, Claim, Event, Role, Status, Submitter, User
 from ..security import hash_password
 from ..web import current_user, file_response, render, require_admin
 from .public import validate_details
@@ -176,9 +178,17 @@ def portal_file(attachment_id: int, stamped: bool = False, user: User = Depends(
 # ---------------------------------------------------------------- gebruikersbeheer
 
 
+DELETED_DOMAIN = "@invalid"
+
+
+def list_users(db: Session) -> list[User]:
+    """Alle gebruikers, zonder de verwijderde (geanonimiseerde) accounts."""
+    return db.scalars(select(User).where(User.email.not_like(f"%{DELETED_DOMAIN}")).order_by(User.name)).all()
+
+
 @router.get("/users")
 def users_page(request: Request, user: User = Depends(require_admin), db: Session = Depends(get_db)):
-    users = db.scalars(select(User).order_by(User.name)).all()
+    users = list_users(db)
     error = request.query_params.get("error")
     return render(
         request, "portal/users.html", user.language,
@@ -206,7 +216,7 @@ def create_user(
     elif db.scalar(select(User).where(User.email == email)):
         error = "error.user_exists"
     if error:
-        users = db.scalars(select(User).order_by(User.name)).all()
+        users = list_users(db)
         return render(request, "portal/users.html", user.language, status_code=422, user=user, users=users, error=error)
     db.add(
         User(
@@ -221,30 +231,96 @@ def create_user(
     return RedirectResponse("/portal/users", status_code=303)
 
 
+def _target(db: Session, user_id: int) -> User:
+    target = db.get(User, user_id)
+    if target is None:
+        raise HTTPException(status_code=404)
+    return target
+
+
+def _render_edit(request: Request, db: Session, user: User, target: User, error: str | None = None, status_code: int = 200):
+    return render(
+        request, "portal/user_edit.html", user.language, status_code=status_code,
+        user=user, target=target, error=error, has_history=has_history(db, target),
+    )
+
+
+def has_history(db: Session, target: User) -> bool:
+    """Komt deze gebruiker voor in een declaratie of het logboek? Dan niet echt verwijderen."""
+    fields = (Claim.created_by_id, Claim.approved_by_id, Claim.prepared_by_id, Claim.paid_by_id, Claim.rejected_by_id)
+    if db.scalar(select(Claim.id).where(or_(*(f == target.id for f in fields))).limit(1)):
+        return True
+    return db.scalar(select(Event.id).where(Event.user_id == target.id).limit(1)) is not None
+
+
+@router.get("/users/{user_id}")
+def edit_user_page(user_id: int, request: Request, user: User = Depends(require_admin), db: Session = Depends(get_db)):
+    return _render_edit(request, db, user, _target(db, user_id))
+
+
 @router.post("/users/{user_id}")
 def update_user(
     user_id: int,
+    request: Request,
+    name: str = Form(""),
+    email: str = Form(""),
+    language: str = Form(""),
     roles: list[str] = Form(default=[]),
     active: bool = Form(False),
     password: str = Form(""),
     user: User = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
-    target = db.get(User, user_id)
-    if target is None:
-        raise HTTPException(status_code=404)
+    target = _target(db, user_id)
+    email = email.strip().lower()
+    error = None
+    if email and "@" not in email:
+        error = "error.email"
+    elif email and email != target.email and db.scalar(select(User).where(User.email == email)):
+        error = "error.user_exists"
+    elif password and len(password) < 10:
+        error = "error.password_short"
+    if error:
+        return _render_edit(request, db, user, target, error=error, status_code=422)
+
     new_roles = [r for r in roles if r in {x.value for x in Role}]
-    # Voorkom dat je jezelf buitensluit.
+    # Voorkom dat je jezelf buitensluit; zo blijft er ook altijd een beheerder over.
     if target.id == user.id:
         active = True
         if Role.ADMIN.value not in new_roles:
             new_roles.append(Role.ADMIN.value)
     target.roles = ",".join(new_roles)
     target.active = active
+    if name.strip():
+        target.name = name.strip()
+    if language in available_languages():
+        target.language = language
+    if email and email != target.email:
+        # Een gebruiker ziet zijn declaraties via het e-mailadres van de indiener; verhuis dat mee.
+        submitter = db.scalar(select(Submitter).where(Submitter.email == target.email))
+        if submitter and not db.scalar(select(Submitter).where(Submitter.email == email)):
+            submitter.email = email
+        target.email = email
     if password:
-        if len(password) < 10:
-            return RedirectResponse("/portal/users?error=password_short", status_code=303)
         target.password_hash = hash_password(password)
+    db.commit()
+    return RedirectResponse("/portal/users", status_code=303)
+
+
+@router.post("/users/{user_id}/delete")
+def delete_user(user_id: int, request: Request, user: User = Depends(require_admin), db: Session = Depends(get_db)):
+    target = _target(db, user_id)
+    if target.id == user.id:
+        return _render_edit(request, db, user, target, error="error.delete_self", status_code=422)
+    if has_history(db, target):
+        # Bewaar het logboek: maak het account onbruikbaar en anoniem in plaats van het te wissen.
+        target.name = f"Verwijderde gebruiker {target.id}"
+        target.email = f"verwijderd-{target.id}{DELETED_DOMAIN}"
+        target.password_hash = hash_password(secrets.token_urlsafe(32))
+        target.roles = ""
+        target.active = False
+    else:
+        db.delete(target)
     db.commit()
     return RedirectResponse("/portal/users", status_code=303)
 
