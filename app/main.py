@@ -65,6 +65,8 @@ def create_app() -> FastAPI:
         headers.setdefault("X-Frame-Options", "SAMEORIGIN")
         # Persoonlijke links (/c/...) mogen niet via de Referer naar andere sites lekken.
         headers.setdefault("Referrer-Policy", "same-origin")
+        # Niet in zoekmachines opnemen.
+        headers.setdefault("X-Robots-Tag", "noindex, nofollow")
         if headers.get("content-type", "").startswith("text/html"):
             headers.setdefault("Content-Security-Policy", CONTENT_SECURITY_POLICY)
         return response
@@ -81,7 +83,7 @@ def create_app() -> FastAPI:
 
     @app.get("/", include_in_schema=False)
     def index():
-        return RedirectResponse("/indienen", status_code=303)
+        return RedirectResponse("/portal", status_code=303)
 
     @app.get("/health", include_in_schema=False)
     def health():

@@ -34,7 +34,7 @@ Alle instellingen staan in `.env` (zie `.env.example`). Na een wijziging: `docke
 
 Elke **ongelezen** mail in de map wordt verwerkt en daarna als gelezen gemarkeerd. Foto's (jpg, png, heic, webp) en pdf's worden bijlagen; kleine plaatjes in de tekst (logo's in handtekeningen) worden overgeslagen. Automatische antwoorden (afwezigheidsmeldingen) worden genegeerd.
 
-Gebruik je een mailprovider zonder IMAP (zoals Proton Mail), laat `IMAP_HOST` dan leeg. Indieners uploaden hun bon dan via `https://<jouw-domein>/indienen`; de rest werkt hetzelfde.
+Gebruik je een mailprovider zonder IMAP (zoals Proton Mail), laat `IMAP_HOST` dan leeg. Declaraties kunnen dan alleen via het portaal worden ingediend, door gebruikers met een account of door een medewerker namens iemand.
 
 ## Uitgaande mail (SMTP)
 

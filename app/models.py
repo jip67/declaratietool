@@ -23,6 +23,11 @@ class Role(str, enum.Enum):
     TREASURER = "treasurer"  # boekhouder/penningmeester: zet betaling klaar
     SECRETARY = "secretary"  # secretaris: geeft betaling akkoord bij de bank
     ADMIN = "admin"  # beheert gebruikers
+    MEMBER = "member"  # gebruiker: dient eigen declaraties in en ziet alleen die
+
+
+# Rollen die alle declaraties zien en mogen afhandelen.
+STAFF_ROLES = (Role.CHAIR, Role.TREASURER, Role.SECRETARY, Role.ADMIN)
 
 
 class Status(str, enum.Enum):
@@ -64,6 +69,10 @@ class User(Base):
 
     def has_role(self, role: Role) -> bool:
         return role in self.role_list
+
+    @property
+    def is_staff(self) -> bool:
+        return any(self.has_role(r) for r in STAFF_ROLES)
 
 
 class Submitter(Base):

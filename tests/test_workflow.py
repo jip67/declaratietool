@@ -3,7 +3,8 @@ from email.message import EmailMessage
 from sqlalchemy import select
 
 from app import intake, mailer, reminders
-from app.models import Claim, KeyValue, Status, Submitter
+from app.models import Claim, KeyValue, Status, Submitter, User
+from app.security import hash_password
 from app.storage import absolute
 
 from .conftest import jpeg_bytes, login, pdf_bytes
@@ -178,40 +179,64 @@ def test_login_lockout(client, staff):
     assert r.status_code == 429
 
 
-def test_upload_page(db, client):
-    from app.routes import public
+def test_only_login_page_is_public(db, client):
+    r = client.get("/", follow_redirects=True)
+    assert r.url.path == "/login"
+    assert "/help" not in r.text and "/indienen" not in r.text
+    assert client.get("/indienen").status_code == 404
+    assert client.post("/indienen", data={"email": "a@b.nl"}).status_code in (404, 405)
+    assert client.get("/help", follow_redirects=False).status_code == 303
 
-    public._uploads.clear()
+
+def make_member(db, email="lid@example.org"):
+    db.add(User(email=email, name="Lies Lid", password_hash=hash_password("geheim12345"), roles="member"))
+    db.commit()
+
+
+def test_member_submits_and_sees_only_own_claims(db, client, staff):
+    make_member(db)
+    intake.process_message(db, make_mail([("bon.jpg", "image/jpeg", jpeg_bytes())]))  # van Piet
+    other = db.scalar(select(Claim))
+    login(client, "lid@example.org")
     r = client.post(
-        "/indienen",
-        data={"email": "Kees@Example.org", "name": "Kees"},
-        files=[("files", ("bon.jpg", jpeg_bytes(), "image/jpeg"))],
+        "/portal/claims/new",
+        data={"email": "iemand@anders.nl", "iban": IBAN, "account_holder": "L. Lid",
+              "description": "Koffie", "amount": "8,50"},
+        files=[("files", ("bon.pdf", pdf_bytes(), "application/pdf"))],
+        follow_redirects=False,
     )
-    assert r.status_code == 200 and "kees@example.org" in r.text
-    claim = db.scalar(select(Claim))
-    assert claim.source == "upload" and claim.status == Status.RECEIVED.value
-    # De link staat alleen in de mail, niet op de pagina.
-    assert claim.token not in r.text
-    assert f"/c/{claim.token}" in sent_to("kees@example.org")[-1].get_content()
+    assert r.status_code == 303
+    mine = db.scalars(select(Claim).order_by(Claim.id.desc())).first()
+    assert mine.submitter.email == "lid@example.org" and mine.status == Status.SUBMITTED.value
+    page = client.get("/portal").text
+    assert mine.reference in page and other.reference not in page
+    assert client.get(f"/portal/claims/{mine.id}").status_code == 200
+    assert client.get(f"/portal/claims/{other.id}").status_code == 404
+    assert client.get(f"/portal/files/{other.attachments[0].id}").status_code == 404
+    # Afhandelen of afwijzen mag een gebruiker niet, ook niet bij een eigen declaratie.
+    r = client.post(f"/portal/claims/{mine.id}/action", data={"action": "reject", "reason": "x"})
+    assert r.status_code == 403
+    assert client.get("/portal/users").status_code == 403
 
 
-def test_upload_requires_file_and_blocks_bots(db, client):
-    from app.routes import public
-
-    public._uploads.clear()
-    assert client.post("/indienen", data={"email": "a@b.nl"}).status_code == 422
-    r = client.post("/indienen", data={"email": "a@b.nl", "website": "spam"},
-                    files=[("files", ("bon.jpg", jpeg_bytes(), "image/jpeg"))])
-    assert r.status_code == 200
-    assert db.scalar(select(Claim)) is None
+def test_admin_creates_member(db, client, staff):
+    login(client, "boekhouder@example.org")
+    r = client.post(
+        "/portal/users",
+        data={"email": "Nieuw@Example.org", "name": "Nieuw Lid", "password": "lang-genoeg-1", "roles": ["member"]},
+        follow_redirects=False,
+    )
+    assert r.status_code == 303
+    user = db.scalar(select(User).where(User.email == "nieuw@example.org"))
+    assert user.roles == "member" and not user.is_staff
 
 
 def test_dutch_is_default_regardless_of_browser(db, client):
-    r = client.get("/indienen", headers={"Accept-Language": "en-US,en;q=0.9"})
+    r = client.get("/login", headers={"Accept-Language": "en-US,en;q=0.9"})
     assert 'lang="nl"' in r.text
     # Een gekozen taal blijft onthouden.
-    client.get("/indienen?lang=en")
-    assert 'lang="en"' in client.get("/indienen").text
+    client.get("/login?lang=en")
+    assert 'lang="en"' in client.get("/login").text
 
 
 def test_attachment_preview(db, client, staff):
@@ -228,8 +253,8 @@ def test_attachment_preview(db, client, staff):
 
 
 def test_help_page(client, staff):
-    assert "Een declaratie indienen" in client.get("/help").text
-    assert "Submitting a claim" in client.get("/help?lang=en").text
     login(client, "voorzitter@example.org")
-    r = client.get("/help")
+    assert "Submitting a claim" in client.get("/help?lang=en").text
+    r = client.get("/help?lang=nl")
+    assert "Een declaratie indienen" in r.text
     assert '<a href="#voorzitter" class="mine">' in r.text and "Uitloggen" in r.text

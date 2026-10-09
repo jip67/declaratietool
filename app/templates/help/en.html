@@ -2,7 +2,7 @@
 <h2 id="indiener">Submitting a claim</h2>
 <ol>
   <li>Take a photo or make a pdf of your receipt or invoice.</li>
-  <li>{% if mailbox %}Email the receipt to <a href="mailto:{{ mailbox }}">{{ mailbox }}</a>, or upload it{% else %}Upload the receipt{% endif %} via <a href="/indienen">Submit a claim</a>. Several receipts in one email or upload become one claim.</li>
+  <li>{% if mailbox %}Email the receipt to <a href="mailto:{{ mailbox }}">{{ mailbox }}</a>, or{% else %}Log in and{% endif %} add it in the portal via <a href="/portal/claims/new">New claim</a>. Several receipts in one email become one claim.</li>
   <li>You receive a confirmation email with a personal link.</li>
   <li>Use that link to fill in the amount, a description, your IBAN and the account holder. Keep "remember" ticked and your bank details will be filled in next time (you can always change them).</li>
   <li>You get an email at every step: approved, payment prepared, paid, or rejected with the reason. The same link always shows the status.</li>
@@ -42,6 +42,7 @@
 <h2 id="beheer">Administration</h2>
 <ul>
   <li>With the Administrator role you see the <strong>Users</strong> page. There you add people, assign roles, deactivate accounts and set a new password.</li>
+  <li>Give members who want to submit claims themselves the <strong>Member</strong> role. They can log in, create a claim and only see their own claims.</li>
   <li>When the board changes, create an account for the new board member and deactivate the old one. History is kept.</li>
   <li>Everyone can change their language and password under their own name (top right).</li>
 </ul>

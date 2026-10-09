@@ -39,7 +39,7 @@
     {% endwith %}
   {% endfor %}
 
-  {% if claim.status not in ['paid', 'rejected'] %}
+  {% if user.is_staff and claim.status not in ['paid', 'rejected'] %}
   <details class="reject">
     <summary>{{ t('action.reject') }}</summary>
     <form method="post" action="/portal/claims/{{ claim.id }}/action">

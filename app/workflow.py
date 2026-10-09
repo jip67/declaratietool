@@ -288,7 +288,7 @@ def mark_paid(db: Session, claim: Claim, user: User) -> None:
 
 
 def reject(db: Session, claim: Claim, user: User, reason: str) -> None:
-    if not any(user.has_role(r) for r in Role):
+    if not user.is_staff:
         raise WorkflowError("not_allowed")
     if claim.status_enum in (Status.PAID, Status.REJECTED):
         raise WorkflowError("wrong_status")

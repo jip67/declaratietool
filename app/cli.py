@@ -62,7 +62,7 @@ def main(argv=None) -> int:
     p = sub.add_parser("create-user", help="Maak of wijzig een portaalgebruiker")
     p.add_argument("--email", required=True)
     p.add_argument("--name", required=True)
-    p.add_argument("--roles", default="admin", help="Komma-gescheiden: admin,chair,treasurer,secretary")
+    p.add_argument("--roles", default="admin", help="Komma-gescheiden: admin,chair,treasurer,secretary,member")
     p.add_argument("--language", default="nl")
     p.add_argument("--password", help="Laat leeg om het wachtwoord veilig in te typen")
     p.set_defaults(func=create_user)
