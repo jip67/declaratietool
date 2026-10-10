@@ -8,7 +8,7 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy import func, or_, select, update
 from sqlalchemy.orm import Session
 
-from .. import mailconfig, storage, updates, workflow
+from .. import mailconfig, notifications, storage, updates, workflow
 from ..config import get_settings
 from ..db import get_db
 from ..i18n import available_languages
@@ -564,6 +564,26 @@ async def mail_save(request: Request, user: User = Depends(require_admin), db: S
     for name in mailconfig.SECRET_FIELDS:
         setattr(config, name, "")
     return _render_mail(request, db, user, form=config, message=message)
+
+
+# ---------------------------------------------------------------- meldingen voor de beheerder
+
+
+@router.get("/notifications")
+def notifications_page(request: Request, user: User = Depends(require_admin), db: Session = Depends(get_db)):
+    return render(
+        request, "portal/notifications.html", user.language,
+        user=user, choices=notifications.load(db), kinds=notifications.KINDS,
+        recipients=notifications.recipients(db), saved=request.query_params.get("saved") == "1",
+    )
+
+
+@router.post("/notifications")
+async def notifications_save(request: Request, user: User = Depends(require_admin), db: Session = Depends(get_db)):
+    form = await request.form()
+    notifications.save(db, {kind: kind in form for kind in notifications.KINDS})
+    db.commit()
+    return RedirectResponse("/portal/notifications?saved=1", status_code=303)
 
 
 # ---------------------------------------------------------------- logboek

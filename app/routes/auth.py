@@ -3,12 +3,12 @@
 from collections import defaultdict
 from datetime import UTC, datetime, timedelta
 
-from fastapi import APIRouter, Depends, Form, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, Form, Request
 from fastapi.responses import RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from .. import activity
+from .. import activity, notifications
 from ..db import get_db
 from ..i18n import available_languages
 from ..models import User
@@ -45,6 +45,7 @@ def login_page(request: Request, next: str = "/portal"):
 @router.post("/login")
 def login(
     request: Request,
+    background: BackgroundTasks,
     email: str = Form(...),
     password: str = Form(...),
     next: str = Form("/portal"),
@@ -71,12 +72,18 @@ def login(
         activity.record_login(db, key, ip, agent, user=user, reason=reason)
         _failures[key].append(datetime.now(UTC))
         _failures[ip_key].append(datetime.now(UTC))
+        # Precies op de grens gaat de blokkering in: dan één melding, niet bij elke volgende poging.
+        if len(_failures[key]) == MAX_ATTEMPTS:
+            notifications.lockout(db, key, ip, by_ip=False, background=background)
+        elif len(_failures[ip_key]) == MAX_ATTEMPTS_PER_IP:
+            notifications.lockout(db, key, ip, by_ip=True, background=background)
         return render(
             request, "login.html", request_language(request), status_code=401,
             next=_safe_next(next), error="error.login",
         )
     _failures.pop(key, None)
     activity.record_login(db, key, ip, agent, user=user)
+    notifications.login(db, user, ip, agent, background)
     request.session.clear()
     request.session["user_id"] = user.id
     request.session["lang"] = user.language
