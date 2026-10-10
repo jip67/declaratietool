@@ -8,7 +8,7 @@ from email.utils import parseaddr
 
 from sqlalchemy.orm import Session
 
-from . import activity, mailconfig, mailer, workflow
+from . import activity, mailconfig, mailer, notifications, workflow
 from .config import get_settings
 from .i18n import pick_language, translate
 from .storage import guess_type
@@ -71,6 +71,7 @@ def process_message(db: Session, raw: bytes) -> str:
         # De declaratie is al opgeslagen; een mislukte logregel mag niet tot een dubbele leiden.
         db.rollback()
         log.exception("Mail kon niet in het logboek worden gezet")
+    notifications.incoming_mail(db, sender, subject, len(files), result, claim)
     return result
 
 
@@ -141,6 +142,7 @@ def _record_failure(db: Session, raw: bytes) -> None:
         sender, subject = sender_and_subject(parse(raw))
         if not activity.recent_error(db, sender, subject):
             activity.record_mail(db, sender, subject, 0, "error")
+            notifications.incoming_mail(db, sender, subject, 0, "error")
     except Exception:
         db.rollback()
         log.exception("Mail kon niet in het logboek worden gezet")

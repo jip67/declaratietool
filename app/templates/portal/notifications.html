@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}{{ t('nav.notifications') }}{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>{{ t('nav.notifications') }}</h1>
+  <p class="muted">{{ t('notify.intro') }}</p>
+  {% if saved %}<p class="success">{{ t('notify.saved') }}</p>{% endif %}
+
+  <form method="post" action="/portal/notifications">
+    <fieldset>
+      {% for kind in kinds %}
+      <div class="option">
+        <label class="check"><input type="checkbox" name="{{ kind }}" {% if choices[kind] %}checked{% endif %}> {{ t('notify.option.' ~ kind) }}</label>
+        <p class="muted small">{{ t('notify.option.' ~ kind ~ '_help') }}</p>
+      </div>
+      {% endfor %}
+    </fieldset>
+    {% if recipients %}
+    <p>{{ t('notify.recipients') }} {% for r in recipients %}{{ r.name }} &lt;{{ r.email }}&gt;{% if not loop.last %}, {% endif %}{% endfor %}</p>
+    {% else %}
+    <p class="error">{{ t('notify.no_recipients') }}</p>
+    {% endif %}
+    <div class="actions"><button class="primary">{{ t('action.save') }}</button></div>
+  </form>
+</section>
+{% endblock %}
