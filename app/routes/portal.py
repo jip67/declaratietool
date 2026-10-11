@@ -453,6 +453,15 @@ def delete_user(user_id: int, request: Request, user: User = Depends(require_adm
     return RedirectResponse("/portal/users", status_code=303)
 
 
+@router.post("/users/{user_id}/reset-2fa")
+def reset_user_2fa(user_id: int, user: User = Depends(require_admin), db: Session = Depends(get_db)):
+    """Voor wie de telefoon en de herstelcodes kwijt is: daarna logt diegene weer in met alleen het wachtwoord."""
+    target = _target(db, user_id)
+    target.clear_2fa()
+    db.commit()
+    return RedirectResponse(f"/portal/users/{target.id}", status_code=303)
+
+
 # ---------------------------------------------------------------- bijwerken
 
 

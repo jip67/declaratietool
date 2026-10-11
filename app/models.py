@@ -4,7 +4,7 @@ import enum
 import secrets
 from datetime import UTC, datetime
 
-from sqlalchemy import ForeignKey, Integer, String, Text, DateTime, Boolean
+from sqlalchemy import ForeignKey, Integer, String, Text, DateTime, Boolean, false
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .db import Base
@@ -62,6 +62,32 @@ class User(Base):
     language: Mapped[str] = mapped_column(String(8), default="nl")
     active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    # Tweestapsverificatie: via authenticator-app (totp_secret) of een code per e-mail (email_2fa).
+    totp_secret: Mapped[str] = mapped_column(String(64), default="", server_default="")
+    totp_last_step: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    email_2fa: Mapped[bool] = mapped_column(Boolean, default=False, server_default=false())
+    email_code_hash: Mapped[str] = mapped_column(String(64), default="", server_default="")
+    email_code_sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    recovery_codes: Mapped[str] = mapped_column(Text, default="", server_default="")  # sha256-hashes, komma-gescheiden
+
+    @property
+    def twofa_method(self) -> str:
+        """'app', 'email' of '' (uit)."""
+        if self.totp_secret:
+            return "app"
+        return "email" if self.email_2fa else ""
+
+    @property
+    def has_2fa(self) -> bool:
+        return bool(self.twofa_method)
+
+    def clear_2fa(self) -> None:
+        self.totp_secret = ""
+        self.totp_last_step = 0
+        self.email_2fa = False
+        self.email_code_hash = ""
+        self.email_code_sent_at = None
+        self.recovery_codes = ""
 
     @property
     def role_list(self) -> list[Role]:

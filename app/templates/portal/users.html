@@ -6,7 +6,7 @@
   {% set is_admin = user.has_role(Role.ADMIN) %}
   {% if error %}<p class="error">{{ t(error) }}</p>{% endif %}
   <table class="list">
-    <thead><tr><th>{{ t('field.name') }}</th><th>{{ t('field.email') }}</th><th>{{ t('field.roles') }}</th><th>{{ t('field.active') }}</th><th></th></tr></thead>
+    <thead><tr><th>{{ t('field.name') }}</th><th>{{ t('field.email') }}</th><th>{{ t('field.roles') }}</th><th>{{ t('field.active') }}</th><th>{{ t('2fa.short') }}</th><th></th></tr></thead>
     <tbody>
     {% for u in users %}
       <tr>
@@ -14,6 +14,7 @@
         <td data-label="{{ t('field.email') }}">{{ u.email }}</td>
         <td data-label="{{ t('field.roles') }}">{% for r in u.role_list %}{{ t('role.' ~ r.value) }}{% if not loop.last %}, {% endif %}{% endfor %}</td>
         <td data-label="{{ t('field.active') }}">{{ t('users.yes') if u.active else t('users.no') }}</td>
+        <td data-label="{{ t('2fa.short') }}">{{ t('2fa.method_' ~ u.twofa_method) if u.has_2fa else t('users.no') }}</td>
         <td>{% if is_admin %}<a class="button" href="/portal/users/{{ u.id }}">{{ t('action.edit') }}</a>{% endif %}</td>
       </tr>
     {% endfor %}

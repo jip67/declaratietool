@@ -22,6 +22,20 @@
     <button class="primary">{{ t('action.save') }}</button>
   </form>
 
+  <h2>{{ t('2fa.title') }}</h2>
+  {% if target.has_2fa %}
+  <p>{{ t('2fa.status_on_' ~ target.twofa_method) }}</p>
+  <details class="reject">
+    <summary>{{ t('2fa.reset') }}</summary>
+    <p>{{ t('2fa.reset_help') }}</p>
+    <form method="post" action="/portal/users/{{ target.id }}/reset-2fa">
+      <button class="danger">{{ t('2fa.reset_confirm') }}</button>
+    </form>
+  </details>
+  {% else %}
+  <p class="muted">{{ t('2fa.status_off') }}</p>
+  {% endif %}
+
   {% if not is_self %}
   <details class="reject">
     <summary>{{ t('action.delete_user') }}</summary>

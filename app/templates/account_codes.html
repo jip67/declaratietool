@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}{{ t('2fa.codes_title') }}{% endblock %}
+{% block content %}
+<section class="card narrow">
+  <h1>{{ t('2fa.codes_title') }}</h1>
+  <p class="success">{{ t('2fa.enabled') }}</p>
+  <p>{{ t('2fa.codes_intro') }}</p>
+  <ul class="recovery-codes">{% for c in codes %}<li><code>{{ c }}</code></li>{% endfor %}</ul>
+  <p class="muted">{{ t('2fa.codes_once') }}</p>
+  <p><a class="button primary" href="/account">{{ t('2fa.codes_done') }}</a></p>
+</section>
+{% endblock %}

@@ -8,6 +8,12 @@
 - **Wachtwoorden** worden opgeslagen als scrypt-hash, nooit leesbaar.
 - **Wachtwoorden raden** wordt afgeremd: na 5 foute pogingen op één account, of 20 vanaf één IP-adres,
   moet je 15 minuten wachten.
+- **Tweestapsverificatie (2FA)** kan iedereen zelf aanzetten onder de eigen naam (rechtsboven). Na het
+  wachtwoord vul je dan ook een code in, uit een authenticator-app (Google Authenticator, Microsoft
+  Authenticator, Bitwarden, 1Password, Aegis, …) of uit een mail die de tool stuurt. De app is het veiligst;
+  de mailcode is zo veilig als je mailbox. Bij het aanzetten krijg je 10 herstelcodes die elk één keer werken.
+  Mislukte codes tellen mee voor de blokkering hierboven en staan in het logboek. Is iemand telefoon én
+  herstelcodes kwijt, dan zet een beheerder het via Gebruikers → Bewerken weer uit. Zie [gebruik.md](gebruik.md#tweestapsverificatie).
 - **Logboek**: bestuursleden en beheerders zien onder Instellingen → Logboek elke geslaagde en mislukte inlogpoging met tijd, IP-adres en
   reden, en alle binnengekomen mail. Na 90 dagen worden de regels automatisch verwijderd.
 - **Inlogsessie** zit in een ondertekend cookie (alleen via https, niet vanaf andere sites mee te sturen,

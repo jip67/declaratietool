@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}{{ t('login.title') }}{% endblock %}
+{% block content %}
+<section class="card narrow">
+  <h1>{{ t('login2fa.title_' ~ method) }}</h1>
+  {% if error %}<p class="error">{{ t(error) }}</p>{% endif %}
+  {% if message %}<p class="success">{{ t(message) }}</p>{% endif %}
+  <p>{{ t('login2fa.intro_' ~ method) }}</p>
+  <form method="post" action="/login/2fa">
+    <label>{{ t('field.code') }}<input name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="20" required autofocus></label>
+    <button class="primary">{{ t('login2fa.submit') }}</button>
+  </form>
+  {% if method == 'email' %}
+  <form method="post" action="/login/2fa/resend">
+    <button>{{ t('login2fa.resend') }}</button>
+  </form>
+  {% endif %}
+  <p class="muted">{{ t('login2fa.recovery_hint') }}</p>
+  <p><a href="/login">{{ t('login2fa.back') }}</a></p>
+</section>
+{% endblock %}
