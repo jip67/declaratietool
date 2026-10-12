@@ -274,4 +274,5 @@ def test_help_page(client, staff):
     assert "Submitting a claim" in client.get("/help?lang=en").text
     r = client.get("/help?lang=nl")
     assert "Een declaratie indienen" in r.text
+    assert 'id="veiligheid"' in r.text and "De tool kan niet bij de bank" in r.text
     assert '<a href="#voorzitter" class="mine">' in r.text and "Uitloggen" in r.text
