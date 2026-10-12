@@ -7,7 +7,7 @@
   {% include "_steps.html" %}
   {% if error %}<p class="error">{{ t('error.' ~ error) }}</p>{% endif %}
 
-  {% if my_task or (user.has_role(Role.ADMIN) and claim.status in ['submitted', 'approved', 'payment_prepared']) %}
+  {% if my_task %}
   <div class="task">
     {% set role = ROLE_FOR_STATUS[Status(claim.status)] %}
     <p><strong>{{ t('task.yours') }}:</strong> {{ t('task.' ~ role.value) }}</p>

@@ -65,7 +65,9 @@ def test_admin_deletes_claim_and_files(db, client, staff):
     make_claim(client)
     claim = db.scalar(select(Claim))
     claim_id = claim.id
+    login(client, "voorzitter@example.org")
     client.post(f"/portal/claims/{claim_id}/action", data={"action": "approve"})
+    login(client, "boekhouder@example.org")
     db.refresh(claim)
     att = claim.attachments[0]
     original, stamped = storage.absolute(att.stored_path), storage.absolute(att.stamped_path)

@@ -231,7 +231,8 @@ def complete_details(
 
 
 def _require(user: User, role: Role) -> None:
-    if not (user.has_role(role) or user.has_role(Role.ADMIN)):
+    # Alleen wie de rol zelf heeft mag de stap zetten; beheerder geeft geen extra rechten.
+    if not user.has_role(role):
         raise WorkflowError("not_allowed")
 
 

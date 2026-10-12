@@ -60,6 +60,8 @@ Rechtsboven staat het menu **Instellingen**. Wat je daarin ziet hangt af van je 
 | Voorzitter, boekhouder, secretaris | bekijken | ja | – | – | – |
 | Beheerder | bekijken en wijzigen | ja | ja | ja | ja |
 
+De rol Beheerder geeft geen rechten in de declaratiestappen. Goedkeuren kan alleen de voorzitter, de betaling klaarzetten alleen de boekhouder en akkoord geven alleen de secretaris. Heeft iemand meerdere rollen, dan mag hij de stappen van al die rollen zetten.
+
 Gebruikers met de rol **Beheerder** voegen op de pagina **Gebruikers** mensen toe. Met **Bewerken** pas je naam, e-mailadres, taal en rollen aan, zet je een account uit of stel je een nieuw wachtwoord in. Onderaan die pagina kun je een gebruiker **verwijderen**. Komt iemand al voor in de geschiedenis van een declaratie (bijvoorbeeld omdat hij iets heeft goedgekeurd), dan wordt het account niet gewist maar uitgeschakeld en geanonimiseerd, zodat het logboek blijft kloppen. Je eigen account kun je niet verwijderen of uitzetten, en je houdt altijd de rol Beheerder. Geef leden die zelf declaraties willen indienen de rol **Gebruiker**: zij kunnen inloggen, een declaratie aanmaken en alleen hun eigen declaraties en de status daarvan zien. Iedereen kan onder zijn eigen naam (rechtsboven) zijn taal en wachtwoord wijzigen.
 
 Onder **Logboek** (voor bestuursleden en beheerders) staan drie tabbladen:
