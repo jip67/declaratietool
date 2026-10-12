@@ -82,6 +82,17 @@ Onder **Instellingen → Meldingen** kiest de beheerder bij welke gebeurtenissen
 
 De meldingen gaan naar alle actieve gebruikers met de rol Beheerder, elk in de eigen taal.
 
+## Tweestapsverificatie
+
+Iedereen met een account kan onder de eigen naam (rechtsboven) **tweestapsverificatie** aanzetten. Na het wachtwoord vraagt de tool dan om een code van 6 cijfers. Je kiest zelf hoe je die krijgt:
+
+- **Authenticator-app** (aanbevolen): kies *Instellen met app*, scan de QR-code met bijvoorbeeld Google Authenticator, Microsoft Authenticator of Bitwarden (of typ de sleutel over) en vul ter controle de code in die de app toont.
+- **Code per e-mail**: kies *Instellen met e-mail*. De tool stuurt een code naar je e-mailadres; vul die in om het aan te zetten. Bij elke login krijg je een nieuwe code, die 10 minuten geldig is. Met *Stuur een nieuwe code* vraag je (hooguit één keer per minuut) een nieuwe aan.
+
+Daarna krijg je **10 herstelcodes**. Bewaar ze goed, bijvoorbeeld in je wachtwoordmanager: zonder telefoon of mail log je daarmee toch in, en elke code werkt één keer. Op de accountpagina zie je hoeveel er nog over zijn en maak je nieuwe aan. Uitzetten kan daar ook, met je wachtwoord.
+
+Een beheerder ziet op de pagina **Gebruikers** wie 2FA gebruikt (App of E-mail). Is iemand zowel de telefoon als de herstelcodes kwijt, dan zet de beheerder het via **Bewerken → Tweestapsverificatie resetten** uit; die persoon logt daarna in met alleen het wachtwoord en kan het opnieuw instellen.
+
 ## Hulp
 
 Via **Help** rechtsboven staat deze uitleg ook in de tool zelf, in het Nederlands en Engels. Ingelogde medewerkers zien de onderdelen voor hun eigen rol gemarkeerd.

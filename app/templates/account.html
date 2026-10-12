@@ -15,5 +15,35 @@
     <label>{{ t('account.new_password') }}<input type="password" name="new_password" minlength="10" autocomplete="new-password"></label>
     <button class="primary">{{ t('action.save') }}</button>
   </form>
+
+  <h2>{{ t('2fa.title') }}</h2>
+  {% if user.has_2fa %}
+  <p class="success">{{ t('2fa.status_on_' ~ user.twofa_method) }}</p>
+  <p class="muted">{{ t('2fa.codes_left', count=codes_left) }}</p>
+  <details>
+    <summary>{{ t('2fa.new_codes') }}</summary>
+    <form method="post" action="/account/2fa/recovery">
+      <label>{{ t('account.current_password') }}<input type="password" name="password" required autocomplete="current-password"></label>
+      <button>{{ t('2fa.new_codes') }}</button>
+    </form>
+  </details>
+  <details class="reject">
+    <summary>{{ t('2fa.disable') }}</summary>
+    <form method="post" action="/account/2fa/disable">
+      <label>{{ t('account.current_password') }}<input type="password" name="password" required autocomplete="current-password"></label>
+      <button class="danger">{{ t('2fa.disable') }}</button>
+    </form>
+  </details>
+  {% else %}
+  <p>{{ t('2fa.intro') }}</p>
+  <ul>
+    <li>{{ t('2fa.option_app') }}</li>
+    <li>{{ t('2fa.option_email') }}</li>
+  </ul>
+  <div class="actions">
+    <a class="button primary" href="/account/2fa">{{ t('2fa.setup_app') }}</a>
+    <form method="post" action="/account/2fa/email/start"><button>{{ t('2fa.setup_email') }}</button></form>
+  </div>
+  {% endif %}
 </section>
 {% endblock %}

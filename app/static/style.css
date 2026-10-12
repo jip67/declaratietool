@@ -278,3 +278,9 @@ table.list .comment-flag:hover { color: var(--primary); }
 .option { margin-bottom: .9rem; }
 .option label.check { margin-bottom: 0; }
 .option p { margin: .15rem 0 0 1.6rem; }
+
+/* Tweestapsverificatie: QR-code altijd op wit, anders scant de app hem niet in donkere modus. */
+img.qr { background: #fff; padding: .4rem; border-radius: 6px; border: 1px solid var(--line); max-width: 100%; height: auto; }
+code.secret { font-size: 1.05rem; letter-spacing: .05em; word-break: break-all; }
+ul.recovery-codes { columns: 2; list-style: none; padding: 0; font-size: 1.1rem; }
+ul.recovery-codes li { padding: .2rem 0; }
