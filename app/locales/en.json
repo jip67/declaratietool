@@ -312,5 +312,8 @@
   "2fa.status_on_app": "Two-step verification is on, with an authenticator app.",
   "2fa.status_on_email": "Two-step verification is on, with a code by e-mail.",
   "2fa.method_app": "App",
-  "2fa.method_email": "E-mail"
+  "2fa.method_email": "E-mail",
+  "action.undo": "Undo last step",
+  "undo.intro": "The last step ({step}) will be reverted and the claim returns to its previous status. The submitter will be notified.",
+  "event.undone": "Step undone"
 }

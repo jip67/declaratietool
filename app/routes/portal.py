@@ -135,7 +135,7 @@ def claim_detail(claim_id: int, request: Request, user: User = Depends(current_u
     claim = _claim(db, claim_id, user)
     return render(
         request, "portal/claim.html", user.language,
-        user=user, claim=claim, my_task=is_my_task(claim, user),
+        user=user, claim=claim, my_task=is_my_task(claim, user), can_undo=workflow.can_undo(claim, user),
         error=request.query_params.get("error"), link=workflow.claim_link(claim),
     )
 
@@ -158,8 +158,11 @@ def claim_action(
     if not user.is_staff:
         raise HTTPException(status_code=403)
     claim = _claim(db, claim_id, user)
+    stale: list[str] = []
     try:
-        if action == "reject":
+        if action == "undo":
+            stale = workflow.undo(db, claim, user)
+        elif action == "reject":
             if not reason.strip():
                 raise workflow.WorkflowError("reason_required")
             workflow.reject(db, claim, user, reason)
@@ -171,6 +174,7 @@ def claim_action(
         db.rollback()
         return RedirectResponse(f"/portal/claims/{claim_id}?error={exc}", status_code=303)
     db.commit()
+    workflow.remove_files(stale)
     return RedirectResponse(f"/portal/claims/{claim_id}", status_code=303)
 
 

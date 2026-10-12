@@ -312,5 +312,8 @@
   "2fa.status_on_app": "Tweestapsverificatie staat aan, met een authenticator-app.",
   "2fa.status_on_email": "Tweestapsverificatie staat aan, met een code per e-mail.",
   "2fa.method_app": "App",
-  "2fa.method_email": "E-mail"
+  "2fa.method_email": "E-mail",
+  "action.undo": "Laatste stap ongedaan maken",
+  "undo.intro": "De laatste stap ({step}) wordt teruggedraaid en de declaratie gaat terug naar de vorige status. De indiener krijgt hier een bericht over.",
+  "event.undone": "Stap ongedaan gemaakt"
 }

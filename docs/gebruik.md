@@ -40,6 +40,10 @@ Alle medewerkers kunnen via **Nieuwe declaratie** zelf een declaratie invoeren, 
 
 Onderaan elke declaratie staat het blok **Interne opmerkingen**, met het label *intern, niet zichtbaar voor indiener*. Voorzitter, boekhouder, secretaris en beheerder kunnen daar extra informatie kwijt, bijvoorbeeld "bon nagevraagd bij de penningmeester". Elke opmerking krijgt naam en tijdstip. De indiener ziet ze nooit: niet op de pagina van de persoonlijke link, niet in mails en ook niet als hij inlogt met de rol Gebruiker.
 
+## Stap ongedaan maken
+
+Per ongeluk goedgekeurd, klaargezet, akkoord gegeven of afgewezen? Open de declaratie en kies **Laatste stap ongedaan maken**. De declaratie gaat terug naar de vorige status; bij een teruggedraaide goedkeuring verdwijnt ook de paraaf op de bonnen. Dit kan degene die de stap zette, en een beheerder. De indiener krijgt een statusupdate, wie weer aan zet is krijgt een bericht, en in de geschiedenis staat "Stap ongedaan gemaakt". Je kunt zo ook meerdere stappen achter elkaar terugdraaien.
+
 ## Declaratie bewerken of wissen (beheerder)
 
 Een beheerder ziet bij elke declaratie de knop **Declaratie bewerken**. Daarmee pas je naam van de indiener, bedrag, omschrijving, IBAN en tenaamstelling aan, ook als de declaratie al is goedgekeurd of betaald. De status verandert niet en de indiener krijgt geen mail; in de geschiedenis staat "Gegevens aangepast door beheerder".
