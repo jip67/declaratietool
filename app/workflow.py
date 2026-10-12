@@ -231,7 +231,8 @@ def complete_details(
 
 
 def _require(user: User, role: Role) -> None:
-    if not (user.has_role(role) or user.has_role(Role.ADMIN)):
+    # Alleen wie de rol zelf heeft mag de stap zetten; beheerder geeft geen extra rechten.
+    if not user.has_role(role):
         raise WorkflowError("not_allowed")
 
 
@@ -298,6 +299,84 @@ def reject(db: Session, claim: Claim, user: User, reason: str) -> None:
     log_event(db, claim, "rejected", user, note=reason.strip())
     db.flush()
     notify_submitter_status(claim)
+
+
+def _status_before_rejection(claim: Claim) -> Status:
+    if claim.prepared_at:
+        return Status.PAYMENT_PREPARED
+    if claim.approved_at:
+        return Status.APPROVED
+    if claim.submitted_at:
+        return Status.SUBMITTED
+    return Status.RECEIVED
+
+
+def undo_info(claim: Claim) -> tuple[str, int | None] | None:
+    """Welke stap ongedaan gemaakt kan worden en wie hem zette, of None."""
+    status = claim.status_enum
+    if status == Status.APPROVED:
+        return "approved", claim.approved_by_id
+    if status == Status.PAYMENT_PREPARED:
+        return "payment_prepared", claim.prepared_by_id
+    if status == Status.PAID:
+        return "paid", claim.paid_by_id
+    if status == Status.REJECTED:
+        return "rejected", claim.rejected_by_id
+    return None
+
+
+def can_undo(claim: Claim, user: User) -> bool:
+    """Wie de laatste stap zette, of een beheerder, mag hem terugdraaien."""
+    info = undo_info(claim)
+    if info is None or not user.is_staff:
+        return False
+    return info[1] == user.id or user.has_role(Role.ADMIN)
+
+
+def undo(db: Session, claim: Claim, user: User) -> list[str]:
+    """Draai de laatste stap terug; de declaratie gaat terug naar de vorige status.
+
+    Geeft de geparafeerde bestanden terug die na de commit weg mogen."""
+    info = undo_info(claim)
+    if info is None:
+        raise WorkflowError("wrong_status")
+    if not can_undo(claim, user):
+        raise WorkflowError("not_allowed")
+    step = info[0]
+    stale: list[str] = []
+    if step == "approved":
+        for att in claim.attachments:
+            if att.stamped_path:
+                stale.append(att.stamped_path)
+                att.stamped_path = None
+        claim.approved_at = None
+        claim.approved_by_id = None
+        set_status(claim, Status.SUBMITTED)
+    elif step == "payment_prepared":
+        claim.prepared_at = None
+        claim.prepared_by_id = None
+        set_status(claim, Status.APPROVED)
+    elif step == "paid":
+        claim.paid_at = None
+        claim.paid_by_id = None
+        set_status(claim, Status.PAYMENT_PREPARED)
+    else:
+        claim.rejected_by_id = None
+        claim.rejection_reason = ""
+        set_status(claim, _status_before_rejection(claim))
+    log_event(db, claim, "undone", user, note=step)
+    db.flush()
+    notify_submitter_status(claim)
+    notify_role(db, claim)
+    return stale
+
+
+def remove_files(paths: list[str]) -> None:
+    for rel in paths:
+        try:
+            storage.absolute(rel).unlink(missing_ok=True)
+        except (ValueError, OSError):
+            log.warning("Bestand %s niet verwijderd", rel)
 
 
 def _tz() -> ZoneInfo:

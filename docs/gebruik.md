@@ -40,6 +40,10 @@ Alle medewerkers kunnen via **Nieuwe declaratie** zelf een declaratie invoeren, 
 
 Onderaan elke declaratie staat het blok **Interne opmerkingen**, met het label *intern, niet zichtbaar voor indiener*. Voorzitter, boekhouder, secretaris en beheerder kunnen daar extra informatie kwijt, bijvoorbeeld "bon nagevraagd bij de penningmeester". Elke opmerking krijgt naam en tijdstip. De indiener ziet ze nooit: niet op de pagina van de persoonlijke link, niet in mails en ook niet als hij inlogt met de rol Gebruiker.
 
+## Stap ongedaan maken
+
+Per ongeluk goedgekeurd, klaargezet, akkoord gegeven of afgewezen? Open de declaratie en kies **Laatste stap ongedaan maken**. De declaratie gaat terug naar de vorige status; bij een teruggedraaide goedkeuring verdwijnt ook de paraaf op de bonnen. Dit kan degene die de stap zette, en een beheerder. De indiener krijgt een statusupdate, wie weer aan zet is krijgt een bericht, en in de geschiedenis staat "Stap ongedaan gemaakt". Je kunt zo ook meerdere stappen achter elkaar terugdraaien.
+
 ## Declaratie bewerken of wissen (beheerder)
 
 Een beheerder ziet bij elke declaratie de knop **Declaratie bewerken**. Daarmee pas je naam van de indiener, bedrag, omschrijving, IBAN en tenaamstelling aan, ook als de declaratie al is goedgekeurd of betaald. De status verandert niet en de indiener krijgt geen mail; in de geschiedenis staat "Gegevens aangepast door beheerder".
@@ -59,6 +63,8 @@ Rechtsboven staat het menu **Instellingen**. Wat je daarin ziet hangt af van je 
 | Gebruiker | – | – | – | – | – |
 | Voorzitter, boekhouder, secretaris | bekijken | ja | – | – | – |
 | Beheerder | bekijken en wijzigen | ja | ja | ja | ja |
+
+De rol Beheerder geeft geen rechten in de declaratiestappen. Goedkeuren kan alleen de voorzitter, de betaling klaarzetten alleen de boekhouder en akkoord geven alleen de secretaris. Heeft iemand meerdere rollen, dan mag hij de stappen van al die rollen zetten.
 
 Gebruikers met de rol **Beheerder** voegen op de pagina **Gebruikers** mensen toe. Met **Bewerken** pas je naam, e-mailadres, taal en rollen aan, zet je een account uit of stel je een nieuw wachtwoord in. Onderaan die pagina kun je een gebruiker **verwijderen**. Komt iemand al voor in de geschiedenis van een declaratie (bijvoorbeeld omdat hij iets heeft goedgekeurd), dan wordt het account niet gewist maar uitgeschakeld en geanonimiseerd, zodat het logboek blijft kloppen. Je eigen account kun je niet verwijderen of uitzetten, en je houdt altijd de rol Beheerder. Geef leden die zelf declaraties willen indienen de rol **Gebruiker**: zij kunnen inloggen, een declaratie aanmaken en alleen hun eigen declaraties en de status daarvan zien. Iedereen kan onder zijn eigen naam (rechtsboven) zijn taal en wachtwoord wijzigen.
 

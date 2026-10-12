@@ -7,7 +7,7 @@
   {% include "_steps.html" %}
   {% if error %}<p class="error">{{ t('error.' ~ error) }}</p>{% endif %}
 
-  {% if my_task or (user.has_role(Role.ADMIN) and claim.status in ['submitted', 'approved', 'payment_prepared']) %}
+  {% if my_task %}
   <div class="task">
     {% set role = ROLE_FOR_STATUS[Status(claim.status)] %}
     <p><strong>{{ t('task.yours') }}:</strong> {{ t('task.' ~ role.value) }}</p>
@@ -58,6 +58,17 @@
   </section>
   {% endif %}
 
+  {% if can_undo %}
+  <details class="reject" id="undo">
+    <summary>{{ t('action.undo') }}</summary>
+    <p>{{ t('undo.intro', step=t('event.' ~ claim.status)) }}</p>
+    <form method="post" action="/portal/claims/{{ claim.id }}/action">
+      <input type="hidden" name="action" value="undo">
+      <button>{{ t('action.undo') }}</button>
+    </form>
+  </details>
+  {% endif %}
+
   {% if user.is_staff and claim.status not in ['paid', 'rejected'] %}
   <details class="reject">
     <summary>{{ t('action.reject') }}</summary>
@@ -83,7 +94,7 @@
   <h2>{{ t('portal.history') }}</h2>
   <ul class="history">
   {% for ev in claim.events %}
-    <li><span class="muted">{{ ev.at|localtime }}</span> {{ t('event.' ~ ev.action) }}{% if ev.user %} · {{ ev.user.name }}{% endif %}{% if ev.note and ev.action == 'rejected' %}: {{ ev.note }}{% endif %}</li>
+    <li><span class="muted">{{ ev.at|localtime }}</span> {{ t('event.' ~ ev.action) }}{% if ev.user %} · {{ ev.user.name }}{% endif %}{% if ev.note and ev.action == 'rejected' %}: {{ ev.note }}{% elif ev.note and ev.action == 'undone' %}: {{ t('event.' ~ ev.note) }}{% endif %}</li>
   {% endfor %}
   </ul>
 </section>

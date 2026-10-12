@@ -75,6 +75,14 @@ def test_full_flow(db, client, staff):
     db.expire_all()
     assert claim.status == Status.SUBMITTED.value
 
+    # Boekhouder met beheerdersrol mag niet goedkeuren en ziet geen taakknop
+    login(client, "boekhouder@example.org")
+    page = client.get(f"/portal/claims/{claim.id}")
+    assert 'value="approve"' not in page.text
+    client.post(f"/portal/claims/{claim.id}/action", data={"action": "approve"})
+    db.expire_all()
+    assert claim.status == Status.SUBMITTED.value
+
     # 3. Voorzitter keurt goed -> paraaf
     login(client, "voorzitter@example.org")
     mine = client.get("/portal?view=mine")
@@ -95,6 +103,14 @@ def test_full_flow(db, client, staff):
     db.expire_all()
     assert claim.status == Status.PAYMENT_PREPARED.value
     assert sent_to("secretaris@example.org")
+
+    # Voorzitter en boekhouder/beheerder mogen de betaling niet akkoord geven
+    for email in ("voorzitter@example.org", "boekhouder@example.org"):
+        login(client, email)
+        assert 'value="pay"' not in client.get(f"/portal/claims/{claim.id}").text
+        client.post(f"/portal/claims/{claim.id}/action", data={"action": "pay"})
+        db.expire_all()
+        assert claim.status == Status.PAYMENT_PREPARED.value
 
     # 5. Secretaris geeft akkoord
     login(client, "secretaris@example.org")
