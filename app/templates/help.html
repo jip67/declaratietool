@@ -5,7 +5,7 @@
   <h1>{{ t('help.title') }}</h1>
   <ul class="toc">
     {% set sections = [('indiener', none), ('voorzitter', Role.CHAIR), ('boekhouder', Role.TREASURER),
-                       ('secretaris', Role.SECRETARY), ('namens', none), ('beheer', Role.ADMIN), ('vragen', none)] %}
+                       ('secretaris', Role.SECRETARY), ('namens', none), ('beheer', Role.ADMIN), ('veiligheid', none), ('vragen', none)] %}
     {% for anchor, role in sections %}
     <li><a href="#{{ anchor }}" {% if user and role and user.has_role(role) %}class="mine"{% endif %}>{{ t('help.section.' ~ anchor) }}</a></li>
     {% endfor %}
