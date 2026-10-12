@@ -58,6 +58,7 @@ git pull && docker compose up -d --build
 - [Bijwerken via het portaal](docs/bijwerken.md): de knop voor de beheerder en hoe die werkt
 - [Installeren met Portainer](docs/portainer.md) (met je eigen reverse proxy)
 - [Configuratie](docs/configuratie.md): alle instellingen in `.env`
+- [Back-up](docs/backup.md): elke nacht versleuteld naar Google Drive, en terugzetten
 - [Beveiliging](docs/beveiliging.md): wat de tool zelf doet en hoe je de server dichtzet
 - [Gebruik](docs/gebruik.md): wat elke rol doet
 - [Ontwikkelen](docs/ontwikkeling.md): lokaal draaien, tests, een taal toevoegen

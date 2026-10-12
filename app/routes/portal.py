@@ -55,6 +55,7 @@ def dashboard(request: Request, view: str = "open", user: User = Depends(current
         request, "portal/dashboard.html", user.language,
         user=user, claims=claims, view=view, my_count=my_count, is_my_task=is_my_task,
         comments=comment_summary(db, [c.id for c in claims]),
+        backup_warning=user.has_role(Role.ADMIN) and updates.backup_needs_attention(),
     )
 
 
@@ -479,7 +480,7 @@ def update_page(request: Request, user: User = Depends(require_admin)):
         request, "portal/update.html", user.language,
         user=user, available=updates.available(), status=current, pending=updates.pending(),
         busy=updates.is_busy(current), update_available=updates.update_available(current),
-        running_version=updates.running_version(), log=updates.log_tail(),
+        running_version=updates.running_version(), log=updates.log_tail(), backup=updates.backup_status(),
         error=request.query_params.get("error") if request.query_params.get("error") in UPDATE_ERRORS else None,
     )
 

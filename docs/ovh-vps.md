@@ -94,6 +94,8 @@ docker compose up -d --build
 
 ## Back-ups
 
+Zet de versleutelde nachtelijke back-up naar Google Drive aan met `sudo deploy/backup.sh setup`; zie [backup.md](backup.md).
+
 OVH biedt voor een VPS een optie voor automatische back-ups (snapshots); die is aan te raden. Daarnaast kun je dagelijks een database-dump maken:
 
 ```bash

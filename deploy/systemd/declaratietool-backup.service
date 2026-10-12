@@ -1,0 +1,11 @@
+# Maakt een versleutelde back-up en zet die op Google Drive (zie docs/backup.md).
+# deploy/backup.sh setup zet dit bestand in /etc/systemd/system met het juiste pad.
+[Unit]
+Description=Declaratietool: versleutelde back-up naar Google Drive
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/declaratietool/deploy/backup.sh
+TimeoutStartSec=1h

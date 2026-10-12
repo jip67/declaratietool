@@ -79,6 +79,8 @@ De app luistert op `127.0.0.1:8000`. Laat je proxy daarheen doorsturen en zorg d
 
 ## Back-ups
 
+Op een VPS die met `deploy/install-vps.sh` is ingericht: gebruik de versleutelde nachtelijke back-up naar Google Drive, zie [backup.md](backup.md). Met de hand kan het zo:
+
 Alles wat bewaard moet blijven staat in twee Docker-volumes: `pgdata` (database) en `uploads` (bonnen en geparafeerde pdf's).
 
 ```bash

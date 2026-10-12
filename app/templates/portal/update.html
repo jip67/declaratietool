@@ -54,5 +54,16 @@
   </details>
   {% endif %}
   {% endif %}
+
+  <h2 id="backup">{{ t('backup.title') }}</h2>
+  {% if not backup or backup.message == 'not_configured' %}
+  <p class="{% if backup %}error{% endif %}">{{ t('backup.not_configured') }}</p>
+  {% elif backup.state == 'ok' %}
+  <p class="{% if backup.stale %}error{% else %}success{% endif %}">{{ t('backup.stale' if backup.stale else 'backup.ok', when=backup.at|localtime) }}</p>
+  <p class="muted">{{ backup.file }} ({{ (backup.size / 1024 / 1024)|round(1) }} MB)</p>
+  {% else %}
+  <p class="error">{{ t('backup.failed', when=backup.at|localtime) }}</p>
+  {% endif %}
+  <p class="muted">{{ t('backup.note') }}</p>
 </section>
 {% endblock %}

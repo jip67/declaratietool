@@ -9,7 +9,7 @@ de app).
 import json
 import logging
 import os
-from datetime import datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from .config import get_settings
@@ -52,6 +52,34 @@ def status() -> dict:
         if isinstance(data.get(key), dict):
             data[key]["date"] = _parse_time(data[key].get("date"))
     return data
+
+
+# Draait de nachtelijke back-up langer dan dit niet, dan waarschuwt het portaal.
+BACKUP_MAX_AGE = timedelta(hours=36)
+
+
+def backup_status() -> dict:
+    """Uitkomst van de laatste back-up, door deploy/backup.sh in status/backup.json gezet.
+
+    Leeg als de back-up nooit heeft gedraaid. 'stale' is waar als de laatste geslaagde
+    back-up te oud is, bijvoorbeeld omdat de timer niet loopt.
+    """
+    try:
+        data = json.loads((_dir() / "status" / "backup.json").read_text())
+    except (OSError, ValueError):
+        return {}
+    if not isinstance(data, dict):
+        return {}
+    data["at"] = _parse_time(data.get("at"))
+    data["stale"] = data.get("state") == "ok" and (
+        data["at"] is None or datetime.now(UTC) - data["at"] > BACKUP_MAX_AGE
+    )
+    return data
+
+
+def backup_needs_attention(data: dict | None = None) -> bool:
+    data = backup_status() if data is None else data
+    return bool(data) and (data.get("state") != "ok" or data["stale"])
 
 
 def _parse_time(value) -> datetime | None:

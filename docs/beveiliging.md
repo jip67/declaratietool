@@ -81,5 +81,5 @@ docker compose ps                # in /opt/declaratietool: db en app zonder publ
 - Bijwerken naar de nieuwste versie (ook voor beveiligingsupdates van de tool):
   de knop **Bijwerken** in het portaal, of `sudo /opt/declaratietool/deploy/updater.sh update`
 - Gebruik voor de accounts in de tool lange wachtwoorden (minstens 10 tekens, liever een zin).
-- Maak een back-up van de database en bijlagen, zodat je bij een probleem terug kunt.
-  Zie [installatie.md](installatie.md).
+- Zet de nachtelijke, versleutelde back-up naar Google Drive aan en bewaar de sleutel buiten de server.
+  Zie [backup.md](backup.md).

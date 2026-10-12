@@ -185,6 +185,10 @@ Handige opdrachten (in $INSTALL_DIR):
 
 Log één keer uit en weer in, dan kun je docker zonder sudo gebruiken.
 
+Back-up: zet de nachtelijke versleutelde back-up naar Google Drive aan met
+  sudo $INSTALL_DIR/deploy/backup.sh setup
+Zie docs/backup.md.
+
 Beveiliging: log bij voorkeur in met een SSH-sleutel in plaats van een wachtwoord.
 Zie docs/beveiliging.md voor de stappen.
 EOF

@@ -1,0 +1,12 @@
+# Elke nacht een back-up; een gemiste back-up (server uit) wordt bij opstarten ingehaald.
+[Unit]
+Description=Elke nacht een back-up van de declaratietool
+
+[Timer]
+OnCalendar=*-*-* 03:30
+RandomizedDelaySec=20min
+Persistent=true
+Unit=declaratietool-backup.service
+
+[Install]
+WantedBy=timers.target

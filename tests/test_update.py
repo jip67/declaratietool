@@ -76,3 +76,36 @@ def test_unknown_action_and_not_configured(client, staff, tmp_path, monkeypatch)
     assert client.post("/portal/update", data={"action": "rm -rf"}).status_code == 400
     r = client.post("/portal/update", data={"action": "update"}, follow_redirects=False)
     assert r.headers["location"].endswith("error=update.not_configured")
+
+
+def write_backup(base, **data):
+    (base / "status" / "backup.json").write_text(json.dumps(data))
+
+
+def test_backup_status_on_update_page_and_dashboard(client, staff, update_dir):
+    from datetime import UTC, datetime, timedelta
+
+    write_status(update_dir)
+    login(client, "boekhouder@example.org")
+    assert "deploy/backup.sh setup" in client.get("/portal/update").text
+    assert "back-up werkt niet" not in client.get("/portal").text
+
+    now = datetime.now(UTC).isoformat()
+    write_backup(update_dir, state="ok", message="", at=now, file="declaratietool-x.tar.gz.gpg", size=2_500_000)
+    page = client.get("/portal/update").text
+    assert "laatste back-up is gelukt" in page and "declaratietool-x.tar.gz.gpg" in page
+    assert "back-up werkt niet" not in client.get("/portal").text
+
+    old = (datetime.now(UTC) - timedelta(days=3)).isoformat()
+    write_backup(update_dir, state="ok", message="", at=old, file="declaratietool-x.tar.gz.gpg", size=1)
+    assert "te lang geleden" in client.get("/portal/update").text
+    assert "back-up werkt niet" in client.get("/portal").text
+
+    write_backup(update_dir, state="failed", message="error", at=now, file="", size=0)
+    assert "back-up is mislukt" in client.get("/portal/update").text
+    assert "back-up werkt niet" in client.get("/portal").text
+
+    # Alleen beheerders krijgen de waarschuwing.
+    client.post("/logout")
+    login(client, "voorzitter@example.org")
+    assert "back-up werkt niet" not in client.get("/portal").text
