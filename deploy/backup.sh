@@ -19,8 +19,11 @@ KEY_FILE=$CONF_DIR/backup.key
 RCLONE_CONF=$CONF_DIR/rclone.conf
 REMOTE="gdrive:declaratietool-backup"
 LOCAL_DIR=/var/backups/declaratietool
-KEEP_LOCAL_DAYS="${KEEP_LOCAL_DAYS:-7}"
-KEEP_REMOTE_DAYS="${KEEP_REMOTE_DAYS:-90}"
+# Bewaren: de back-ups van de laatste KEEP_DAYS dagen, op de server en op Google Drive.
+# Op Google Drive daarnaast de eerste back-up van elke maand, van de huidige maand en
+# de KEEP_MONTHS maanden daarvoor.
+KEEP_DAYS="${KEEP_DAYS:-7}"
+KEEP_MONTHS="${KEEP_MONTHS:-3}"
 STATUS_DIR=$INSTALL_DIR/update/status
 STATUS_FILE=$STATUS_DIR/backup.json
 # Laat rclone authorize de toegang beperken tot bestanden die rclone zelf maakt (scope drive.file).
@@ -68,11 +71,44 @@ run_backup() {
 
   echo "Uploaden naar Google Drive"
   rc copy "$out" "$REMOTE"
-  rc delete --min-age "${KEEP_REMOTE_DAYS}d" --include 'declaratietool-*.gpg' "$REMOTE"
-  find "$LOCAL_DIR" -name 'declaratietool-*.gpg' -mtime +"$KEEP_LOCAL_DAYS" -delete
+  echo "Oude back-ups opruimen"
+  local old
+  for old in $(rc lsf --files-only --include 'declaratietool-*.gpg' "$REMOTE" | to_remove "$KEEP_DAYS" "$KEEP_MONTHS"); do
+    # Meteen definitief weg, niet eerst naar de prullenbak (die telt mee voor de opslag).
+    rc deletefile --drive-use-trash=false "$REMOTE/$old"
+  done
+  for old in $(ls "$LOCAL_DIR" | to_remove "$KEEP_DAYS" 0); do
+    rm -f "$LOCAL_DIR/$old"
+  done
 
   write_status ok "" "$name" "$size"
   echo "Klaar: $name ($((size / 1024)) kB)"
+}
+
+to_remove() {  # to_remove DAGEN MAANDEN < bestandsnamen -> namen die weg mogen
+  python3 -c '
+import re, sys
+from datetime import date, timedelta
+days, months = int(sys.argv[1]), int(sys.argv[2])
+today = date.today()
+first = today.replace(day=1)
+for _ in range(months):
+    first = (first - timedelta(days=1)).replace(day=1)
+backups = {}
+for name in sys.stdin.read().split():
+    m = re.fullmatch(r"declaratietool-(\d{4})-(\d{2})-(\d{2})_\d{4}\.tar\.gz\.gpg", name)
+    if m:
+        backups[name] = date(*map(int, m.groups()))
+keep = {n for n, d in backups.items() if d > today - timedelta(days=days)}
+if months:
+    first_of_month = {}
+    for name in sorted(backups):  # op naam = op datum en tijd
+        d = backups[name]
+        if d >= first:
+            first_of_month.setdefault((d.year, d.month), name)
+    keep |= set(first_of_month.values())
+print("\n".join(sorted(set(backups) - keep)))
+' "$1" "$2"
 }
 
 read_token() {

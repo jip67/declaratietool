@@ -11,7 +11,20 @@ gestuurd. Google, of iemand die het Google-account binnenkomt, ziet alleen onlee
 
 De server krijgt alleen toegang tot de bestanden die hij zelf op de Drive zet (Google noemt dit
 `drive.file`), niet tot de rest van de Drive. Back-ups staan in de map `declaratietool-backup`,
-op de server blijven de laatste 7 dagen staan en op Google Drive de laatste 90 dagen.
+en het script ruimt oude back-ups elke nacht zelf op:
+
+- op de server en op Google Drive blijven de back-ups van de laatste 7 dagen staan;
+- op Google Drive blijft daarnaast de eerste back-up van elke maand staan, van de huidige
+  maand en de 3 maanden daarvoor.
+
+Wat weg mag, wordt meteen definitief verwijderd (niet eerst naar de prullenbak), zodat het geen
+ruimte blijft innemen. Andere aantallen kun je instellen met `KEEP_DAYS` en `KEEP_MONTHS`, via
+`sudo systemctl edit declaratietool-backup` met bijvoorbeeld:
+
+```ini
+[Service]
+Environment=KEEP_DAYS=14 KEEP_MONTHS=6
+```
 
 ## Wat je nodig hebt
 
