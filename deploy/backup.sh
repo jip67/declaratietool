@@ -76,18 +76,32 @@ run_backup() {
 }
 
 read_token() {
-  # rclone authorize geeft de sleutel als JSON, in sommige versies base64-gecodeerd.
-  local line decoded token=""
+  # rclone authorize geeft de sleutel als JSON. Nieuwere versies geven een base64-code
+  # met daarin {"client_id": ..., "token": "<de JSON>"}; dan halen we de token eruit.
+  local line token=""
   while [[ -z $token ]]; do
     read -r -p "Plak hier de regel die met { begint (of de lange code): " line </dev/tty
-    line=$(printf '%s' "$line" | tr -d '[:space:]')
-    if [[ $line == \{* ]]; then
-      token=$line
-    elif decoded=$(printf '%s' "$line" | base64 -d 2>/dev/null) && [[ $decoded == \{* ]]; then
-      token=$decoded
-    else
-      echo "Dat lijkt geen sleutel van rclone te zijn; probeer opnieuw." >&2
-    fi
+    token=$(printf '%s' "$line" | python3 -c '
+import base64, binascii, json, sys
+text = "".join(sys.stdin.read().split())
+if not text.startswith("{"):
+    try:
+        text = base64.b64decode(text + "=" * (-len(text) % 4)).decode()
+    except (binascii.Error, UnicodeDecodeError, ValueError):
+        sys.exit(1)
+try:
+    data = json.loads(text)
+except ValueError:
+    sys.exit(1)
+if isinstance(data, dict) and isinstance(data.get("token"), str):
+    data = json.loads(data["token"])
+if not isinstance(data, dict) or not data.get("refresh_token"):
+    sys.exit(1)
+print(json.dumps(data, separators=(",", ":")))
+') || {
+      token=""
+      echo "Dat lijkt geen (volledige) sleutel van rclone te zijn; probeer opnieuw." >&2
+    }
   done
   printf '%s' "$token"
 }
@@ -95,7 +109,7 @@ read_token() {
 setup() {
   say "Programma's installeren (rclone, gpg)"
   export DEBIAN_FRONTEND=noninteractive
-  apt-get install -y -q rclone gnupg openssl >/dev/null
+  apt-get install -y -q rclone gnupg openssl python3 >/dev/null
 
   mkdir -p "$CONF_DIR"
   chmod 700 "$CONF_DIR"
@@ -116,6 +130,11 @@ EOF
     say "Bestaande sleutel in $KEY_FILE blijft in gebruik"
   fi
 
+  # Een eerdere koppeling die niet werkt (verlopen of verkeerd geplakt) opnieuw doen.
+  if rc listremotes 2>/dev/null | grep -qx 'gdrive:' && ! rc lsd gdrive: >/dev/null 2>&1; then
+    say "De bestaande koppeling met Google Drive werkt niet; die doen we opnieuw"
+    rc config delete gdrive
+  fi
   if ! rc listremotes 2>/dev/null | grep -qx 'gdrive:'; then
     say "Google Drive koppelen"
     cat <<EOF

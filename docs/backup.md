@@ -44,7 +44,8 @@ Het script:
    ```
 
    Er opent een browser; log in met het back-upaccount en geef toestemming. rclone toont daarna
-   een regel tussen `Paste the following` en `End paste`. Plak die in het venster van de server;
+   een regel of lange code tussen `Paste the following` en `End paste`. Plak die in het venster
+   van de server. Ging de koppeling eerder mis, draai `setup` dan gewoon opnieuw;
 4. zet de nachtelijke back-up aan (rond 03:30, een gemiste back-up wordt ingehaald na opstarten);
 5. maakt meteen de eerste back-up.
 
