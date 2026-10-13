@@ -324,5 +324,12 @@
   "2fa.method_email": "E-mail",
   "action.undo": "Laatste stap ongedaan maken",
   "undo.intro": "De laatste stap ({step}) wordt teruggedraaid en de declaratie gaat terug naar de vorige status. De indiener krijgt hier een bericht over.",
-  "event.undone": "Stap ongedaan gemaakt"
+  "event.undone": "Stap ongedaan gemaakt",
+  "view_as.start": "Meekijken",
+  "view_as.help": "Zie het portaal precies zoals deze persoon het ziet, om te helpen of uit te leggen. Je kunt dan niets goedkeuren, opslaan of versturen. Dit wordt vastgelegd in het logboek.",
+  "view_as.banner": "Je kijkt mee als {name}",
+  "view_as.read_only": "alleen bekijken, je kunt niets wijzigen",
+  "view_as.blocked": "Dat kan niet tijdens meekijken. Stop eerst met meekijken.",
+  "view_as.stop": "Stoppen met meekijken",
+  "log.view_as": "Meegekeken als {name}"
 }

@@ -15,7 +15,8 @@
         <td data-label="{{ t('field.roles') }}">{% for r in u.role_list %}{{ t('role.' ~ r.value) }}{% if not loop.last %}, {% endif %}{% endfor %}</td>
         <td data-label="{{ t('field.active') }}">{{ t('users.yes') if u.active else t('users.no') }}</td>
         <td data-label="{{ t('2fa.short') }}">{{ t('2fa.method_' ~ u.twofa_method) if u.has_2fa else t('users.no') }}</td>
-        <td>{% if is_admin %}<a class="button" href="/portal/users/{{ u.id }}">{{ t('action.edit') }}</a>{% endif %}</td>
+        <td>{% if is_admin %}<span class="actions-inline"><a class="button" href="/portal/users/{{ u.id }}">{{ t('action.edit') }}</a>
+          {% if u.id != user.id and u.active %}<form method="post" action="/portal/users/{{ u.id }}/view-as" class="inline"><button title="{{ t('view_as.help') }}">{{ t('view_as.start') }}</button></form>{% endif %}</span>{% endif %}</td>
       </tr>
     {% endfor %}
     </tbody>

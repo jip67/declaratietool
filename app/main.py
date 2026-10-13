@@ -22,6 +22,8 @@ CONTENT_SECURITY_POLICY = (
     "base-uri 'self'; form-action 'self'; frame-ancestors 'self'"
 )
 UNSAFE_METHODS = {"POST", "PUT", "PATCH", "DELETE"}
+# Wat tijdens meekijken nog wel mag: stoppen en uitloggen.
+VIEW_AS_ALLOWED = {"/portal/view-as/stop", "/logout"}
 
 
 def check_secret_key(settings) -> None:
@@ -47,6 +49,23 @@ def create_app() -> FastAPI:
     settings = get_settings()
     check_secret_key(settings)
     app = FastAPI(title=settings.app_name, docs_url=None, redoc_url=None)
+
+    # Staat binnen de SessionMiddleware (die wordt hierna toegevoegd en komt dus buitenom).
+    @app.middleware("http")
+    async def block_while_viewing(request: Request, call_next):
+        """Meekijken is alleen-lezen: niets opslaan, goedkeuren of versturen."""
+        if (
+            request.method in UNSAFE_METHODS
+            and request.session.get("view_as")
+            and request.url.path not in VIEW_AS_ALLOWED
+        ):
+            request.session["view_as_blocked"] = True
+            back = urlsplit(request.headers.get("referer", ""))
+            same_site = not back.netloc or back.netloc == request.headers.get("host", "")
+            target = back.path if same_site and back.path.startswith("/") and not back.path.startswith("//") else "/portal"
+            return RedirectResponse(target + (f"?{back.query}" if same_site and back.query else ""), status_code=303)
+        return await call_next(request)
+
     app.add_middleware(
         SessionMiddleware,
         secret_key=settings.secret_key,

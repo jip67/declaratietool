@@ -284,3 +284,10 @@ img.qr { background: #fff; padding: .4rem; border-radius: 6px; border: 1px solid
 code.secret { font-size: 1.05rem; letter-spacing: .05em; word-break: break-all; }
 ul.recovery-codes { columns: 2; list-style: none; padding: 0; font-size: 1.1rem; }
 ul.recovery-codes li { padding: .2rem 0; }
+
+/* Meekijken als een andere gebruiker: alleen-lezen */
+.view-as-banner { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; padding: .75rem 1rem; background: var(--s-submitted-bg); color: var(--s-submitted); border-bottom: 2px solid var(--s-submitted); }
+.view-as-banner p { margin: 0; }
+.view-as-banner form { margin-left: auto; }
+.viewing-as main form[method="post"] :is(button, input, textarea, select) { opacity: .5; pointer-events: none; }
+.actions-inline { display: inline-flex; flex-wrap: wrap; gap: .4rem; }
