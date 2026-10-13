@@ -2,7 +2,7 @@
 
 ontvangen -> (indiener vult aan) -> ingediend -> (voorzitter keurt goed + paraaf)
 -> goedgekeurd -> (boekhouder zet betaling klaar) -> klaargezet
--> (secretaris geeft akkoord bij de bank) -> betaald
+-> (secretaris voert betaling uit bij de bank) -> betaald
 
 Bij elke stap krijgt de indiener een update en krijgt wie daarna aan zet is een bericht.
 """
@@ -277,7 +277,7 @@ def prepare_payment(db: Session, claim: Claim, user: User) -> None:
 
 
 def mark_paid(db: Session, claim: Claim, user: User) -> None:
-    """Secretaris heeft de betaling akkoord gegeven bij de bank."""
+    """Secretaris heeft de betaling uitgevoerd bij de bank."""
     _require(user, Role.SECRETARY)
     _require_status(claim, Status.PAYMENT_PREPARED)
     set_status(claim, Status.PAID)

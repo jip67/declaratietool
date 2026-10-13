@@ -25,8 +25,8 @@ Tot de voorzitter heeft goedgekeurd kun je je gegevens nog aanpassen.
 ## Secretaris
 
 1. Je krijgt een mail zodra de boekhouder de betaling heeft klaargezet.
-2. Geef de betaling akkoord bij de bank.
-3. Klik in het portaal op **Betaling is akkoord gegeven**. De declaratie staat dan op betaald.
+2. Voer de betaling uit bij de bank.
+3. Klik in het portaal op **Betaling is uitgevoerd**. De declaratie staat dan op betaald en iedereen, ook de indiener, weet dat er betaald is.
 
 ## Declaratie aanmaken namens iemand
 
@@ -42,7 +42,7 @@ Onderaan elke declaratie staat het blok **Interne opmerkingen**, met het label *
 
 ## Stap ongedaan maken
 
-Per ongeluk goedgekeurd, klaargezet, akkoord gegeven of afgewezen? Open de declaratie en kies **Laatste stap ongedaan maken**. De declaratie gaat terug naar de vorige status; bij een teruggedraaide goedkeuring verdwijnt ook de paraaf op de bonnen. Dit kan degene die de stap zette, en een beheerder. De indiener krijgt een statusupdate, wie weer aan zet is krijgt een bericht, en in de geschiedenis staat "Stap ongedaan gemaakt". Je kunt zo ook meerdere stappen achter elkaar terugdraaien.
+Per ongeluk goedgekeurd, klaargezet, uitgevoerd of afgewezen? Open de declaratie en kies **Laatste stap ongedaan maken**. De declaratie gaat terug naar de vorige status; bij een teruggedraaide goedkeuring verdwijnt ook de paraaf op de bonnen. Dit kan degene die de stap zette, en een beheerder. De indiener krijgt een statusupdate, wie weer aan zet is krijgt een bericht, en in de geschiedenis staat "Stap ongedaan gemaakt". Je kunt zo ook meerdere stappen achter elkaar terugdraaien.
 
 ## Declaratie bewerken of wissen (beheerder)
 
@@ -52,7 +52,7 @@ Onderaan de declaratie staat **Declaratie wissen**. Na het aanvinken van de beve
 
 ## Eenvoudige weergave
 
-Voor wie niet veel met computers doet is er een **eenvoudige weergave**, voor voorzitter, boekhouder en secretaris. Na het inloggen staat dan alleen wat op die persoon wacht, als grote kaarten met bedrag, omschrijving en een knop als **Bekijken en goedkeuren**. Na het goedkeuren (of klaarzetten, of akkoord geven) kom je meteen terug op de takenlijst, met de melding dat het gelukt is. Instellingen en Nieuwe declaratie staan niet in het menu; via **Alle declaraties bekijken** blijft de volledige lijst bereikbaar.
+Voor wie niet veel met computers doet is er een **eenvoudige weergave**, voor voorzitter, boekhouder en secretaris. Na het inloggen staat dan alleen wat op die persoon wacht, als grote kaarten met bedrag, omschrijving en een knop als **Bekijken en goedkeuren**. Na het goedkeuren (of klaarzetten, of betaling uitvoeren) kom je meteen terug op de takenlijst, met de melding dat het gelukt is. Instellingen en Nieuwe declaratie staan niet in het menu; via **Alle declaraties bekijken** blijft de volledige lijst bereikbaar.
 
 Iedereen zet dit zelf aan of uit onder zijn naam (**Eenvoudige weergave**). De beheerder kan het ook per persoon aanzetten onder **Instellingen → Gebruikers → Bewerken**.
 
@@ -78,7 +78,7 @@ Rechtsboven staat het menu **Instellingen**. Wat je daarin ziet hangt af van je 
 | Voorzitter, boekhouder, secretaris | bekijken | ja | – | – | – |
 | Beheerder | bekijken en wijzigen | ja | ja | ja | ja |
 
-De rol Beheerder geeft geen rechten in de declaratiestappen. Goedkeuren kan alleen de voorzitter, de betaling klaarzetten alleen de boekhouder en akkoord geven alleen de secretaris. Heeft iemand meerdere rollen, dan mag hij de stappen van al die rollen zetten.
+De rol Beheerder geeft geen rechten in de declaratiestappen. Goedkeuren kan alleen de voorzitter, de betaling klaarzetten alleen de boekhouder en de betaling uitvoeren alleen de secretaris. Heeft iemand meerdere rollen, dan mag hij de stappen van al die rollen zetten.
 
 Gebruikers met de rol **Beheerder** voegen op de pagina **Gebruikers** mensen toe. Met **Bewerken** pas je naam, e-mailadres, taal en rollen aan, zet je een account uit of stel je een nieuw wachtwoord in. Onderaan die pagina kun je een gebruiker **verwijderen**. Komt iemand al voor in de geschiedenis van een declaratie (bijvoorbeeld omdat hij iets heeft goedgekeurd), dan wordt het account niet gewist maar uitgeschakeld en geanonimiseerd, zodat het logboek blijft kloppen. Je eigen account kun je niet verwijderen of uitzetten, en je houdt altijd de rol Beheerder. Geef leden die zelf declaraties willen indienen de rol **Gebruiker**: zij kunnen inloggen, een declaratie aanmaken en alleen hun eigen declaraties en de status daarvan zien. Iedereen kan onder zijn eigen naam (rechtsboven) zijn taal en wachtwoord wijzigen.
 

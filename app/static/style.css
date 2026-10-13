@@ -72,6 +72,7 @@ dl.details dt { color: var(--muted); }
 dl.details dd { margin: 0; white-space: pre-wrap; }
 .task { border: 1px solid var(--primary); border-radius: 8px; padding: .75rem 1rem; margin: 0 0 1rem; }
 .task p { margin: 0 0 .5rem; }
+.task .task-hint { margin: .5rem 0 0; font-size: .9rem; }
 .reject { margin-top: 1.5rem; }
 .reject summary { cursor: pointer; color: var(--danger); }
 ul.files, ul.history { padding-left: 1.2rem; }

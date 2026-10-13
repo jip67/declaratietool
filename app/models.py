@@ -21,7 +21,7 @@ def new_token() -> str:
 class Role(str, enum.Enum):
     CHAIR = "chair"  # voorzitter: keurt goed en parafeert
     TREASURER = "treasurer"  # boekhouder/penningmeester: zet betaling klaar
-    SECRETARY = "secretary"  # secretaris: geeft betaling akkoord bij de bank
+    SECRETARY = "secretary"  # secretaris: voert de betaling uit bij de bank
     ADMIN = "admin"  # beheert gebruikers
     MEMBER = "member"  # gebruiker: dient eigen declaraties in en ziet alleen die
 
@@ -34,7 +34,7 @@ class Status(str, enum.Enum):
     RECEIVED = "received"  # bon ontvangen, wacht op gegevens van indiener
     SUBMITTED = "submitted"  # compleet, wacht op goedkeuring voorzitter
     APPROVED = "approved"  # goedgekeurd, wacht op klaarzetten betaling
-    PAYMENT_PREPARED = "payment_prepared"  # klaargezet, wacht op akkoord secretaris
+    PAYMENT_PREPARED = "payment_prepared"  # klaargezet, wacht op uitvoering door secretaris
     PAID = "paid"  # betaald
     REJECTED = "rejected"  # afgewezen
 

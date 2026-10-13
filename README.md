@@ -5,7 +5,7 @@ Een kleine, zelf te hosten webapplicatie om declaraties van een vereniging of st
 - **Indienen per mail.** Iemand mailt een foto of pdf van de bon naar één vast adres en krijgt direct een bevestiging met een persoonlijke link.
 - **Aanvullen via een link.** Via die link vult de indiener bedrag, omschrijving, IBAN en tenaamstelling in. Rekeninggegevens worden onthouden voor een volgende keer (en blijven aan te passen).
 - **Goedkeuren met paraaf.** De voorzitter krijgt een mail, keurt goed in het portaal en de bonnen krijgen automatisch een paraaf (stempel met naam, datum en kenmerk) als pdf.
-- **Betalen.** De boekhouder krijgt een mail met alle gegevens en de geparafeerde bonnen en zet de betaling klaar bij de bank. Daarna krijgt de secretaris bericht om de betaling akkoord te geven.
+- **Betalen.** De boekhouder krijgt een mail met alle gegevens en de geparafeerde bonnen en zet de betaling klaar bij de bank. Daarna krijgt de secretaris bericht om de betaling uit te voeren.
 - **Altijd op de hoogte.** De indiener krijgt bij elke stap een update. Wie nog een taak open heeft, krijgt elke dag een herinnering.
 - **Portaal.** Voorzitter, boekhouder en secretaris loggen in om de status van alle declaraties te zien en kunnen zelf een declaratie aanmaken namens iemand.
 - **Meertalig.** Nederlands en Engels; een taal toevoegen is één bestand vertalen.
@@ -23,7 +23,7 @@ flowchart LR
     B -->|indiener vult aan| C[Wacht op goedkeuring]
     C -->|voorzitter keurt goed<br/>+ paraaf| D[Goedgekeurd]
     D -->|boekhouder zet<br/>betaling klaar| E[Betaling klaargezet]
-    E -->|secretaris geeft<br/>akkoord bij bank| F[Betaald]
+    E -->|secretaris voert<br/>betaling uit| F[Betaald]
     C & D & E -.->|afwijzen| X[Afgewezen]
 ```
 

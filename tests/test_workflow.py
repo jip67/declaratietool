@@ -104,7 +104,7 @@ def test_full_flow(db, client, staff):
     assert claim.status == Status.PAYMENT_PREPARED.value
     assert sent_to("secretaris@example.org")
 
-    # Voorzitter en boekhouder/beheerder mogen de betaling niet akkoord geven
+    # Voorzitter en boekhouder/beheerder mogen de betaling niet als uitgevoerd melden
     for email in ("voorzitter@example.org", "boekhouder@example.org"):
         login(client, email)
         assert 'value="pay"' not in client.get(f"/portal/claims/{claim.id}").text
@@ -112,7 +112,7 @@ def test_full_flow(db, client, staff):
         db.expire_all()
         assert claim.status == Status.PAYMENT_PREPARED.value
 
-    # 5. Secretaris geeft akkoord
+    # 5. Secretaris voert de betaling uit
     login(client, "secretaris@example.org")
     client.post(f"/portal/claims/{claim.id}/action", data={"action": "pay"})
     db.expire_all()
