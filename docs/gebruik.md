@@ -50,6 +50,12 @@ Een beheerder ziet bij elke declaratie de knop **Declaratie bewerken**. Daarmee 
 
 Onderaan de declaratie staat **Declaratie wissen**. Na het aanvinken van de bevestiging wordt de declaratie definitief verwijderd, met de bijlagen (ook de geparafeerde versies) op schijf, de geschiedenis en de interne opmerkingen. Handig om testdata op te ruimen; het kan niet ongedaan worden gemaakt.
 
+## Eenvoudige weergave
+
+Voor wie niet veel met computers doet is er een **eenvoudige weergave**, voor voorzitter, boekhouder en secretaris. Na het inloggen staat dan alleen wat op die persoon wacht, als grote kaarten met bedrag, omschrijving en een knop als **Bekijken en goedkeuren**. Na het goedkeuren (of klaarzetten, of akkoord geven) kom je meteen terug op de takenlijst, met de melding dat het gelukt is. Instellingen en Nieuwe declaratie staan niet in het menu; via **Alle declaraties bekijken** blijft de volledige lijst bereikbaar.
+
+Iedereen zet dit zelf aan of uit onder zijn naam (**Eenvoudige weergave**). De beheerder kan het ook per persoon aanzetten onder **Instellingen → Gebruikers → Bewerken**.
+
 ## Meekijken als een andere gebruiker (beheerder)
 
 Onder **Instellingen → Gebruikers** staat bij elke actieve gebruiker de knop **Meekijken**. Je ziet het portaal dan precies zoals die persoon het ziet: dezelfde declaraties, dezelfde taken en dezelfde knoppen. Zo kun je bijvoorbeeld de voorzitter aan de telefoon uitleggen waar hij moet klikken, of controleren wat een lid met de rol Gebruiker ziet.

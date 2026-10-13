@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="/static/style.css">
   {% block head %}{% endblock %}
 </head>
-<body{% if user %} class="has-sidebar{% if user.viewed_by %} viewing-as{% endif %}"{% endif %}>
+<body{% if user %} class="has-sidebar{% if user.viewed_by %} viewing-as{% endif %}{% if user.simple_view and user.is_staff %} simple-view{% endif %}"{% endif %}>
 <header class="topbar">
   <a class="brand" href="{% if user %}/portal{% else %}/login{% endif %}">{{ settings.app_name }}</a>
   <span class="org">{{ settings.organisation_name }}</span>
@@ -16,11 +16,12 @@
   <label for="nav-toggle" class="nav-button" aria-label="{{ t('nav.menu') }}"><span class="burger" aria-hidden="true"></span> {{ t('nav.menu') }}</label>
   <nav class="mainnav">
     {% set path = request.url.path %}
-    {% set mine = path == '/portal' and request.query_params.get('view') == 'mine' %}
+    {% set simple = user.simple_view and user.is_staff %}
+    {% set mine = path == '/portal' and (request.query_params.get('view') == 'mine' or (simple and request.query_params.get('view', 'open') == 'open')) %}
     {% if user.is_staff %}<a href="/portal?view=mine" {% if mine %}class="active"{% endif %}>{{ t('nav.my_tasks') }}{% if my_count %} <span class="count">{{ my_count }}</span>{% endif %}</a>{% endif %}
-    <a href="/portal" {% if (path == '/portal' and not mine) or (path.startswith('/portal/claims/') and path != '/portal/claims/new') %}class="active"{% endif %}>{{ t('nav.claims') }}</a>
-    <a href="/portal/claims/new" {% if path == '/portal/claims/new' %}class="active"{% endif %}>{{ t('nav.new_claim') }}</a>
-    {% if user.is_staff %}
+    <a href="/portal{% if simple %}?view=all{% endif %}" {% if (path == '/portal' and not mine) or (path.startswith('/portal/claims/') and path != '/portal/claims/new') %}class="active"{% endif %}>{{ t('nav.claims') }}</a>
+    {% if not simple %}<a href="/portal/claims/new" {% if path == '/portal/claims/new' %}class="active"{% endif %}>{{ t('nav.new_claim') }}</a>{% endif %}
+    {% if user.is_staff and not simple %}
     <details class="menu">
       <summary>{{ t('nav.settings') }}</summary>
       <div class="menu-items">

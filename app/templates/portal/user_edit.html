@@ -17,6 +17,8 @@
       {% for r in Role %}<label class="check"><input type="checkbox" name="roles" value="{{ r.value }}" {% if target.has_role(r) %}checked{% endif %}> {{ t('role.' ~ r.value) }}</label>{% endfor %}
     </fieldset>
     <label class="check"><input type="checkbox" name="active" value="true" {% if target.active %}checked{% endif %}> {{ t('field.active') }}</label>
+    <label class="check"><input type="checkbox" name="simple_view" value="true" {% if target.simple_view %}checked{% endif %}> {{ t('simple.setting') }}</label>
+    <p class="muted">{{ t('simple.setting_help_admin') }}</p>
     {% if is_self %}<p class="muted">{{ t('users.self_note') }}</p>{% endif %}
     <label>{{ t('field.new_password') }}<input type="password" name="password" minlength="10" autocomplete="new-password"></label>
     <button class="primary">{{ t('action.save') }}</button>

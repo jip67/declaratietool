@@ -291,3 +291,19 @@ ul.recovery-codes li { padding: .2rem 0; }
 .view-as-banner form { margin-left: auto; }
 .viewing-as main form[method="post"] :is(button, input, textarea, select) { opacity: .5; pointer-events: none; }
 .actions-inline { display: inline-flex; flex-wrap: wrap; gap: .4rem; }
+
+/* Eenvoudige weergave: grote letters, alleen eigen taken */
+.simple-view { font-size: 18px; }
+.simple-view main .card { max-width: 720px; }
+.simple .lead { font-size: 1.15rem; }
+.task-cards { list-style: none; margin: 0 0 1.5rem; padding: 0; display: grid; gap: 1rem; }
+.task-card { display: grid; gap: .3rem; padding: 1.1rem 1.25rem; border: 2px solid var(--primary); border-radius: 14px; background: var(--mine); color: var(--text); text-decoration: none; }
+.task-card:hover { box-shadow: 0 4px 16px rgba(67,56,202,.18); }
+.tc-amount { font-size: 1.6rem; font-weight: 700; }
+.tc-what { font-size: 1.15rem; }
+.tc-who { color: var(--muted); font-size: .95rem; }
+.tc-go { margin-top: .5rem; justify-self: start; font-size: 1.1rem; padding: .75rem 1.4rem; }
+.nothing { font-size: 1.25rem; padding: 1.5rem 0; }
+.done-banner { background: var(--s-paid-bg); color: var(--s-paid); border-radius: 10px; padding: .8rem 1rem; font-weight: 600; }
+.simple-view .task button.primary { font-size: 1.2rem; padding: .9rem 1.6rem; }
+@media (max-width: 760px) { .tc-go { justify-self: stretch; text-align: center; } }

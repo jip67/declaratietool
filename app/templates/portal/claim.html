@@ -3,7 +3,9 @@
 {% block content %}
 <section class="card">
   <div class="row"><h1>{{ claim.reference }}</h1>{% include "_status.html" %}</div>
-  {% if user.has_role(Role.ADMIN) %}<p class="admin-tools"><a class="button" href="/portal/claims/{{ claim.id }}/edit">{{ t('claim.edit') }}</a></p>{% endif %}
+  {% set simple = user.simple_view and user.is_staff %}
+  {% if simple %}<p><a href="/portal">&larr; {{ t('simple.back') }}</a></p>{% endif %}
+  {% if user.has_role(Role.ADMIN) and not simple %}<p class="admin-tools"><a class="button" href="/portal/claims/{{ claim.id }}/edit">{{ t('claim.edit') }}</a></p>{% endif %}
   {% include "_steps.html" %}
   {% if error %}<p class="error">{{ t('error.' ~ error) }}</p>{% endif %}
 
@@ -40,7 +42,7 @@
     {% endwith %}
   {% endfor %}
 
-  {% if user.is_staff %}
+  {% if user.is_staff and not (simple and not claim.comments) %}
   <section class="internal" id="comments">
     <h2>{{ t('comments.title') }} <span class="badge-internal">{{ t('comments.badge') }}</span></h2>
     <p class="muted">{{ t('comments.hint') }}</p>
@@ -80,7 +82,7 @@
   </details>
   {% endif %}
 
-  {% if user.has_role(Role.ADMIN) %}
+  {% if user.has_role(Role.ADMIN) and not simple %}
   <details class="reject" id="delete">
     <summary>{{ t('claim.delete') }}</summary>
     <p>{{ t('claim.delete_warning') }}</p>
