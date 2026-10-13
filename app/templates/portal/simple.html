@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{{ t('nav.my_tasks') }}{% endblock %}
+{% block content %}
+<section class="card simple">
+  {% if done %}<p class="done-banner">{{ t('simple.done', ref=done.reference, status=t('status.' ~ done.status)) }}</p>{% endif %}
+  <h1>{{ t('simple.title', name=user.name.split(' ')[0]) }}</h1>
+  {% if claims %}
+  <p class="lead">{{ t('simple.intro_one') if claims|length == 1 else t('simple.intro', count=claims|length) }}</p>
+  <ul class="task-cards">
+  {% for claim in claims %}
+    {% set role = ROLE_FOR_STATUS[Status(claim.status)] %}
+    <li>
+      <a class="task-card" href="/portal/claims/{{ claim.id }}">
+        <span class="tc-amount">{{ claim.amount_display }}</span>
+        <span class="tc-what">{{ claim.description or '-' }}</span>
+        <span class="tc-who">{{ claim.submitter.name or claim.submitter.email }} · {{ claim.created_at|localtime }}</span>
+        <span class="button primary tc-go">{{ t('simple.open_' ~ role.value) }}</span>
+      </a>
+    </li>
+  {% endfor %}
+  </ul>
+  {% else %}
+  <p class="nothing">{{ t('simple.nothing') }}</p>
+  {% endif %}
+  <p class="muted"><a href="/portal?view=all">{{ t('simple.all_claims') }}</a></p>
+</section>
+{% endblock %}

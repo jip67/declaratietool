@@ -331,5 +331,18 @@
   "view_as.read_only": "read-only, you cannot change anything",
   "view_as.blocked": "That is not possible while viewing as someone else. Stop viewing first.",
   "view_as.stop": "Stop viewing",
-  "log.view_as": "Viewed as {name}"
+  "log.view_as": "Viewed as {name}",
+  "simple.setting": "Simple view",
+  "simple.setting_help": "After signing in you only see what is waiting for you, with large buttons. Settings and New claim are hidden from the menu.",
+  "simple.setting_help_admin": "For chair, treasurer or secretary: only their own tasks, large buttons, no settings in the menu. The person can also switch this on or off under their name.",
+  "simple.title": "Hello {name}",
+  "simple.intro": "{count} claims are waiting for you. Click a claim to view it.",
+  "simple.nothing": "Nothing is waiting for you right now. You will get an e-mail as soon as there is something to do.",
+  "simple.all_claims": "View all claims",
+  "simple.open_chair": "View and approve",
+  "simple.open_treasurer": "View and prepare payment",
+  "simple.open_secretary": "View and authorise",
+  "simple.done": "Done: {ref} is now “{status}”. Thank you!",
+  "simple.back": "Back to my tasks",
+  "simple.intro_one": "1 claim is waiting for you. Click it to view it."
 }

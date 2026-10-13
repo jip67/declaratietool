@@ -10,6 +10,10 @@
     <label>{{ t('field.language') }}
       <select name="language">{% for code in languages %}<option value="{{ code }}" {% if code == user.language %}selected{% endif %}>{{ t('lang.' ~ code) }}</option>{% endfor %}</select>
     </label>
+    {% if user.is_staff %}
+    <label class="check"><input type="checkbox" name="simple_view" value="true" {% if user.simple_view %}checked{% endif %}> {{ t('simple.setting') }}</label>
+    <p class="muted">{{ t('simple.setting_help') }}</p>
+    {% endif %}
     <h2>{{ t('account.change_password') }}</h2>
     <label>{{ t('account.current_password') }}<input type="password" name="current_password" autocomplete="current-password"></label>
     <label>{{ t('account.new_password') }}<input type="password" name="new_password" minlength="10" autocomplete="new-password"></label>

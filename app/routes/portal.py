@@ -13,7 +13,7 @@ from ..config import get_settings
 from ..db import get_db
 from ..i18n import available_languages
 from ..models import (
-    OPEN_STATUSES, Attachment, Claim, Comment, Event, IncomingMail, LoginAttempt, Role, Status, Submitter, User,
+    OPEN_STATUSES, ROLE_FOR_STATUS, Attachment, Claim, Comment, Event, IncomingMail, LoginAttempt, Role, Status, Submitter, User,
 )
 from ..security import hash_password, is_valid_iban, normalize_iban, parse_amount
 from ..web import current_user, file_response, logged_in_user, is_my_task, my_task_count, render, require_admin, require_staff
@@ -42,6 +42,16 @@ def dashboard(request: Request, view: str = "open", user: User = Depends(current
         return render(
             request, "portal/dashboard.html", user.language,
             user=user, claims=claims, view="all", my_count=0, is_my_task=is_my_task,
+        )
+    if user.simple_view and view in ("open", "mine"):
+        # Eenvoudige weergave: alleen wat op deze persoon wacht, als grote kaarten.
+        open_claims = db.scalars(query.where(Claim.status.in_([s.value for s in ROLE_FOR_STATUS]))).all()
+        tasks = [c for c in open_claims if is_my_task(c, user)]
+        done = db.scalar(select(Claim).where(Claim.reference == request.query_params.get("done", ""))) \
+            if request.query_params.get("done") else None
+        return render(
+            request, "portal/simple.html", user.language,
+            user=user, claims=tasks, my_count=len(tasks), done=done,
         )
     if view == "open":
         query = query.where(Claim.status.in_([s.value for s in OPEN_STATUSES]))
@@ -176,6 +186,9 @@ def claim_action(
         return RedirectResponse(f"/portal/claims/{claim_id}?error={exc}", status_code=303)
     db.commit()
     workflow.remove_files(stale)
+    if user.simple_view and action in ACTIONS:
+        # Terug naar de takenlijst, met een bevestiging bovenaan.
+        return RedirectResponse(f"/portal?done={claim.reference}", status_code=303)
     return RedirectResponse(f"/portal/claims/{claim_id}", status_code=303)
 
 
@@ -400,6 +413,7 @@ def update_user(
     language: str = Form(""),
     roles: list[str] = Form(default=[]),
     active: bool = Form(False),
+    simple_view: bool = Form(False),
     password: str = Form(""),
     user: User = Depends(require_admin),
     db: Session = Depends(get_db),
@@ -424,6 +438,7 @@ def update_user(
             new_roles.append(Role.ADMIN.value)
     target.roles = ",".join(new_roles)
     target.active = active
+    target.simple_view = simple_view
     if name.strip():
         target.name = name.strip()
     if language in available_languages():

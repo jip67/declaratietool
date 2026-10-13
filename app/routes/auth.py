@@ -224,11 +224,13 @@ def account_update(
     language: str = Form(...),
     current_password: str = Form(""),
     new_password: str = Form(""),
+    simple_view: bool = Form(False),
     user: User = Depends(current_user),
     db: Session = Depends(get_db),
 ):
     error = None
     user.name = name.strip() or user.name
+    user.simple_view = simple_view
     if language in available_languages():
         user.language = language
         request.session["lang"] = language

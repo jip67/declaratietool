@@ -69,6 +69,8 @@ class User(Base):
     email_code_hash: Mapped[str] = mapped_column(String(64), default="", server_default="")
     email_code_sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     recovery_codes: Mapped[str] = mapped_column(Text, default="", server_default="")  # sha256-hashes, komma-gescheiden
+    # Eenvoudige weergave: alleen eigen taken, grote knoppen, geen instellingen.
+    simple_view: Mapped[bool] = mapped_column(Boolean, default=False, server_default=false())
 
     # Niet opgeslagen: de beheerder die op dit moment met deze gebruiker meekijkt (alleen-lezen).
     viewed_by = None

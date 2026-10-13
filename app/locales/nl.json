@@ -331,5 +331,18 @@
   "view_as.read_only": "alleen bekijken, je kunt niets wijzigen",
   "view_as.blocked": "Dat kan niet tijdens meekijken. Stop eerst met meekijken.",
   "view_as.stop": "Stoppen met meekijken",
-  "log.view_as": "Meegekeken als {name}"
+  "log.view_as": "Meegekeken als {name}",
+  "simple.setting": "Eenvoudige weergave",
+  "simple.setting_help": "Na het inloggen zie je alleen wat er op jou wacht, met grote knoppen. Instellingen en Nieuwe declaratie staan dan niet in het menu.",
+  "simple.setting_help_admin": "Voor voorzitter, boekhouder of secretaris: alleen eigen taken, grote knoppen, geen instellingen in het menu. De persoon kan dit zelf ook aan- en uitzetten onder zijn naam.",
+  "simple.title": "Hallo {name}",
+  "simple.intro": "Er wachten {count} declaraties op jou. Klik op een declaratie om hem te bekijken.",
+  "simple.nothing": "Er wacht nu niets op jou. Je krijgt een mail zodra er iets te doen is.",
+  "simple.all_claims": "Alle declaraties bekijken",
+  "simple.open_chair": "Bekijken en goedkeuren",
+  "simple.open_treasurer": "Bekijken en betaling klaarzetten",
+  "simple.open_secretary": "Bekijken en akkoord geven",
+  "simple.done": "Gelukt: {ref} is nu “{status}”. Dank je wel!",
+  "simple.back": "Terug naar mijn taken",
+  "simple.intro_one": "Er wacht 1 declaratie op jou. Klik erop om hem te bekijken."
 }
