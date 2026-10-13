@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="/static/style.css">
   {% block head %}{% endblock %}
 </head>
-<body{% if user %} class="has-sidebar"{% endif %}>
+<body{% if user %} class="has-sidebar{% if user.viewed_by %} viewing-as{% endif %}"{% endif %}>
 <header class="topbar">
   <a class="brand" href="{% if user %}/portal{% else %}/login{% endif %}">{{ settings.app_name }}</a>
   <span class="org">{{ settings.organisation_name }}</span>
@@ -42,6 +42,15 @@
   </nav>
   {% endif %}
 </header>
+{% if user and user.viewed_by %}
+<div class="view-as-banner" role="status">
+  <p><strong>{{ t('view_as.banner', name=user.name) }}</strong>
+  {% if user.role_list %}({% for r in user.role_list %}{{ t('role.' ~ r.value) }}{% if not loop.last %}, {% endif %}{% endfor %}){% endif %}
+  · {{ t('view_as.read_only') }}</p>
+  {% if view_blocked %}<p class="error">{{ t('view_as.blocked') }}</p>{% endif %}
+  <form method="post" action="/portal/view-as/stop" class="inline"><button class="primary">{{ t('view_as.stop') }}</button></form>
+</div>
+{% endif %}
 <main>
 {% block content %}{% endblock %}
 </main>

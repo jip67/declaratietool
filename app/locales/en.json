@@ -324,5 +324,12 @@
   "2fa.method_email": "E-mail",
   "action.undo": "Undo last step",
   "undo.intro": "The last step ({step}) will be reverted and the claim returns to its previous status. The submitter will be notified.",
-  "event.undone": "Step undone"
+  "event.undone": "Step undone",
+  "view_as.start": "View as",
+  "view_as.help": "See the portal exactly as this person sees it, to help or explain. You cannot approve, save or send anything meanwhile. This is recorded in the log.",
+  "view_as.banner": "You are viewing as {name}",
+  "view_as.read_only": "read-only, you cannot change anything",
+  "view_as.blocked": "That is not possible while viewing as someone else. Stop viewing first.",
+  "view_as.stop": "Stop viewing",
+  "log.view_as": "Viewed as {name}"
 }

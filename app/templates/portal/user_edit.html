@@ -22,6 +22,12 @@
     <button class="primary">{{ t('action.save') }}</button>
   </form>
 
+  {% if not is_self and target.active %}
+  <h2>{{ t('view_as.start') }}</h2>
+  <p class="muted">{{ t('view_as.help') }}</p>
+  <form method="post" action="/portal/users/{{ target.id }}/view-as"><button>{{ t('view_as.start') }}</button></form>
+  {% endif %}
+
   <h2>{{ t('2fa.title') }}</h2>
   {% if target.has_2fa %}
   <p>{{ t('2fa.status_on_' ~ target.twofa_method) }}</p>

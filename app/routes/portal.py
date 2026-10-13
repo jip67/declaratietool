@@ -8,7 +8,7 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy import func, or_, select, update
 from sqlalchemy.orm import Session
 
-from .. import mailconfig, notifications, storage, updates, workflow
+from .. import activity, mailconfig, notifications, storage, updates, workflow
 from ..config import get_settings
 from ..db import get_db
 from ..i18n import available_languages
@@ -16,7 +16,7 @@ from ..models import (
     OPEN_STATUSES, Attachment, Claim, Comment, Event, IncomingMail, LoginAttempt, Role, Status, Submitter, User,
 )
 from ..security import hash_password, is_valid_iban, normalize_iban, parse_amount
-from ..web import current_user, file_response, is_my_task, my_task_count, render, require_admin, require_staff
+from ..web import current_user, file_response, logged_in_user, is_my_task, my_task_count, render, require_admin, require_staff
 from .public import validate_details
 
 router = APIRouter(prefix="/portal")
@@ -465,6 +465,27 @@ def reset_user_2fa(user_id: int, user: User = Depends(require_admin), db: Sessio
     target.clear_2fa()
     db.commit()
     return RedirectResponse(f"/portal/users/{target.id}", status_code=303)
+
+
+# ---------------------------------------------------------------- meekijken (alleen-lezen)
+
+
+@router.post("/users/{user_id}/view-as")
+def start_view_as(user_id: int, request: Request, user: User = Depends(require_admin), db: Session = Depends(get_db)):
+    """De beheerder ziet het portaal zoals deze gebruiker het ziet, zonder iets te kunnen wijzigen."""
+    target = _target(db, user_id)
+    if target.id == user.id or not target.active:
+        raise HTTPException(status_code=400)
+    request.session["view_as"] = target.id
+    activity.record_view_as(db, user, target, request.client.host if request.client else "")
+    return RedirectResponse("/portal", status_code=303)
+
+
+@router.post("/view-as/stop")
+def stop_view_as(request: Request, user: User = Depends(logged_in_user)):
+    target = request.session.pop("view_as", None)
+    request.session.pop("view_as_blocked", None)
+    return RedirectResponse(f"/portal/users/{target}" if target else "/portal", status_code=303)
 
 
 # ---------------------------------------------------------------- bijwerken

@@ -46,7 +46,8 @@
         <td data-label="{{ t('field.name') }}">{{ r.user.name if r.user else '' }}</td>
         {% if tab == 'failed' %}<td data-label="{{ t('log.reason') }}">{{ t('log.reason.' ~ r.reason) }}</td>{% endif %}
         <td data-label="{{ t('log.ip') }}"><code>{{ r.ip }}</code></td>
-        <td class="muted" data-label="{{ t('log.browser') }}" title="{{ r.user_agent }}">{{ r.user_agent|truncate(40) }}</td>
+        {% if r.reason == 'view_as' %}<td data-label="{{ t('log.browser') }}">{{ t('log.view_as', name=r.user_agent) }}</td>
+        {% else %}<td class="muted" data-label="{{ t('log.browser') }}" title="{{ r.user_agent }}">{{ r.user_agent|truncate(40) }}</td>{% endif %}
       </tr>
     {% endfor %}
     </tbody>

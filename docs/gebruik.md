@@ -50,6 +50,14 @@ Een beheerder ziet bij elke declaratie de knop **Declaratie bewerken**. Daarmee 
 
 Onderaan de declaratie staat **Declaratie wissen**. Na het aanvinken van de bevestiging wordt de declaratie definitief verwijderd, met de bijlagen (ook de geparafeerde versies) op schijf, de geschiedenis en de interne opmerkingen. Handig om testdata op te ruimen; het kan niet ongedaan worden gemaakt.
 
+## Meekijken als een andere gebruiker (beheerder)
+
+Onder **Instellingen → Gebruikers** staat bij elke actieve gebruiker de knop **Meekijken**. Je ziet het portaal dan precies zoals die persoon het ziet: dezelfde declaraties, dezelfde taken en dezelfde knoppen. Zo kun je bijvoorbeeld de voorzitter aan de telefoon uitleggen waar hij moet klikken, of controleren wat een lid met de rol Gebruiker ziet.
+
+Meekijken is alleen-lezen. Een gele balk bovenaan laat zien met wie je meekijkt; knoppen zijn grijs en de server weigert elke wijziging (goedkeuren, opmerkingen, instellingen, account). Met **Stoppen met meekijken** ben je weer jezelf. Elke keer dat je gaat meekijken komt in het logboek onder **Inlogs** ("Meegekeken als ...").
+
+Indieners zonder account hebben geen portaal; hun eigen pagina open je via de link bij de declaratie.
+
 ## Herinneringen
 
 Elke ochtend (instelbaar) krijgt iedereen met openstaande taken één mail met een overzicht. Indieners die hun gegevens nog niet hebben ingevuld krijgen ook een herinnering, standaard maximaal 14 dagen lang.

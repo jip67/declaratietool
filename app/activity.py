@@ -34,6 +34,21 @@ def record_login(
     db.commit()
 
 
+def record_view_as(db: Session, admin: User, target: User, ip: str) -> None:
+    """Legt vast dat een beheerder is gaan meekijken; zichtbaar bij Inlogs in het logboek."""
+    db.add(
+        LoginAttempt(
+            email=admin.email[:255],
+            user_id=admin.id,
+            success=True,
+            reason="view_as",
+            ip=ip[:64],
+            user_agent=f"{target.name} <{target.email}>"[:255],
+        )
+    )
+    db.commit()
+
+
 def record_mail(db: Session, sender: str, subject: str, attachments: int, result: str, claim: Claim | None = None) -> None:
     db.add(
         IncomingMail(

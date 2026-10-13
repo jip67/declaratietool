@@ -49,11 +49,29 @@ class LoginRequired(Exception):
     pass
 
 
-def current_user(request: Request, db: Session = Depends(get_db)) -> User:
+def logged_in_user(request: Request, db: Session = Depends(get_db)) -> User:
+    """Wie echt is ingelogd, ook tijdens meekijken."""
     user_id = request.session.get("user_id")
     user = db.get(User, user_id) if user_id else None
     if user is None or not user.active:
         raise LoginRequired()
+    return user
+
+
+def current_user(request: Request, db: Session = Depends(get_db)) -> User:
+    """De gebruiker van wie het portaal getoond wordt.
+
+    Kijkt een beheerder mee met iemand anders, dan is dat die ander; user.viewed_by is dan de beheerder.
+    Opslaan of afhandelen is tijdens meekijken geblokkeerd (zie block_while_viewing in main.py).
+    """
+    user = logged_in_user(request, db)
+    view_as = request.session.get("view_as")
+    if view_as:
+        target = db.get(User, view_as)
+        if user.has_role(Role.ADMIN) and target is not None and target.active and target.id != user.id:
+            target.viewed_by = user
+            return target
+        request.session.pop("view_as", None)
     return user
 
 
@@ -103,6 +121,8 @@ def render(request: Request, name: str, lang: str, status_code: int = 200, **con
             context["my_count"] = my_task_count(db, user)
         finally:
             db.close()
+    if "view_as" in request.session:
+        context["view_blocked"] = request.session.pop("view_as_blocked", False)
     context.update(
         t=translator(lang),
         lang=lang,
