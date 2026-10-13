@@ -18,6 +18,7 @@
       {% elif claim.status == 'approved' %}<input type="hidden" name="action" value="prepare"><button class="primary">{{ t('action.prepare') }}</button>
       {% elif claim.status == 'payment_prepared' %}<input type="hidden" name="action" value="pay"><button class="primary">{{ t('action.pay') }}</button>{% endif %}
     </form>
+    {% if claim.status == 'payment_prepared' %}<p class="muted task-hint">{{ t('task.secretary_hint') }}</p>{% endif %}
   </div>
   {% endif %}
 
