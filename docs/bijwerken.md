@@ -1,7 +1,7 @@
 # Bijwerken via het portaal
 
 Een beheerder kan de tool bijwerken met een knop in het portaal, zonder in te loggen op de server.
-Onder **Instellingen → Bijwerken** (alleen zichtbaar met de rol Beheerder) zie je:
+Onder **Instellingen → Updates** (alleen zichtbaar met de rol Beheerder) zie je:
 
 - welke versie er geïnstalleerd is en welke versie er draait;
 - de nieuwste versie op GitHub, met de wijzigingen die erbij komen;
@@ -11,6 +11,8 @@ Onder **Instellingen → Bijwerken** (alleen zichtbaar met de rol Beheerder) zie
 een paar minuten; de tool is alleen tijdens het herstarten (enkele seconden) niet bereikbaar. De database
 wordt daarbij automatisch bijgewerkt. **Nu controleren** kijkt alleen of er een nieuwe versie is; dat doet
 de server ook zelf elk uur.
+
+Is er een nieuwere versie, dan zie je als beheerder een uitroepteken bij het menu **Instellingen** en bij **Updates**. Dat volgt de controle die de server elk uur doet.
 
 ## Hoe het werkt
 
@@ -56,7 +58,7 @@ git pull
 sudo bash deploy/install-vps.sh
 ```
 
-Daarna staat **Bijwerken** in het menu **Instellingen**.
+Daarna staat **Updates** in het menu **Instellingen**.
 
 Controleren of de updater actief is:
 

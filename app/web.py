@@ -8,6 +8,7 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from . import updates
 from .config import get_settings
 from .db import get_db, new_session
 from .i18n import available_languages, pick_language, translator
@@ -121,6 +122,12 @@ def render(request: Request, name: str, lang: str, status_code: int = 200, **con
             context["my_count"] = my_task_count(db, user)
         finally:
             db.close()
+    if user is not None and user.has_role(Role.ADMIN) and "update_ready" not in context:
+        # Leest alleen status.json van de updater op de server; geen externe aanroep.
+        try:
+            context["update_ready"] = updates.update_available(updates.status())
+        except Exception:
+            context["update_ready"] = False
     if "view_as" in request.session:
         context["view_blocked"] = request.session.pop("view_as_blocked", False)
     context.update(
