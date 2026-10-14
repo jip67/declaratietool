@@ -72,7 +72,7 @@ Elke ochtend (instelbaar) krijgt iedereen met openstaande taken één mail met e
 
 Rechtsboven staat het menu **Instellingen**. Wat je daarin ziet hangt af van je rol:
 
-| Rol | Gebruikers | Logboek | Mailinstellingen | Meldingen | Bijwerken |
+| Rol | Gebruikers | Logboek | Mailinstellingen | Meldingen | Updates |
 | --- | --- | --- | --- | --- | --- |
 | Gebruiker | – | – | – | – | – |
 | Voorzitter, boekhouder, secretaris | bekijken | ja | – | eigen | – |

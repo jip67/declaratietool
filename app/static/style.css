@@ -311,3 +311,6 @@ ul.recovery-codes li { padding: .2rem 0; }
 .done-banner { background: var(--s-paid-bg); color: var(--s-paid); border-radius: 10px; padding: .8rem 1rem; font-weight: 600; }
 .simple-view .task button.primary { font-size: 1.2rem; padding: .9rem 1.6rem; }
 @media (max-width: 760px) { .tc-go { justify-self: stretch; text-align: center; } }
+
+/* Uitroepteken bij Instellingen en Updates als er een nieuwe versie is (alleen beheerders). */
+.alert-dot { display: inline-grid; place-items: center; width: 1.15rem; height: 1.15rem; margin-left: .3rem; border-radius: 50%; background: var(--danger); color: #fff; font-size: .72rem; font-weight: 800; line-height: 1; vertical-align: middle; }

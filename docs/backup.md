@@ -66,7 +66,7 @@ Je kunt het script veilig opnieuw draaien; een bestaande sleutel en koppeling bl
 
 ## Controleren
 
-In het portaal staat onder **Instellingen → Bijwerken** wanneer de laatste back-up is gelukt.
+In het portaal staat onder **Instellingen → Updates** wanneer de laatste back-up is gelukt.
 Mislukt de back-up, of is er meer dan anderhalve dag geen back-up gemaakt, dan ziet een beheerder
 een waarschuwing op het overzicht.
 

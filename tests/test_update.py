@@ -109,3 +109,25 @@ def test_backup_status_on_update_page_and_dashboard(client, staff, update_dir):
     client.post("/logout")
     login(client, "voorzitter@example.org")
     assert "back-up werkt niet" not in client.get("/portal").text
+
+
+def test_menu_shows_mark_when_update_available(client, staff, update_dir):
+    login(client, "boekhouder@example.org")
+    assert "alert-dot" not in client.get("/portal").text  # nog geen status.json
+
+    write_status(update_dir)
+    page = client.get("/portal").text
+    assert page.count('class="alert-dot"') == 2  # bij Instellingen en bij Updates
+    assert "Nieuwe versie beschikbaar" in page
+
+    write_status(update_dir, latest={"sha": "a" * 40, "date": None, "subject": "Oude versie"}, new_commits=[])
+    assert "alert-dot" not in client.get("/portal").text
+
+    (update_dir / "status" / "status.json").write_text("kapot")
+    assert client.get("/portal").status_code == 200
+
+
+def test_no_mark_for_board_members(client, staff, update_dir):
+    write_status(update_dir)
+    login(client, "voorzitter@example.org")
+    assert "alert-dot" not in client.get("/portal").text

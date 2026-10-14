@@ -43,7 +43,7 @@ Log in op `https://<jouw-domein>` en voeg onder **Instellingen → Gebruikers** 
 ## Bijwerken
 
 Nieuwe versies komen via GitHub. Met het installatiescript kan een beheerder bijwerken via
-**Instellingen → Bijwerken** in het portaal; zie [bijwerken.md](bijwerken.md). Met de hand, op de server:
+**Instellingen → Updates** in het portaal; zie [bijwerken.md](bijwerken.md). Met de hand, op de server:
 
 ```bash
 cd declaratietool

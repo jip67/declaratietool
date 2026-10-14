@@ -23,13 +23,13 @@
     {% if not simple %}<a href="/portal/claims/new" {% if path == '/portal/claims/new' %}class="active"{% endif %}>{{ t('nav.new_claim') }}</a>{% endif %}
     {% if user.is_staff and not simple %}
     <details class="menu">
-      <summary>{{ t('nav.settings') }}</summary>
+      <summary>{{ t('nav.settings') }}{% if update_ready %} <span class="alert-dot" role="img" title="{{ t('nav.update_available') }}" aria-label="{{ t('nav.update_available') }}">!</span>{% endif %}</summary>
       <div class="menu-items">
         <a href="/portal/users">{{ t('nav.users') }}</a>
         <a href="/portal/log">{{ t('nav.log') }}</a>
         <a href="/portal/notifications">{{ t('nav.notifications') }}</a>
         {% if user.has_role(Role.ADMIN) %}<a href="/portal/mail">{{ t('nav.mail') }}</a>
-        <a href="/portal/update">{{ t('nav.update') }}</a>{% endif %}
+        <a href="/portal/update">{{ t('nav.update') }}{% if update_ready %} <span class="alert-dot" role="img" title="{{ t('nav.update_available') }}" aria-label="{{ t('nav.update_available') }}">!</span>{% endif %}</a>{% endif %}
       </div>
     </details>
     {% endif %}
