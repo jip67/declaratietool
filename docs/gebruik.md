@@ -66,7 +66,7 @@ Indieners zonder account hebben geen portaal; hun eigen pagina open je via de li
 
 ## Herinneringen
 
-Elke ochtend (instelbaar) krijgt iedereen met openstaande taken één mail met een overzicht. Indieners die hun gegevens nog niet hebben ingevuld krijgen ook een herinnering, standaard maximaal 14 dagen lang.
+Elke ochtend (instelbaar) krijgt iedereen met openstaande taken één mail met een overzicht. Bestuursleden die het aanzetten krijgen in dezelfde ronde ook een melding van taken die te lang openstaan (zie [Beheer](#beheer)). Indieners die hun gegevens nog niet hebben ingevuld krijgen ook een herinnering, standaard maximaal 14 dagen lang.
 
 ## Beheer
 
@@ -75,8 +75,8 @@ Rechtsboven staat het menu **Instellingen**. Wat je daarin ziet hangt af van je 
 | Rol | Gebruikers | Logboek | Mailinstellingen | Meldingen | Bijwerken |
 | --- | --- | --- | --- | --- | --- |
 | Gebruiker | – | – | – | – | – |
-| Voorzitter, boekhouder, secretaris | bekijken | ja | – | – | – |
-| Beheerder | bekijken en wijzigen | ja | ja | ja | ja |
+| Voorzitter, boekhouder, secretaris | bekijken | ja | – | eigen | – |
+| Beheerder | bekijken en wijzigen | ja | ja | eigen + beheer | ja |
 
 De rol Beheerder geeft geen rechten in de declaratiestappen. Goedkeuren kan alleen de voorzitter, de betaling klaarzetten alleen de boekhouder en de betaling uitvoeren alleen de secretaris. Heeft iemand meerdere rollen, dan mag hij de stappen van al die rollen zetten.
 
@@ -94,13 +94,19 @@ Bij een bestuurswissel: maak een account voor de nieuwe bestuurder met de juiste
 
 Beheerders vinden onder **Instellingen → Mailinstellingen** de gegevens van de mailbox (SMTP voor versturen, IMAP voor ophalen). Daar pas je ze aan zonder `.env` te wijzigen en test je de verbinding met één klik; zie [Configuratie](configuratie.md#mailinstellingen-in-het-portaal).
 
-Onder **Instellingen → Meldingen** kiest de beheerder bij welke gebeurtenissen hij een e-mail wil krijgen. Elke melding zet je los aan of uit; standaard staan ze alle drie uit:
+Onder **Instellingen → Meldingen** kiest elk bestuurslid (voorzitter, boekhouder, secretaris en beheerder) zelf bij welke gebeurtenissen hij een e-mail wil krijgen. Het is een persoonlijke instelling: wat jij aanzet geldt alleen voor jou. Standaard staat alles uit. Wie de eenvoudige weergave gebruikt vindt de pagina via de link op de eigen accountpagina (onder je naam).
+
+- **Nieuwe declaratie**: zodra er een declaratie binnenkomt, per mail of via het portaal, met indiener, bedrag en een link. Maak je zelf een declaratie aan, dan krijg je geen mail.
+- **Statuswijzigingen**: bij elke stap (gegevens ingevuld, goedgekeurd, betaling klaargezet, betaald, afgewezen, stap ongedaan gemaakt), met wie de stap zette. Je krijgt geen melding van stappen die je zelf zet, en ook niet als de declaratie daarna op jou wacht: dan krijg je al de gewone mail met je taak.
+- **Taak staat te lang open**: zodra een declaratie langer dan het gekozen aantal dagen (standaard 3, in te stellen van 1 tot 365) in dezelfde stap staat, ook als iemand anders aan zet is of de indiener zijn gegevens nog moet invullen. Je krijgt per taak maar één melding; gaat de declaratie naar de volgende stap, dan telt die als nieuwe taak. De melding gaat mee met de dagelijkse herinneringsronde, in één mail per persoon.
+
+Beheerders zien daaronder nog drie meldingen:
 
 - **Iemand logt in**: bij elke geslaagde login, met gebruiker, tijdstip, IP-adres en browser.
 - **Tijdelijke inlogblokkering**: één mail zodra een e-mailadres of IP-adres na te veel mislukte pogingen 15 minuten wordt geblokkeerd.
 - **Binnengekomen e-mail**: bij elk bericht in de declaratiemailbox, met afzender, onderwerp en wat de tool ermee deed. Automatische berichten zoals afwezigheidsmeldingen tellen niet mee.
 
-De meldingen gaan naar alle actieve gebruikers met de rol Beheerder, elk in de eigen taal.
+Iedereen krijgt de meldingen in de eigen taal. Stonden de beheermeldingen al aan voor de update naar deze versie, dan staan ze daarna aan voor elke beheerder.
 
 ## Tweestapsverificatie
 

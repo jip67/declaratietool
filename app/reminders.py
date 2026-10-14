@@ -8,7 +8,7 @@ from zoneinfo import ZoneInfo
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from . import mailer, workflow
+from . import mailer, notifications, workflow
 from .config import get_settings
 from .i18n import translate
 from .models import ROLE_FOR_STATUS, Claim, KeyValue, Status, utcnow
@@ -80,6 +80,8 @@ def send_reminders(db: Session) -> int:
         )
         sent += 1
     log.info("Herinneringen verstuurd: %s", sent)
+    # Bestuursleden die het willen weten: taken die te lang openstaan (elke taak één keer).
+    notifications.overdue(db, now)
     return sent
 
 

@@ -13,6 +13,7 @@
     {% if user.is_staff %}
     <label class="check"><input type="checkbox" name="simple_view" value="true" {% if user.simple_view %}checked{% endif %}> {{ t('simple.setting') }}</label>
     <p class="muted">{{ t('simple.setting_help') }}</p>
+    <p><a href="/portal/notifications">{{ t('notify.account_link') }}</a></p>
     {% endif %}
     <h2>{{ t('account.change_password') }}</h2>
     <label>{{ t('account.current_password') }}<input type="password" name="current_password" autocomplete="current-password"></label>

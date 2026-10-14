@@ -15,7 +15,7 @@ from zoneinfo import ZoneInfo
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from . import mailer, storage
+from . import mailer, notifications, storage
 from .config import get_settings
 from .i18n import translate
 from .models import ROLE_FOR_STATUS, Claim, Event, Role, Status, Submitter, User, utcnow
@@ -209,8 +209,12 @@ def complete_details(
     amount_cents: int,
     remember: bool = True,
     user: User | None = None,
+    inform: bool = True,
 ) -> None:
-    """De indiener (of een medewerker) vult de gegevens aan; daarna gaat de declaratie naar de voorzitter."""
+    """De indiener (of een medewerker) vult de gegevens aan; daarna gaat de declaratie naar de voorzitter.
+
+    inform=False: geen statusmelding aan bestuursleden, omdat de declaratie net is aangemaakt en
+    de melding over de nieuwe declaratie volgt."""
     if claim.status_enum not in (Status.RECEIVED, Status.SUBMITTED):
         raise WorkflowError("claim_locked")
     claim.iban = normalize_iban(iban)
@@ -228,6 +232,8 @@ def complete_details(
         db.flush()
         notify_submitter_status(claim)
         notify_role(db, claim)
+        if inform:
+            notifications.status_changed(db, claim, "submitted", user)
 
 
 def _require(user: User, role: Role) -> None:
@@ -261,6 +267,7 @@ def approve(db: Session, claim: Claim, user: User) -> None:
     db.flush()
     notify_submitter_status(claim)
     notify_role(db, claim)
+    notifications.status_changed(db, claim, "approved", user)
 
 
 def prepare_payment(db: Session, claim: Claim, user: User) -> None:
@@ -274,6 +281,7 @@ def prepare_payment(db: Session, claim: Claim, user: User) -> None:
     db.flush()
     notify_submitter_status(claim)
     notify_role(db, claim)
+    notifications.status_changed(db, claim, "payment_prepared", user)
 
 
 def mark_paid(db: Session, claim: Claim, user: User) -> None:
@@ -286,6 +294,7 @@ def mark_paid(db: Session, claim: Claim, user: User) -> None:
     log_event(db, claim, "paid", user)
     db.flush()
     notify_submitter_status(claim)
+    notifications.status_changed(db, claim, "paid", user)
 
 
 def reject(db: Session, claim: Claim, user: User, reason: str) -> None:
@@ -299,6 +308,7 @@ def reject(db: Session, claim: Claim, user: User, reason: str) -> None:
     log_event(db, claim, "rejected", user, note=reason.strip())
     db.flush()
     notify_submitter_status(claim)
+    notifications.status_changed(db, claim, "rejected", user)
 
 
 def _status_before_rejection(claim: Claim) -> Status:
@@ -368,6 +378,7 @@ def undo(db: Session, claim: Claim, user: User) -> list[str]:
     db.flush()
     notify_submitter_status(claim)
     notify_role(db, claim)
+    notifications.status_changed(db, claim, "undone", user)
     return stale
 
 

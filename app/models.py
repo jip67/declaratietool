@@ -71,6 +71,10 @@ class User(Base):
     recovery_codes: Mapped[str] = mapped_column(Text, default="", server_default="")  # sha256-hashes, komma-gescheiden
     # Eenvoudige weergave: alleen eigen taken, grote knoppen, geen instellingen.
     simple_view: Mapped[bool] = mapped_column(Boolean, default=False, server_default=false())
+    # Meldingen per e-mail die deze gebruiker wil krijgen (komma-gescheiden soorten, zie notifications.py).
+    notify: Mapped[str] = mapped_column(String(255), default="", server_default="")
+    # Na hoeveel dagen een openstaande taak een melding oplevert (soort 'overdue').
+    notify_overdue_days: Mapped[int] = mapped_column(Integer, default=3, server_default="3")
 
     # Niet opgeslagen: de beheerder die op dit moment met deze gebruiker meekijkt (alleen-lezen).
     viewed_by = None
@@ -237,6 +241,21 @@ class KeyValue(Base):
 
     key: Mapped[str] = mapped_column(String(64), primary_key=True)
     value: Mapped[str] = mapped_column(Text, default="")
+
+
+class OverdueNotice(Base):
+    """Onthoudt dat een gebruiker al gemeld is dat een taak te lang openstaat.
+
+    Een taak is een declaratie in één status; since is het moment waarop die status begon.
+    Verandert de status, dan is het een nieuwe taak en mag er weer één melding komen.
+    """
+
+    __tablename__ = "overdue_notices"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    claim_id: Mapped[int] = mapped_column(ForeignKey("claims.id", ondelete="CASCADE"), index=True)
+    since: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 
 class LoginAttempt(Base):

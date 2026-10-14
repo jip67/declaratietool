@@ -133,11 +133,12 @@ async def new_claim(
     if details_given:
         workflow.complete_details(
             db, claim, iban=iban, account_holder=account_holder, description=description,
-            amount_cents=cents, remember=True, user=user,
+            amount_cents=cents, remember=True, user=user, inform=False,
         )
     db.commit()
     if not details_given:
         workflow.notify_received(claim)
+    notifications.new_claim(db, claim, user)
     return RedirectResponse(f"/portal/claims/{claim.id}", status_code=303)
 
 
@@ -616,22 +617,27 @@ async def mail_save(request: Request, user: User = Depends(require_admin), db: S
     return _render_mail(request, db, user, form=config, message=message)
 
 
-# ---------------------------------------------------------------- meldingen voor de beheerder
+# ---------------------------------------------------------------- meldingen (persoonlijke instelling)
 
 
 @router.get("/notifications")
-def notifications_page(request: Request, user: User = Depends(require_admin), db: Session = Depends(get_db)):
+def notifications_page(request: Request, user: User = Depends(require_staff)):
     return render(
         request, "portal/notifications.html", user.language,
-        user=user, choices=notifications.load(db), kinds=notifications.KINDS,
-        recipients=notifications.recipients(db), saved=request.query_params.get("saved") == "1",
+        user=user, choices=notifications.load(user), staff_kinds=notifications.STAFF_KINDS,
+        admin_kinds=notifications.ADMIN_KINDS if user.has_role(Role.ADMIN) else (),
+        max_days=notifications.MAX_OVERDUE_DAYS, saved=request.query_params.get("saved") == "1",
     )
 
 
 @router.post("/notifications")
-async def notifications_save(request: Request, user: User = Depends(require_admin), db: Session = Depends(get_db)):
+async def notifications_save(request: Request, user: User = Depends(require_staff), db: Session = Depends(get_db)):
     form = await request.form()
-    notifications.save(db, {kind: kind in form for kind in notifications.KINDS})
+    try:
+        days = int(str(form.get("overdue_days", "")).strip())
+    except ValueError:
+        days = None
+    notifications.save(user, {kind: kind in form for kind in notifications.KINDS}, days)
     db.commit()
     return RedirectResponse("/portal/notifications?saved=1", status_code=303)
 
