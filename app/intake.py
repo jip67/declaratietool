@@ -102,6 +102,7 @@ def _process(db: Session, msg: Message, files: list[tuple[str, str, bytes]]):
         claim.description = subject[:500]
     db.commit()
     workflow.notify_received(claim)
+    notifications.new_claim(db, claim)
     log.info("Declaratie %s aangemaakt vanuit mail van %s", claim.reference, address)
     return f"created:{claim.reference}", claim
 

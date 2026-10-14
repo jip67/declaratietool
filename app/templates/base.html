@@ -27,8 +27,8 @@
       <div class="menu-items">
         <a href="/portal/users">{{ t('nav.users') }}</a>
         <a href="/portal/log">{{ t('nav.log') }}</a>
-        {% if user.has_role(Role.ADMIN) %}<a href="/portal/mail">{{ t('nav.mail') }}</a>
         <a href="/portal/notifications">{{ t('nav.notifications') }}</a>
+        {% if user.has_role(Role.ADMIN) %}<a href="/portal/mail">{{ t('nav.mail') }}</a>
         <a href="/portal/update">{{ t('nav.update') }}</a>{% endif %}
       </div>
     </details>
