@@ -16,7 +16,7 @@
   <script src="/static/js/app.js" defer></script>
   {% block head %}{% endblock %}
 </head>
-<body{% if user %} class="has-sidebar{% if user.viewed_by %} viewing-as{% endif %}{% if user.simple_view and user.is_staff %} simple-view{% endif %}"{% endif %}>
+<body{% if user %} class="has-sidebar{% if user.viewed_by %} viewing-as{% endif %}{% if user.simple_view and user.is_staff %} simple-view{% endif %}"{% endif %}{% if not user %} data-badge="0"{% elif not user.viewed_by %} data-badge="{{ my_count or 0 }}"{% endif %}>
 <header class="topbar">
   <a class="brand" href="{% if user %}/portal{% else %}/login{% endif %}">{{ settings.app_name }}</a>
   <span class="org">{{ settings.organisation_name }}</span>

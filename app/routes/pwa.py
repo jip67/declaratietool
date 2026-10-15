@@ -2,11 +2,15 @@
 
 from pathlib import Path
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Depends, Request
 from fastapi.responses import FileResponse, JSONResponse
 
 from ..config import get_settings
-from ..web import render, request_language
+from ..db import get_db
+from ..models import User
+from sqlalchemy.orm import Session
+
+from ..web import logged_in_user, my_task_count, render, request_language
 
 router = APIRouter()
 
@@ -52,3 +56,10 @@ def service_worker():
 @router.get("/offline", include_in_schema=False)
 def offline(request: Request):
     return render(request, "offline.html", request_language(request))
+
+
+@router.get("/badge", include_in_schema=False)
+def badge(user: User = Depends(logged_in_user), db: Session = Depends(get_db)):
+    """Aantal taken dat op deze gebruiker wacht, voor de teller op het app-icoon."""
+    count = my_task_count(db, user) if user.is_staff else 0
+    return JSONResponse({"count": count}, headers={"Cache-Control": "no-store"})

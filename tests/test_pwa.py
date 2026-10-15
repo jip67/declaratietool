@@ -49,3 +49,21 @@ def test_offline_page_needs_no_login(client):
     r = client.get("/offline?lang=en", follow_redirects=False)
     assert r.status_code == 200
     assert "No connection" in r.text
+
+
+def test_badge_counts_tasks_waiting_for_me(client, staff):
+    from .conftest import login
+    from .test_claim_admin import make_claim
+
+    make_claim(client)  # wacht nu op de voorzitter
+    assert client.get("/badge").json() == {"count": 0}
+    assert 'data-badge="0"' in client.get("/portal").text
+    client.post("/logout")
+    login(client, "voorzitter@example.org")
+    assert client.get("/badge").json() == {"count": 1}
+    assert 'data-badge="1"' in client.get("/portal").text
+
+
+def test_badge_cleared_when_logged_out(client):
+    assert 'data-badge="0"' in client.get("/login").text
+    assert client.get("/badge", follow_redirects=False).status_code == 303

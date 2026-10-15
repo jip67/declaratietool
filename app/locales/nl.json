@@ -368,5 +368,7 @@
   "notify.overdue.submitter": "indiener",
   "offline.title": "Geen verbinding",
   "offline.text": "Je bent offline. Zodra je weer internet hebt, kun je verder met je declaraties.",
-  "offline.retry": "Opnieuw proberen"
+  "offline.retry": "Opnieuw proberen",
+  "badge.allow": "Teller op app-icoon aanzetten",
+  "badge.allow_help": "Op de iPhone en iPad toont het app-icoon het aantal taken dat op je wacht, als je meldingen toestaat. Je krijgt daardoor geen extra berichten."
 }
