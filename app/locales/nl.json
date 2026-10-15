@@ -126,6 +126,7 @@
   "help.section.namens": "Namens iemand",
   "help.section.beheer": "Beheer",
   "help.section.veiligheid": "Veiligheid",
+  "help.section.app": "App",
   "help.section.vragen": "Vragen",
   "preview.unavailable": "Geen voorbeeld mogelijk; open de bijlage via de link.",
   "preview.show": "Voorbeeld tonen",
@@ -364,5 +365,8 @@
   "notify.overdue.subject": "[{app}] {count} declaratie(s) staan langer dan {days} dagen open",
   "notify.overdue.body": "Hallo {name},\n\nDeze declaraties staan langer dan {days} dagen in dezelfde stap:\n\n{list}\n\nJe krijgt per taak maar één keer zo'n melding.\n\nOverzicht: {overview}\n\nJe krijgt deze melding omdat ze aan staat onder Instellingen → Meldingen: {url}/portal/notifications",
   "notify.overdue.waiting": "wacht op {who}, {days} dagen",
-  "notify.overdue.submitter": "indiener"
+  "notify.overdue.submitter": "indiener",
+  "offline.title": "Geen verbinding",
+  "offline.text": "Je bent offline. Zodra je weer internet hebt, kun je verder met je declaraties.",
+  "offline.retry": "Opnieuw proberen"
 }

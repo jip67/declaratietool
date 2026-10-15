@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}{{ settings.app_name }}{% endblock %} · {{ settings.organisation_name }}</title>
   <link rel="stylesheet" href="/static/style.css">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
+  <meta name="theme-color" content="#4338ca" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#312e81" media="(prefers-color-scheme: dark)">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="{{ settings.app_name }}">
+  <script src="/static/js/app.js" defer></script>
   {% block head %}{% endblock %}
 </head>
 <body{% if user %} class="has-sidebar{% if user.viewed_by %} viewing-as{% endif %}{% if user.simple_view and user.is_staff %} simple-view{% endif %}"{% endif %}>

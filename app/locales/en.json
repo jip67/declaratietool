@@ -126,6 +126,7 @@
   "help.section.namens": "On someone's behalf",
   "help.section.beheer": "Administration",
   "help.section.veiligheid": "Security",
+  "help.section.app": "App",
   "help.section.vragen": "FAQ",
   "preview.unavailable": "No preview available; open the attachment via the link.",
   "preview.show": "Show preview",
@@ -364,5 +365,8 @@
   "notify.overdue.subject": "[{app}] {count} expense claim(s) open for more than {days} days",
   "notify.overdue.body": "Hello {name},\n\nThese expense claims have been in the same step for more than {days} days:\n\n{list}\n\nYou only get this notification once per task.\n\nOverview: {overview}\n\nYou receive this notification because it is switched on under Settings → Notifications: {url}/portal/notifications",
   "notify.overdue.waiting": "waiting for {who}, {days} days",
-  "notify.overdue.submitter": "submitter"
+  "notify.overdue.submitter": "submitter",
+  "offline.title": "No connection",
+  "offline.text": "You are offline. As soon as you are back online, you can continue with your claims.",
+  "offline.retry": "Try again"
 }
