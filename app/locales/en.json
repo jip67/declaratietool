@@ -368,5 +368,7 @@
   "notify.overdue.submitter": "submitter",
   "offline.title": "No connection",
   "offline.text": "You are offline. As soon as you are back online, you can continue with your claims.",
-  "offline.retry": "Try again"
+  "offline.retry": "Try again",
+  "badge.allow": "Show count on app icon",
+  "badge.allow_help": "On iPhone and iPad the app icon shows how many tasks are waiting for you once you allow notifications. This does not send you any extra messages."
 }

@@ -126,6 +126,8 @@ De tool is een web-app (PWA): je kunt hem op Android en iPhone op het beginscher
 - **Android (Chrome):** menu (⋮) → **App installeren** of **Toevoegen aan startscherm**.
 - **iPhone/iPad (Safari):** deelknop → **Zet op beginscherm**.
 
+**Teller op het icoon.** Wacht er een taak op je, dan staat het aantal op het app-icoon. Dat werkt op iPhone/iPad (iOS 16.4 of nieuwer; zet het één keer aan via **Mijn account → Teller op app-icoon aanzetten**, iOS vraagt dan om meldingen toe te staan) en op Windows/macOS. De teller wordt bijgewerkt zodra je de app opent of er weer naartoe gaat; een teller die verandert terwijl de app dicht is, of een teller op Android, kan alleen met pushmeldingen.
+
 De app bewaart geen declaraties of bankgegevens op de telefoon; zonder internet toont hij alleen een melding dat er geen verbinding is. Op de iPhone log je in de app apart in, los van Safari. Installeren werkt alleen via https, dus op de echte server (niet op `http://localhost`, behalve in Chrome op dezelfde computer).
 
 ## Hulp
