@@ -119,6 +119,15 @@ Daarna krijg je **10 herstelcodes**. Bewaar ze goed, bijvoorbeeld in je wachtwoo
 
 Een beheerder ziet op de pagina **Gebruikers** wie 2FA gebruikt (App of E-mail). Is iemand zowel de telefoon als de herstelcodes kwijt, dan zet de beheerder het via **Bewerken → Tweestapsverificatie resetten** uit; die persoon logt daarna in met alleen het wachtwoord en kan het opnieuw instellen.
 
+## Als app op je telefoon
+
+De tool is een web-app (PWA): je kunt hem op Android en iPhone op het beginscherm zetten, zonder app-winkel. Hij opent dan schermvullend en werkt verder precies als de website; een update op de server is meteen in de app te zien.
+
+- **Android (Chrome):** menu (⋮) → **App installeren** of **Toevoegen aan startscherm**.
+- **iPhone/iPad (Safari):** deelknop → **Zet op beginscherm**.
+
+De app bewaart geen declaraties of bankgegevens op de telefoon; zonder internet toont hij alleen een melding dat er geen verbinding is. Op de iPhone log je in de app apart in, los van Safari. Installeren werkt alleen via https, dus op de echte server (niet op `http://localhost`, behalve in Chrome op dezelfde computer).
+
 ## Hulp
 
 Via **Help** rechtsboven staat deze uitleg ook in de tool zelf, in het Nederlands en Engels. Ingelogde medewerkers zien de onderdelen voor hun eigen rol gemarkeerd.

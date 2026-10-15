@@ -11,7 +11,7 @@ from pathlib import Path
 from starlette.middleware.sessions import SessionMiddleware
 
 from .config import get_settings
-from .routes import auth, helppage, portal, public
+from .routes import auth, helppage, portal, public, pwa
 from .web import LoginRequired
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -95,6 +95,7 @@ def create_app() -> FastAPI:
     app.include_router(auth.router)
     app.include_router(portal.router)
     app.include_router(helppage.router)
+    app.include_router(pwa.router)
 
     @app.exception_handler(LoginRequired)
     async def _login_required(request: Request, exc: LoginRequired):
