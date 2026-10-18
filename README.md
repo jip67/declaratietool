@@ -52,6 +52,7 @@ git pull && docker compose up -d --build
 
 ## Documentatie
 
+- [Beheerdocument](docs/beheer.md): beheer, herstel, noodscenario's en wat er gebouwd is
 - [Stappenplan](docs/stappenplan.md): van nul tot werkende tool, inclusief domein en mail
 - [Installeren op een VPS bij OVH](docs/ovh-vps.md): stap voor stap, met installatiescript
 - [Installatie en bijwerken](docs/installatie.md)
