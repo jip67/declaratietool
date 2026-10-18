@@ -41,23 +41,27 @@ Op Mac, Linux of Windows (PowerShell):
 
 ```sh
 ssh-keygen -t ed25519
-ssh-copy-id root@zambesidreef.nl
+ssh-copy-id root@<jouw-domein>
 ```
+
+Gebruik je PuTTY, maak de sleutel dan met PuTTYgen (type Ed25519, met passphrase) en zet de regel
+`ssh-ed25519 AAAA...` uit PuTTYgen in `/root/.ssh/authorized_keys` op de server; zie
+[beheer.md](beheer.md#5-inloggen-op-de-server).
 
 Op Windows bestaat `ssh-copy-id` niet; gebruik dan:
 
 ```powershell
-type $env:USERPROFILE\.ssh\id_ed25519.pub | ssh root@zambesidreef.nl "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
+type $env:USERPROFILE\.ssh\id_ed25519.pub | ssh root@<jouw-domein> "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
 ```
 
-Test in een **nieuw** venster dat `ssh root@zambesidreef.nl` werkt zonder wachtwoord te vragen.
+Test in een **nieuw** venster dat `ssh root@<jouw-domein>` werkt zonder wachtwoord te vragen.
 
 ### 2. Zet inloggen met wachtwoord uit
 
 Alleen als stap 1 werkt, anders sluit je jezelf buiten. Op de server:
 
 ```sh
-cat > /etc/ssh/sshd_config.d/10-alleen-sleutel.conf <<'EOF2'
+cat > /etc/ssh/sshd_config.d/00-alleen-sleutels.conf <<'EOF2'
 PasswordAuthentication no
 KbdInteractiveAuthentication no
 PermitRootLogin prohibit-password
@@ -65,8 +69,9 @@ EOF2
 sshd -t && systemctl reload ssh
 ```
 
+De `00` in de naam zorgt dat dit bestand voorgaat op instellingen die de aanbieder al heeft neergezet.
 Test opnieuw in een nieuw venster voordat je het oude sluit. Kom je er toch niet meer in,
-dan kun je via de console in het Netcup-klantpaneel (SCP) inloggen en het bestand weer verwijderen.
+dan kun je via de console in het klantpaneel van je VPS-aanbieder inloggen en het bestand weer verwijderen.
 
 ### 3. Controleren
 

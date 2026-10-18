@@ -120,6 +120,6 @@ tar xzf backup.tar.gz    # database.sql, uploads.tar.gz, env, versie.txt
 
 ## Extra zekerheid
 
-Netcup biedt snapshots van de hele server. Die zijn handig om na een mislukte update snel terug te
+De meeste VPS-aanbieders bieden snapshots van de hele server. Die zijn handig om na een mislukte update snel terug te
 gaan, maar staan bij dezelfde partij als de server. De versleutelde back-up op Google Drive is je
 kopie buiten de deur. Probeer af en toe (bijvoorbeeld eens per jaar) of terugzetten werkt.
