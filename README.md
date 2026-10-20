@@ -62,6 +62,7 @@ git pull && docker compose up -d --build
 - [Back-up](docs/backup.md): elke nacht versleuteld naar Google Drive, en terugzetten
 - [Beveiliging](docs/beveiliging.md): wat de tool zelf doet en hoe je de server dichtzet
 - [Gebruik](docs/gebruik.md): wat elke rol doet
+- [QR-pagina](docs/qr.md): optionele pagina met wachtwoord om QR-codes te maken, op een eigen subdomein
 - [Ontwikkelen](docs/ontwikkeling.md): lokaal draaien, tests, een taal toevoegen
 
 ## Techniek

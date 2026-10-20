@@ -71,6 +71,8 @@ services:
       - "443:443"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./sites:/etc/caddy/sites:ro    # eigen extra websites, zie sites/README.md
+      - ./extras:/srv/extras:ro        # pagina's voor die websites (zoals de QR-pagina)
       - caddy_data:/data
       - caddy_config:/config
     depends_on:
