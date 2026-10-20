@@ -1,0 +1,12 @@
+# Oud adres doorsturen naar het nieuwe adres van de tool, zie docs/installatie.md
+# ("Ander domein"). In het kort:
+#   cp sites/doorsturen.caddy.example sites/doorsturen.caddy
+#   nano sites/doorsturen.caddy                        (oude en nieuwe domein)
+#   docker compose exec caddy caddy reload --config /etc/caddy/Caddyfile
+#
+# Links in eerder verstuurde mails blijven zo werken: /c/<code> gaat naar dezelfde
+# pagina op het nieuwe adres. Zet hier alleen domeinen die naar de server wijzen.
+
+example.org, www.example.org {
+	redir https://declaraties.example.org{uri} permanent
+}

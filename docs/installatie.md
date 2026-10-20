@@ -93,6 +93,36 @@ docker run --rm -v declaratietool_uploads:/data -v "$PWD":/backup alpine \
 
 De volumenaam begint met de mapnaam van het project; controleer hem met `docker volume ls`.
 
+## Ander domein
+
+Wil je de tool op een ander (sub)domein, bijvoorbeeld `declaraties.example.org` in plaats van
+`example.org`? Zet eerst een A-record van het nieuwe domein naar de server. Daarna:
+
+```bash
+cd /opt/declaratietool
+nano .env                     # DOMAIN=declaraties.example.org en BASE_URL=https://declaraties.example.org
+docker compose up -d          # app, worker en Caddy starten opnieuw met het nieuwe domein
+```
+
+Caddy haalt bij het eerste bezoek zelf een certificaat voor het nieuwe domein. Links in nieuwe
+mails gebruiken vanaf nu `BASE_URL`.
+
+Het oude adres werkt dan niet meer, ook niet de links in mails die al verstuurd zijn. Laat het
+daarom doorsturen naar het nieuwe adres:
+
+```bash
+cp sites/doorsturen.caddy.example sites/doorsturen.caddy
+nano sites/doorsturen.caddy   # oude domein(en) en nieuwe domein invullen
+docker compose exec caddy caddy reload --config /etc/caddy/Caddyfile
+```
+
+Let op:
+
+- Iedereen moet één keer opnieuw inloggen; de login hoort bij het adres.
+- Wie de app op de telefoon heeft gezet (PWA), verwijdert die en zet hem opnieuw op het
+  beginscherm vanaf het nieuwe adres.
+- Bij 2FA met een app verandert niets: de codes blijven geldig.
+
 ## Problemen oplossen
 
 ```bash
