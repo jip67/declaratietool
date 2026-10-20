@@ -1,0 +1,22 @@
+# QR-pagina met wachtwoord, zie docs/qr.md. In het kort:
+#   docker compose exec caddy caddy hash-password      (typ je wachtwoord twee keer)
+#   cp sites/qr.caddy.example sites/qr.caddy
+#   nano sites/qr.caddy                                (domein, gebruikersnaam en hash)
+#   docker compose exec caddy caddy reload --config /etc/caddy/Caddyfile
+
+qr.example.org {
+	basic_auth {
+		# gebruikersnaam  hash
+		qr $2a$14$VERVANG_DIT_DOOR_JE_HASH
+	}
+	root * /srv/extras/qr
+	file_server
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		Referrer-Policy no-referrer
+		X-Frame-Options DENY
+		X-Robots-Tag "noindex, nofollow"
+		Content-Security-Policy "default-src 'self'; img-src 'self' data: blob:; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+	}
+}

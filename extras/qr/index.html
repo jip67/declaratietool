@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>QR-code maken</title>
+<link rel="stylesheet" href="qr.css">
+</head>
+<body>
+<main>
+  <h1>QR-code maken</h1>
+  <form id="form" autocomplete="off">
+    <label for="text">Adres (URL) of tekst</label>
+    <input id="text" type="text" inputmode="url" placeholder="https://..." autofocus>
+    <label for="size">Grootte van de afbeelding</label>
+    <select id="size">
+      <option value="256">Klein (256 px)</option>
+      <option value="512" selected>Middel (512 px)</option>
+      <option value="1024">Groot (1024 px)</option>
+      <option value="2048">Extra groot (2048 px, voor drukwerk)</option>
+    </select>
+  </form>
+  <p id="error" class="error" hidden></p>
+  <div id="result" hidden>
+    <canvas id="canvas" aria-label="QR-code"></canvas>
+    <div class="buttons">
+      <button type="button" id="png">Download PNG</button>
+      <button type="button" id="svg">Download SVG</button>
+      <button type="button" id="copy">Kopieer afbeelding</button>
+    </div>
+    <p id="copied" class="hint" hidden>Gekopieerd.</p>
+  </div>
+</main>
+<script src="qrcode.js"></script>
+<script src="qr.js"></script>
+</body>
+</html>

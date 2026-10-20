@@ -11,3 +11,7 @@
 	}
 	reverse_proxy app:8000
 }
+
+# Eigen extra websites op dezelfde server (bijv. de QR-pagina), zie sites/README.md.
+# Die bestanden staan niet in git, zodat 'Bijwerken' ze niet overschrijft.
+import /etc/caddy/sites/*.caddy

@@ -7,3 +7,6 @@ data/
 *.db
 .pytest_cache/
 update/
+
+# Eigen extra websites voor Caddy (bevatten wachtwoord-hashes), zie sites/README.md
+sites/*.caddy
