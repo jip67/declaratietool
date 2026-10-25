@@ -97,7 +97,7 @@
   <h2>{{ t('portal.history') }}</h2>
   <ul class="history">
   {% for ev in claim.events %}
-    <li><span class="muted">{{ ev.at|localtime }}</span> {{ t('event.' ~ ev.action) }}{% if ev.user %} · {{ ev.user.name }}{% endif %}{% if ev.note and ev.action == 'rejected' %}: {{ ev.note }}{% elif ev.note and ev.action == 'undone' %}: {{ t('event.' ~ ev.note) }}{% endif %}</li>
+    <li><span class="muted">{{ ev.at|localtime }}</span> {{ t('event.' ~ ev.action) }}{% if ev.user %} · {{ ev.user.name }}{% endif %}{% if ev.note and ev.action == 'rejected' %}: {{ ev.note }}{% elif ev.note == 'link' and ev.action == 'approved' %} ({{ t('event.approved_link') }}){% elif ev.note and ev.action == 'undone' %}: {{ t('event.' ~ ev.note) }}{% endif %}</li>
   {% endfor %}
   </ul>
 </section>

@@ -49,6 +49,9 @@ class Settings(BaseSettings):
     reminder_hour: int = 9
     submitter_reminder_days: int = 14
 
+    # Goedkeuren via link in de mail (per voorzitter aan te zetten): na zoveel dagen verloopt de link.
+    approval_link_days: int = 7
+
     # Logboek (inlogpogingen en binnengekomen mail): na zoveel dagen opruimen; 0 = nooit.
     log_retention_days: int = 90
 

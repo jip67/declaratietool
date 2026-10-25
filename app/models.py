@@ -75,6 +75,8 @@ class User(Base):
     notify: Mapped[str] = mapped_column(String(255), default="", server_default="")
     # Na hoeveel dagen een openstaande taak een melding oplevert (soort 'overdue').
     notify_overdue_days: Mapped[int] = mapped_column(Integer, default=3, server_default="3")
+    # Voorzitter mag goedkeuren via een link in de mail, zonder inloggen (zie approval_links.py).
+    approve_by_link: Mapped[bool] = mapped_column(Boolean, default=False, server_default=false())
 
     # Niet opgeslagen: de beheerder die op dit moment met deze gebruiker meekijkt (alleen-lezen).
     viewed_by = None
@@ -232,6 +234,24 @@ class Comment(Base):
 
     claim: Mapped[Claim] = relationship(back_populates="comments")
     user: Mapped[User | None] = relationship()
+
+
+class ApprovalLink(Base):
+    """Eenmalige link waarmee een voorzitter een declaratie goedkeurt zonder in te loggen."""
+
+    __tablename__ = "approval_links"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True)  # sha256 van het token
+    claim_id: Mapped[int] = mapped_column(ForeignKey("claims.id", ondelete="CASCADE"), index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    used_ip: Mapped[str] = mapped_column(String(64), default="")
+
+    claim: Mapped[Claim] = relationship()
+    user: Mapped[User] = relationship()
 
 
 class KeyValue(Base):

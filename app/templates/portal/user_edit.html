@@ -19,6 +19,8 @@
     <label class="check"><input type="checkbox" name="active" value="true" {% if target.active %}checked{% endif %}> {{ t('field.active') }}</label>
     <label class="check"><input type="checkbox" name="simple_view" value="true" {% if target.simple_view %}checked{% endif %}> {{ t('simple.setting') }}</label>
     <p class="muted">{{ t('simple.setting_help_admin') }}</p>
+    <label class="check"><input type="checkbox" name="approve_by_link" value="true" {% if target.approve_by_link %}checked{% endif %}> {{ t('approve_link.setting') }}</label>
+    <p class="muted">{{ t('approve_link.setting_help') }}</p>
     {% if is_self %}<p class="muted">{{ t('users.self_note') }}</p>{% endif %}
     <label>{{ t('field.new_password') }}<input type="password" name="password" minlength="10" autocomplete="new-password"></label>
     <button class="primary">{{ t('action.save') }}</button>

@@ -15,7 +15,7 @@ from zoneinfo import ZoneInfo
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from . import mailer, notifications, storage
+from . import approval_links, mailer, notifications, storage
 from .config import get_settings
 from .i18n import translate
 from .models import ROLE_FOR_STATUS, Claim, Event, Role, Status, Submitter, User, utcnow
@@ -152,24 +152,33 @@ def task_attachments(claim: Claim) -> list[mailer.MailAttachment]:
     return result
 
 
+def approval_link_text(db: Session, claim: Claim, user: User, key: str = "mail.approve_link") -> str:
+    """Extra tekst met een goedkeurlink voor een voorzitter die dat aan heeft staan, anders leeg."""
+    if claim.status_enum != Status.SUBMITTED or not approval_links.enabled_for(user):
+        return ""
+    url, expires = approval_links.create(db, claim, user)
+    return translate(key, user.language, link=url, until=local_time(expires))
+
+
 def notify_role(db: Session, claim: Claim) -> None:
     role = ROLE_FOR_STATUS.get(claim.status_enum)
     if role is None:
         return
     for user in users_with_role(db, role):
         lang = user.language
+        body = translate(
+            "mail.task.body",
+            lang,
+            name=user.name,
+            action=translate(f"task.{role.value}", lang),
+            summary=claim_summary(claim, lang),
+            link=portal_link(claim),
+        )
         mailer.send(
             mailer.Mail(
                 to=[user.email],
                 subject=translate("mail.task.subject", lang, reference=claim.reference),
-                body=translate(
-                    "mail.task.body",
-                    lang,
-                    name=user.name,
-                    action=translate(f"task.{role.value}", lang),
-                    summary=claim_summary(claim, lang),
-                    link=portal_link(claim),
-                ),
+                body=body + approval_link_text(db, claim, user),
                 attachments=task_attachments(claim),
             )
         )
@@ -247,8 +256,10 @@ def _require_status(claim: Claim, status: Status) -> None:
         raise WorkflowError("wrong_status")
 
 
-def approve(db: Session, claim: Claim, user: User) -> None:
-    """Voorzitter keurt goed; de bonnen krijgen een paraaf."""
+def approve(db: Session, claim: Claim, user: User, via_link: bool = False) -> None:
+    """Voorzitter keurt goed; de bonnen krijgen een paraaf.
+
+    via_link: goedgekeurd met de link uit de mail in plaats van in het portaal (komt in de geschiedenis)."""
     _require(user, Role.CHAIR)
     _require_status(claim, Status.SUBMITTED)
     now = utcnow()
@@ -263,7 +274,7 @@ def approve(db: Session, claim: Claim, user: User) -> None:
     set_status(claim, Status.APPROVED)
     claim.approved_at = now
     claim.approved_by_id = user.id
-    log_event(db, claim, "approved", user)
+    log_event(db, claim, "approved", user, note="link" if via_link else "")
     db.flush()
     notify_submitter_status(claim)
     notify_role(db, claim)

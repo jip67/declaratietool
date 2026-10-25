@@ -85,6 +85,8 @@ flowchart LR
    aan te passen).
 3. **Goedkeuren.** De voorzitter krijgt een mail, keurt goed in het portaal, en elke bon krijgt
    automatisch een paraaf: een stempel met GOEDGEKEURD, naam, datum en kenmerk, opgeslagen als pdf.
+   Als de beheerder het voor de voorzitter aanzet, kan dat ook met een eenmalige link in de mail,
+   zonder inloggen (zie [gebruik.md](gebruik.md#goedkeuren-via-een-link-in-de-mail)).
 4. **Betaling klaarzetten.** De boekhouder krijgt een mail met alle gegevens en de
    geparafeerde bonnen en zet de betaling klaar bij de bank.
 5. **Betaling uitvoeren.** De secretaris krijgt bericht en voert de betaling uit bij de bank.
@@ -117,6 +119,7 @@ persoonlijke link (`/c/<code>`).
 - **Nieuwe declaratie** namens iemand (voor wie geen mail gebruikt of een papieren bon inlevert).
 - **Eenvoudige weergave** voor bestuursleden die weinig met computers doen: alleen de eigen taken
   als grote kaarten.
+- **Goedkeuren via een link** in de mail, zonder inloggen, per voorzitter aan te zetten.
 - **Instellingen** (zijbalk):
   - **Gebruikers**: toevoegen, bewerken, uitzetten, verwijderen, 2FA resetten, **Meekijken**
     (alleen-lezen het portaal zien zoals iemand anders het ziet);
@@ -590,6 +593,7 @@ op GitHub; dit is het overzicht.
 | 14 okt | #28 | Menu **Updates** met uitroepteken bij een nieuwe versie |
 | 15 okt | #29, #30 | **App op de telefoon** (PWA) met teller op het icoon |
 | 18 okt | | SSH alleen met sleutel; dit beheerdocument |
+| 25 okt | | Voorzitter kan **goedkeuren via een link** in de mail (per persoon aan te zetten) |
 
 De volledige lijst: `git log` of https://github.com/jip67/declaratietool/pulls?q=is%3Apr.
 
@@ -600,6 +604,9 @@ De volledige lijst: `git log` of https://github.com/jip67/declaratietool/pulls?q
 - **Geen publieke uploadpagina.** Bezoekers zonder account zien alleen het inlogscherm; indienen
   gaat per mail of via een account. Minder aanvalsoppervlak.
 - **De app mag Docker niet besturen.** Daarom de aparte updater met een verzoekbestand.
+- **Goedkeuren via een link** is een bewuste afweging: makkelijker voor een voorzitter die moeite heeft
+  met inloggen, ten koste van wachtwoord en 2FA voor die ene stap. Daarom standaard uit, alleen voor de
+  rol Voorzitter, eenmalig, verlopend en met een bevestigingsknop; boekhouder en secretaris kijken nog.
 - **Beheerder heeft geen workflowrechten.** Goedkeuren, klaarzetten en uitvoeren kan alleen wie die
   rol heeft, zodat het vier-ogenprincipe blijft werken.
 - **Back-up naar Google Drive, niet naar de NAS thuis via FTP.** FTP is onversleuteld en vraagt een

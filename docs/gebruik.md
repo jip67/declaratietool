@@ -16,6 +16,27 @@ Tot de voorzitter heeft goedgekeurd kun je je gegevens nog aanpassen.
 3. Klik op **Goedkeuren en paraferen**. Elke bon krijgt een stempel met je naam, datum en kenmerk; de geparafeerde versie staat als pdf bij de declaratie.
 4. Klopt er iets niet? Gebruik **Afwijzen** en geef een reden; de indiener krijgt die te zien.
 
+### Goedkeuren via een link in de mail
+
+Voor een voorzitter die liever niet inlogt kan de beheerder **goedkeuren via een link** aanzetten
+(Instellingen → Gebruikers → Bewerken → *Mag goedkeuren via een link in de e-mail*). De mail over een
+nieuwe declaratie en de dagelijkse herinnering bevatten dan een extra link. Die opent een pagina met de
+gegevens en de bonnen en één grote knop **Goedkeuren en paraferen**. De paraaf is dezelfde als in het portaal.
+
+- Openen alleen keurt niets goed; pas de knop doet dat. Zo kan een virusscanner die links in mail opent
+  niet per ongeluk goedkeuren.
+- Een link hoort bij één declaratie en één voorzitter, werkt één keer en verloopt na
+  `APPROVAL_LINK_DAYS` dagen (standaard 7). De herinnering van de volgende ochtend heeft weer een verse link.
+- Is de declaratie al goedgekeurd, afgewezen of ongedaan gemaakt, of staat de instelling uit, dan werkt
+  een oude link niet meer.
+- Veranderen bedrag, rekening of bonnen terwijl de pagina openstaat, dan vraagt de pagina om opnieuw te kijken.
+- In de geschiedenis staat *Goedgekeurd en geparafeerd · naam (via link in e-mail)*.
+- Afwijzen of een opmerking plaatsen gaat niet via de link; daarvoor log je in.
+
+Het risico: wie de mail van de voorzitter kan lezen, kan ook goedkeuren, zonder wachtwoord of
+tweestapsverificatie. Daarom staat het standaard uit en kan het alleen voor iemand met de rol Voorzitter.
+Boekhouder en secretaris controleren de declaratie daarna nog, en de tool betaalt zelf niets uit.
+
 ## Boekhouder
 
 1. Na goedkeuring krijg je een mail met alle gegevens (bedrag, IBAN, tenaamstelling, omschrijving, kenmerk) en de geparafeerde bonnen als bijlage.
