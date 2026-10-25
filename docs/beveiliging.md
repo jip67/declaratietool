@@ -21,6 +21,13 @@
 - **Formulieren vanaf andere websites** (CSRF) worden geweigerd.
 - **Persoonlijke links** voor indieners bevatten een willekeurige code van 32 tekens, die niet te raden is,
   en lekken niet via de Referer naar andere sites.
+- **Goedkeuren via een link** (optioneel, per voorzitter aan te zetten door de beheerder, standaard uit):
+  de link bevat een willekeurige code van 43 tekens waarvan alleen de hash wordt opgeslagen, hoort bij één
+  declaratie en één voorzitter, werkt één keer, verloopt na `APPROVAL_LINK_DAYS` dagen en vervalt zodra de
+  declaratie een andere status krijgt. Openen verandert niets; pas de knop op de pagina keurt goed. De
+  goedkeuring staat in de geschiedenis met *via link in e-mail* (IP-adres in de database). Wie de mailbox
+  van de voorzitter kan lezen kan hiermee goedkeuren zonder wachtwoord of 2FA; boekhouder en secretaris
+  controleren daarna nog. Zie [gebruik.md](gebruik.md#goedkeuren-via-een-link-in-de-mail).
 - **Bijlagen**: alleen pdf en foto's, met een maximale grootte; ze worden onder een willekeurige naam
   opgeslagen en de browser mag ze niet als webpagina uitvoeren (`nosniff`, Content-Security-Policy).
 - **Pagina's** worden geëscaped (geen ingevoegde scripts) en mogen niet op andere sites ingebed worden.

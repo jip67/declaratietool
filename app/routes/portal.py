@@ -415,6 +415,7 @@ def update_user(
     roles: list[str] = Form(default=[]),
     active: bool = Form(False),
     simple_view: bool = Form(False),
+    approve_by_link: bool = Form(False),
     password: str = Form(""),
     user: User = Depends(require_admin),
     db: Session = Depends(get_db),
@@ -440,6 +441,7 @@ def update_user(
     target.roles = ",".join(new_roles)
     target.active = active
     target.simple_view = simple_view
+    target.approve_by_link = approve_by_link
     if name.strip():
         target.name = name.strip()
     if language in available_languages():
@@ -468,6 +470,7 @@ def delete_user(user_id: int, request: Request, user: User = Depends(require_adm
         target.password_hash = hash_password(secrets.token_urlsafe(32))
         target.roles = ""
         target.active = False
+        target.approve_by_link = False
     else:
         db.delete(target)
     db.commit()

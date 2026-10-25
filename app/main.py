@@ -11,7 +11,7 @@ from pathlib import Path
 from starlette.middleware.sessions import SessionMiddleware
 
 from .config import get_settings
-from .routes import auth, helppage, portal, public, pwa
+from .routes import approve, auth, helppage, portal, public, pwa
 from .web import LoginRequired
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -92,6 +92,7 @@ def create_app() -> FastAPI:
 
     app.mount("/static", StaticFiles(directory=str(Path(__file__).parent / "static")), name="static")
     app.include_router(public.router)
+    app.include_router(approve.router)
     app.include_router(auth.router)
     app.include_router(portal.router)
     app.include_router(helppage.router)

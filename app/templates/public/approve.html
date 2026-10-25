@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}{{ t('public.title', reference=claim.reference) }}{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>{{ t('public.title', reference=claim.reference) }}</h1>
+  {% if done %}
+    <p class="success">{{ t('approve_link.done') }}</p>
+    <p>{{ t('approve_link.status', status=t('status.' ~ claim.status)) }}</p>
+  {% elif problem %}
+    <p class="error">{{ t('approve_link.problem.' ~ problem) }}</p>
+    <p>{{ t('approve_link.status', status=t('status.' ~ claim.status)) }}</p>
+    <p><a class="button" href="/portal/claims/{{ claim.id }}">{{ t('approve_link.login') }}</a></p>
+  {% else %}
+    {% if changed %}<p class="error">{{ t('approve_link.changed') }}</p>{% endif %}
+    <p>{{ t('approve_link.intro') }}</p>
+    <dl class="details">
+      <dt>{{ t('field.submitter') }}</dt><dd>{{ claim.submitter.name or claim.submitter.email }}</dd>
+      <dt>{{ t('field.amount') }}</dt><dd>{{ claim.amount_display }}</dd>
+      <dt>{{ t('field.description') }}</dt><dd>{{ claim.description }}</dd>
+      <dt>{{ t('field.iban') }}</dt><dd>{{ claim.iban|iban }}</dd>
+      <dt>{{ t('field.account_holder') }}</dt><dd>{{ claim.account_holder }}</dd>
+    </dl>
+
+    <h2>{{ t('field.attachments') }}</h2>
+    {% for att in claim.attachments %}
+      {% with name=att.original_filename, url='/a/' ~ token ~ '/files/' ~ att.id, kind=att.content_type|preview_kind, stamped_url=None %}
+        {% include "_attachment.html" %}
+      {% endwith %}
+    {% endfor %}
+
+    <form method="post">
+      <input type="hidden" name="fingerprint" value="{{ fingerprint }}">
+      <button class="primary approve-link">{{ t('action.approve') }}</button>
+    </form>
+    <p class="muted">{{ t('approve_link.other') }} <a href="/portal/claims/{{ claim.id }}">{{ t('approve_link.login') }}</a></p>
+  {% endif %}
+</section>
+{% endblock %}

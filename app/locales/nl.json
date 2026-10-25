@@ -370,5 +370,20 @@
   "offline.text": "Je bent offline. Zodra je weer internet hebt, kun je verder met je declaraties.",
   "offline.retry": "Opnieuw proberen",
   "badge.allow": "Teller op app-icoon aanzetten",
-  "badge.allow_help": "Op de iPhone en iPad toont het app-icoon het aantal taken dat op je wacht, als je meldingen toestaat. Je krijgt daardoor geen extra berichten."
+  "badge.allow_help": "Op de iPhone en iPad toont het app-icoon het aantal taken dat op je wacht, als je meldingen toestaat. Je krijgt daardoor geen extra berichten.",
+  "mail.approve_link": "\n\nDirect goedkeuren zonder in te loggen (de link werkt één keer, tot {until}):\n{link}",
+  "mail.approve_link_short": "\n  Direct goedkeuren zonder inloggen: {link}",
+  "approve_link.intro": "Controleer de declaratie en de bonnen. Klopt alles, klik dan op de knop. De bonnen krijgen dan jouw paraaf.",
+  "approve_link.done": "Goedgekeurd en geparafeerd. Dank je wel!",
+  "approve_link.status": "Status nu: {status}.",
+  "approve_link.changed": "De gegevens zijn gewijzigd sinds je deze pagina opende. Controleer ze opnieuw voordat je goedkeurt.",
+  "approve_link.other": "Niet akkoord, of wil je eerst iets vragen? Log in om af te wijzen of een opmerking te plaatsen:",
+  "approve_link.login": "Inloggen en bekijken",
+  "approve_link.problem.used": "Deze link is al gebruikt.",
+  "approve_link.problem.handled": "Deze declaratie wacht niet (meer) op goedkeuring via deze link. Log in om te zien hoe het ermee staat.",
+  "approve_link.problem.expired": "Deze link is verlopen. Log in om de declaratie te bekijken, of gebruik de link uit de nieuwste herinnering.",
+  "approve_link.problem.disabled": "Goedkeuren via een link staat niet (meer) aan voor jouw account. Log in om de declaratie te bekijken.",
+  "approve_link.setting": "Mag goedkeuren via een link in de e-mail (zonder inloggen)",
+  "approve_link.setting_help": "Alleen voor de voorzitter. De mail met een nieuwe declaratie en de dagelijkse herinnering krijgen dan een link waarmee hij of zij direct kan goedkeuren. De link werkt één keer, alleen voor die declaratie, en verloopt na een paar dagen. Wie de mail kan lezen, kan dus goedkeuren; de boekhouder en secretaris controleren daarna nog.",
+  "event.approved_link": "via link in e-mail"
 }

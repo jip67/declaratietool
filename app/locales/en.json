@@ -370,5 +370,20 @@
   "offline.text": "You are offline. As soon as you are back online, you can continue with your claims.",
   "offline.retry": "Try again",
   "badge.allow": "Show count on app icon",
-  "badge.allow_help": "On iPhone and iPad the app icon shows how many tasks are waiting for you once you allow notifications. This does not send you any extra messages."
+  "badge.allow_help": "On iPhone and iPad the app icon shows how many tasks are waiting for you once you allow notifications. This does not send you any extra messages.",
+  "mail.approve_link": "\n\nApprove directly without logging in (the link works once, until {until}):\n{link}",
+  "mail.approve_link_short": "\n  Approve directly without logging in: {link}",
+  "approve_link.intro": "Check the claim and the receipts. If everything is correct, click the button. Your initials will then be added to the receipts.",
+  "approve_link.done": "Approved and initialled. Thank you!",
+  "approve_link.status": "Current status: {status}.",
+  "approve_link.changed": "The details changed since you opened this page. Please check them again before approving.",
+  "approve_link.other": "Not okay, or want to ask something first? Log in to reject or add a comment:",
+  "approve_link.login": "Log in and view",
+  "approve_link.problem.used": "This link has already been used.",
+  "approve_link.problem.handled": "This claim is no longer waiting for approval via this link. Log in to see where it stands.",
+  "approve_link.problem.expired": "This link has expired. Log in to view the claim, or use the link from the latest reminder.",
+  "approve_link.problem.disabled": "Approving by link is not (or no longer) enabled for your account. Log in to view the claim.",
+  "approve_link.setting": "May approve via a link in the email (without logging in)",
+  "approve_link.setting_help": "Only for the chair. The email about a new claim and the daily reminder then contain a link to approve directly. The link works once, only for that claim, and expires after a few days. Anyone who can read the email can therefore approve; the treasurer and secretary still check afterwards.",
+  "event.approved_link": "via link in email"
 }

@@ -63,6 +63,7 @@ def send_reminders(db: Session) -> int:
         user = users[user_id]
         lines = [
             f"- {c.reference} | {c.amount_display} | {translate('task.' + ROLE_FOR_STATUS[c.status_enum].value, user.language)} | {workflow.portal_link(c)}"
+            + workflow.approval_link_text(db, c, user, "mail.approve_link_short")
             for c in user_claims
         ]
         mailer.send(
