@@ -8,7 +8,7 @@
 
   <h2>{{ t('field.attachments') }}</h2>
   {% for att in claim.attachments %}
-    {% with name=att.original_filename, url='/c/' ~ claim.token ~ '/files/' ~ att.id, kind=att.content_type|preview_kind, stamped_url=None %}
+    {% with name=att.original_filename, url='/c/' ~ claim.token ~ '/files/' ~ att.id ~ '?v=' ~ att.version, kind=att.content_type|preview_kind, stamped_url=None %}
       {% include "_attachment.html" %}
     {% endwith %}
   {% endfor %}

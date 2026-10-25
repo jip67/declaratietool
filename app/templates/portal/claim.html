@@ -37,8 +37,8 @@
 
   <h2 id="attachments">{{ t('field.attachments') }}</h2>
   {% for att in claim.attachments %}
-    {% with name=att.original_filename, url='/portal/files/' ~ att.id, kind=att.content_type|preview_kind,
-             stamped_url=('/portal/files/' ~ att.id ~ '?stamped=1') if att.stamped_path else None %}
+    {% with name=att.original_filename, url='/portal/files/' ~ att.id ~ '?v=' ~ att.version, kind=att.content_type|preview_kind,
+             stamped_url=('/portal/files/' ~ att.id ~ '?stamped=1&v=' ~ att.version) if att.stamped_path else None %}
       {% include "_attachment.html" %}
     {% endwith %}
     {% if user.has_role(Role.ADMIN) and not simple %}
