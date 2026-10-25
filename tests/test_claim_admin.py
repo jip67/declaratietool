@@ -3,11 +3,11 @@ from pathlib import Path
 from sqlalchemy import select
 
 from app import mailer, storage
-from app.models import Claim, Comment, Event, IncomingMail, Status
+from app.models import Attachment, Claim, Comment, Event, IncomingMail, Status, Submitter
 from app.security import hash_password
 from app.models import User
 
-from .conftest import login, pdf_bytes
+from .conftest import jpeg_bytes, login, pdf_bytes
 
 IBAN = "NL91ABNA0417164300"
 
@@ -131,3 +131,104 @@ def test_dashboard_shows_comment_icon_for_staff_only(db, client, staff):
     login(client, "indiener@example.org")
     page = client.get("/portal").text
     assert claim.reference in page and "comment-flag" not in page and "Bon nagevraagd" not in page
+
+
+def test_admin_fixes_submitter_email_typo(db, client, staff):
+    login(client, "boekhouder@example.org")
+    client.post(
+        "/portal/claims/new",
+        data={"email": "ina@exmaple.org", "name": "Ina Indienr", "iban": IBAN,
+              "account_holder": "I. Indiener", "description": "Koffie", "amount": "8,50"},
+        files=[("files", ("bon.pdf", pdf_bytes(), "application/pdf"))],
+    )
+    claim = db.scalar(select(Claim))
+    mailer.outbox.clear()
+    r = client.post(
+        f"/portal/claims/{claim.id}/edit",
+        data={"name": "Ina Indiener", "email": "Ina@Example.org", "resend": "yes", "description": "Koffie",
+              "amount": "8,50", "iban": IBAN, "account_holder": "I. Indiener"},
+        follow_redirects=False,
+    )
+    assert r.status_code == 303
+    db.expire_all()
+    claim = db.get(Claim, claim.id)
+    assert (claim.submitter.email, claim.submitter.name) == ("ina@example.org", "Ina Indiener")
+    assert claim.submitter.iban == IBAN
+    # Het verkeerde adres wordt vergeten; de indiener krijgt de stand op het goede adres.
+    assert db.scalar(select(Submitter).where(Submitter.email == "ina@exmaple.org")) is None
+    assert [m["To"] for m in mailer.outbox] == ["ina@example.org"]
+    event = db.scalar(select(Event).where(Event.action == "edited"))
+    assert event.note == "name,email"
+    page = client.get(f"/portal/claims/{claim.id}").text
+    assert "naam, e-mailadres" in page
+
+    r = client.post(f"/portal/claims/{claim.id}/edit",
+                    data={"email": "geen-adres", "description": "Koffie", "amount": "8,50", "iban": IBAN,
+                          "account_holder": "I. Indiener"})
+    assert r.status_code == 422
+
+
+def test_email_change_keeps_other_claims_of_old_address(db, client, staff):
+    make_claim(client)
+    make_claim(client)
+    first, second = db.scalars(select(Claim).order_by(Claim.id)).all()
+    client.post(f"/portal/claims/{first.id}/edit",
+                data={"email": "ander@example.org", "description": "Koffie", "amount": "8,50", "iban": IBAN,
+                      "account_holder": "I. Indiener"})
+    db.expire_all()
+    assert db.get(Claim, first.id).submitter.email == "ander@example.org"
+    assert db.get(Claim, second.id).submitter.email == "indiener@example.org"
+
+
+def test_admin_replaces_attachment_before_approval(db, client, staff):
+    make_claim(client)
+    claim = db.scalar(select(Claim))
+    att = claim.attachments[0]
+    old = storage.absolute(att.stored_path)
+    r = client.post(f"/portal/claims/{claim.id}/attachments/{att.id}/replace",
+                    files={"file": ("getekend.jpg", jpeg_bytes(), "image/jpeg")}, follow_redirects=False)
+    assert r.status_code == 303
+    db.expire_all()
+    att = db.get(Attachment, att.id)
+    assert (att.original_filename, att.content_type, att.stamped_path) == ("getekend.jpg", "image/jpeg", None)
+    assert storage.absolute(att.stored_path).exists() and not old.exists()
+    event = db.scalar(select(Event).where(Event.action == "attachment_replaced"))
+    assert event.note == "bon.pdf → getekend.jpg"
+    assert "Bijlage vervangen door beheerder" in client.get(f"/portal/claims/{claim.id}").text
+
+
+def test_replaced_attachment_keeps_approval_stamp(db, client, staff):
+    make_claim(client)
+    claim = db.scalar(select(Claim))
+    login(client, "voorzitter@example.org")
+    client.post(f"/portal/claims/{claim.id}/action", data={"action": "approve"})
+    # Alleen de beheerder mag vervangen.
+    att = db.scalar(select(Attachment))
+    r = client.post(f"/portal/claims/{claim.id}/attachments/{att.id}/replace",
+                    files={"file": ("getekend.pdf", pdf_bytes(), "application/pdf")})
+    assert r.status_code == 403
+    login(client, "boekhouder@example.org")
+    db.expire_all()
+    att = db.scalar(select(Attachment))
+    old_stamped = storage.absolute(att.stamped_path)
+    client.post(f"/portal/claims/{claim.id}/attachments/{att.id}/replace",
+                files={"file": ("getekend.pdf", pdf_bytes(), "application/pdf")})
+    db.expire_all()
+    att = db.get(Attachment, att.id)
+    claim = db.get(Claim, claim.id)
+    assert claim.status == Status.APPROVED.value
+    assert att.stamped_path and storage.absolute(att.stamped_path).exists() and not old_stamped.exists()
+    from pypdf import PdfReader
+    text = PdfReader(storage.absolute(att.stamped_path)).pages[0].extract_text()
+    assert "Vera Voorzitter" in text and claim.reference in text
+
+
+def test_replace_rejects_wrong_file(db, client, staff):
+    make_claim(client)
+    claim = db.scalar(select(Claim))
+    att = claim.attachments[0]
+    r = client.post(f"/portal/claims/{claim.id}/attachments/{att.id}/replace",
+                    files={"file": ("virus.exe", b"MZ", "application/octet-stream")}, follow_redirects=False)
+    assert "error=file_type" in r.headers["location"]
+    db.refresh(att)
+    assert att.original_filename == "bon.pdf"

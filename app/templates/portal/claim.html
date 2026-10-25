@@ -35,12 +35,22 @@
   <p class="muted">{{ t('portal.edit_hint') }} <a href="{{ link }}" target="_blank">{{ t('portal.open_form') }}</a></p>
   {% endif %}
 
-  <h2>{{ t('field.attachments') }}</h2>
+  <h2 id="attachments">{{ t('field.attachments') }}</h2>
   {% for att in claim.attachments %}
     {% with name=att.original_filename, url='/portal/files/' ~ att.id, kind=att.content_type|preview_kind,
              stamped_url=('/portal/files/' ~ att.id ~ '?stamped=1') if att.stamped_path else None %}
       {% include "_attachment.html" %}
     {% endwith %}
+    {% if user.has_role(Role.ADMIN) and not simple %}
+    <details class="replace">
+      <summary>{{ t('attachment.replace') }}</summary>
+      <p class="muted">{{ t('attachment.replace_intro_stamped' if claim.approved_at else 'attachment.replace_intro') }}</p>
+      <form method="post" action="/portal/claims/{{ claim.id }}/attachments/{{ att.id }}/replace" enctype="multipart/form-data">
+        <label>{{ t('attachment.replace_file') }}<input type="file" name="file" accept="application/pdf,image/*" required></label>
+        <button>{{ t('attachment.replace') }}</button>
+      </form>
+    </details>
+    {% endif %}
   {% endfor %}
 
   {% if user.is_staff and not (simple and not claim.comments) %}
@@ -97,7 +107,7 @@
   <h2>{{ t('portal.history') }}</h2>
   <ul class="history">
   {% for ev in claim.events %}
-    <li><span class="muted">{{ ev.at|localtime }}</span> {{ t('event.' ~ ev.action) }}{% if ev.user %} · {{ ev.user.name }}{% endif %}{% if ev.note and ev.action == 'rejected' %}: {{ ev.note }}{% elif ev.note == 'link' and ev.action == 'approved' %} ({{ t('event.approved_link') }}){% elif ev.note and ev.action == 'undone' %}: {{ t('event.' ~ ev.note) }}{% endif %}</li>
+    <li><span class="muted">{{ ev.at|localtime }}</span> {{ t('event.' ~ ev.action) }}{% if ev.user %} · {{ ev.user.name }}{% endif %}{% if ev.note and ev.action == 'rejected' %}: {{ ev.note }}{% elif ev.note == 'link' and ev.action == 'approved' %} ({{ t('event.approved_link') }}){% elif ev.note and ev.action == 'undone' %}: {{ t('event.' ~ ev.note) }}{% elif ev.note and ev.action == 'edited' %}: {% for f in ev.note.split(',') %}{{ t('edited.' ~ f) }}{% if not loop.last %}, {% endif %}{% endfor %}{% elif ev.note and ev.action == 'attachment_replaced' %}: {{ ev.note }}{% endif %}</li>
   {% endfor %}
   </ul>
 </section>

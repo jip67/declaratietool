@@ -44,15 +44,20 @@ def upload_root() -> Path:
     return root
 
 
-def save_attachment(db: Session, claim: Claim, filename: str, content_type: str, data: bytes) -> Attachment:
+def write_file(claim: Claim, content_type: str, data: bytes) -> str:
+    """Schrijf een bijlage weg in de map van de declaratie; geeft het relatieve pad terug."""
     folder = upload_root() / str(claim.id)
     folder.mkdir(parents=True, exist_ok=True)
     path = folder / f"{uuid.uuid4().hex}{ALLOWED_TYPES[content_type]}"
     path.write_bytes(data)
+    return str(path.relative_to(upload_root()))
+
+
+def save_attachment(db: Session, claim: Claim, filename: str, content_type: str, data: bytes) -> Attachment:
     att = Attachment(
         claim=claim,
         original_filename=safe_filename(filename),
-        stored_path=str(path.relative_to(upload_root())),
+        stored_path=write_file(claim, content_type, data),
         content_type=content_type,
         size=len(data),
     )

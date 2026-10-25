@@ -221,6 +221,7 @@ def add_comment(
 def _claim_form(claim: Claim) -> dict:
     return {
         "name": claim.submitter.name,
+        "email": claim.submitter.email,
         "description": claim.description,
         "amount": f"{claim.amount_cents / 100:.2f}".replace(".", ",") if claim.amount_cents is not None else "",
         "iban": claim.iban,
@@ -246,6 +247,8 @@ def edit_claim(
     claim_id: int,
     request: Request,
     name: str = Form(""),
+    email: str = Form(""),
+    resend: str = Form(""),
     description: str = Form(""),
     amount: str = Form(""),
     iban: str = Form(""),
@@ -255,7 +258,9 @@ def edit_claim(
 ):
     """De beheerder past de gegevens van een declaratie aan, in elke status. De status verandert niet."""
     claim = _claim(db, claim_id, user)
-    form = {"name": name, "description": description, "amount": amount, "iban": iban, "account_holder": account_holder}
+    form = {"name": name, "email": email, "description": description, "amount": amount, "iban": iban,
+            "account_holder": account_holder}
+    email = email.strip().lower()
     if claim.status_enum == Status.RECEIVED:
         # Nog niet compleet ingediend: lege velden mogen, ingevulde velden moeten kloppen.
         errors = {}
@@ -266,17 +271,59 @@ def edit_claim(
             errors["amount"] = "error.amount"
     else:
         errors, cents = validate_details(iban, account_holder, description, amount)
+    if email and "@" not in email:
+        errors["email"] = "error.email"
     if errors:
         return _render_claim_edit(request, user, claim, form, errors, status_code=422)
+    before = _claim_form(claim)
+    email_changed = bool(email) and email != claim.submitter.email
+    if email_changed:
+        workflow.change_submitter(db, claim, email)
     if name.strip():
         claim.submitter.name = name.strip()
     claim.description = description.strip()
     claim.amount_cents = cents
     claim.iban = normalize_iban(iban) if iban.strip() else ""
     claim.account_holder = account_holder.strip()
-    workflow.log_event(db, claim, "edited", user)
+    changed = [k for k, v in _claim_form(claim).items() if v != before[k]]
+    workflow.log_event(db, claim, "edited", user, note=",".join(changed))
     db.commit()
+    if email_changed and resend == "yes":
+        # De eerdere berichten gingen naar het verkeerde adres: stuur het nieuwe adres de laatste stand.
+        if claim.status_enum == Status.RECEIVED:
+            workflow.notify_received(claim)
+        else:
+            workflow.notify_submitter_status(claim)
     return RedirectResponse(f"/portal/claims/{claim_id}", status_code=303)
+
+
+@router.post("/claims/{claim_id}/attachments/{attachment_id}/replace")
+async def replace_attachment(
+    claim_id: int,
+    attachment_id: int,
+    file: UploadFile | None = File(None),
+    user: User = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    """De beheerder vervangt een bijlage, bijvoorbeeld door een met de hand getekende factuur."""
+    claim = _claim(db, claim_id, user)
+    att = db.get(Attachment, attachment_id)
+    if att is None or att.claim_id != claim.id:
+        raise HTTPException(status_code=404)
+    data = await file.read() if file is not None and file.filename else b""
+    ctype = storage.guess_type(file.filename, file.content_type) if data else None
+    if not data:
+        error = "file_required"
+    elif ctype is None or len(data) > get_settings().max_upload_mb * 1024 * 1024:
+        error = "file_type"
+    else:
+        error = ""
+    if error:
+        return RedirectResponse(f"/portal/claims/{claim_id}?error={error}#attachments", status_code=303)
+    stale = workflow.replace_attachment(db, claim, att, file.filename, ctype, data, user)
+    db.commit()
+    workflow.remove_files(stale)
+    return RedirectResponse(f"/portal/claims/{claim_id}#attachments", status_code=303)
 
 
 @router.post("/claims/{claim_id}/delete")

@@ -67,7 +67,11 @@ Per ongeluk goedgekeurd, klaargezet, uitgevoerd of afgewezen? Open de declaratie
 
 ## Declaratie bewerken of wissen (beheerder)
 
-Een beheerder ziet bij elke declaratie de knop **Declaratie bewerken**. Daarmee pas je naam van de indiener, bedrag, omschrijving, IBAN en tenaamstelling aan, ook als de declaratie al is goedgekeurd of betaald. De status verandert niet en de indiener krijgt geen mail; in de geschiedenis staat "Gegevens aangepast door beheerder".
+Een beheerder ziet bij elke declaratie de knop **Declaratie bewerken**. Daarmee pas je naam en e-mailadres van de indiener, bedrag, omschrijving, IBAN en tenaamstelling aan, ook als de declaratie al is goedgekeurd of betaald. De status verandert niet en de indiener krijgt geen mail; in de geschiedenis staat "Gegevens aangepast door beheerder", met welke velden zijn gewijzigd.
+
+Een typefout in het e-mailadres herstel je hier ook. De declaratie wordt dan gekoppeld aan het nieuwe adres; hangen aan het foute adres geen andere declaraties, dan wordt het vergeten. Laat het vinkje aan om de indiener op het nieuwe adres de link en de huidige stand te sturen, want eerdere mails gingen naar het verkeerde adres.
+
+Onder elke bijlage staat **Bijlage vervangen**. Daarmee zet je een nieuwe versie in de plaats van de bon of factuur, bijvoorbeeld een met de hand getekende factuur van de voorzitter. Het oude bestand wordt verwijderd. Was de declaratie al goedgekeurd, dan krijgt het nieuwe bestand dezelfde paraaf (naam van de voorzitter en tijdstip van de goedkeuring), zodat de boekhouder en secretaris de geparafeerde versie blijven zien. In de geschiedenis staat "Bijlage vervangen door beheerder" met de oude en de nieuwe bestandsnaam.
 
 Onderaan de declaratie staat **Declaratie wissen**. Na het aanvinken van de bevestiging wordt de declaratie definitief verwijderd, met de bijlagen (ook de geparafeerde versies) op schijf, de geschiedenis en de interne opmerkingen. Handig om testdata op te ruimen; het kan niet ongedaan worden gemaakt.
 

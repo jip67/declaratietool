@@ -103,7 +103,7 @@ maken door wie hem zette, of door een beheerder.
 | `chair` | Voorzitter | goedkeuren en paraferen |
 | `treasurer` | Boekhouder | betaling klaarzetten |
 | `secretary` | Secretaris | betaling uitvoeren |
-| `admin` | Beheerder | gebruikers, mailinstellingen, updates, declaraties bewerken en wissen, meekijken |
+| `admin` | Beheerder | gebruikers, mailinstellingen, updates, declaraties bewerken (ook e-mailadres en bijlagen) en wissen, meekijken |
 | `member` | Gebruiker | eigen declaraties indienen en alleen die zien |
 
 Iemand kan meerdere rollen hebben, bijvoorbeeld `admin` en `treasurer`. De rol Beheerder geeft
@@ -275,7 +275,7 @@ De tool draait vanzelf. Wat je als beheerder af en toe doet:
 | Nieuwe bestuurder | **Instellingen → Gebruikers → toevoegen** met de juiste rol; het oude account uitzetten (geschiedenis blijft kloppen) |
 | Iemand kan niet inloggen | **Gebruikers → Bewerken**: nieuw wachtwoord, of 2FA resetten. In het **Logboek** zie je waarom een poging mislukte (bij 5 foute pogingen 15 minuten blokkade) |
 | Iemand helpen met de tool | **Gebruikers → Meekijken**: je ziet precies wat die persoon ziet, zonder iets te kunnen wijzigen |
-| Fout in een declaratie | **Declaratie bewerken** (beheerder), of **Laatste stap ongedaan maken** |
+| Fout in een declaratie | **Declaratie bewerken** (beheerder), **Bijlage vervangen**, of **Laatste stap ongedaan maken** |
 | Testdeclaraties opruimen | **Declaratie wissen** onderaan de declaratie (definitief) |
 | Kijken of alles goed gaat | **Instellingen → Updates**: versie en laatste back-up. Het overzicht waarschuwt als de back-up mislukt of ouder dan 36 uur is |
 | Meldingen | **Instellingen → Meldingen**: mail bij nieuwe declaratie, statuswijziging, taak die te lang openstaat; voor beheerders ook bij logins, blokkades en binnenkomende mail |
