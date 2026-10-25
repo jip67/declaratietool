@@ -204,6 +204,11 @@ class Attachment(Base):
 
     claim: Mapped[Claim] = relationship(back_populates="attachments")
 
+    @property
+    def version(self) -> str:
+        """Verandert als het bestand wordt vervangen; in de url zodat de browser geen oude versie toont."""
+        return self.stored_path.rsplit("/", 1)[-1].split(".")[0][:12]
+
 
 class Event(Base):
     """Logboek: wie deed wat en wanneer."""

@@ -42,7 +42,8 @@ def file_response(path: Path, media_type: str, filename: str) -> FileResponse:
         media_type=media_type,
         filename=filename,
         content_disposition_type="inline",
-        headers={"X-Content-Type-Options": "nosniff"},
+        # Altijd opnieuw controleren: een vervangen bijlage houdt hetzelfde adres.
+        headers={"X-Content-Type-Options": "nosniff", "Cache-Control": "private, no-cache"},
     )
 
 

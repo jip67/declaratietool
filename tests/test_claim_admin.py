@@ -232,3 +232,19 @@ def test_replace_rejects_wrong_file(db, client, staff):
     assert "error=file_type" in r.headers["location"]
     db.refresh(att)
     assert att.original_filename == "bon.pdf"
+
+
+def test_replaced_attachment_gets_new_url_and_is_not_cached(db, client, staff):
+    make_claim(client)
+    claim = db.scalar(select(Claim))
+    att = claim.attachments[0]
+    old_url = f"/portal/files/{att.id}?v={att.version}"
+    assert old_url in client.get(f"/portal/claims/{claim.id}").text
+    r = client.get(old_url)
+    assert "no-cache" in r.headers["cache-control"]
+    client.post(f"/portal/claims/{claim.id}/attachments/{att.id}/replace",
+                files={"file": ("getekend.pdf", pdf_bytes(), "application/pdf")})
+    db.expire_all()
+    att = db.get(Attachment, att.id)
+    page = client.get(f"/portal/claims/{claim.id}").text
+    assert old_url not in page and f"/portal/files/{att.id}?v={att.version}" in page
