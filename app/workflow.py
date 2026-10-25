@@ -18,7 +18,7 @@ from sqlalchemy.orm import Session
 from . import approval_links, mailer, notifications, storage
 from .config import get_settings
 from .i18n import translate
-from .models import ROLE_FOR_STATUS, Claim, Event, Role, Status, Submitter, User, utcnow
+from .models import ROLE_FOR_STATUS, Attachment, Claim, Event, Role, Status, Submitter, User, utcnow
 from .security import format_iban, normalize_iban
 from .stamping import stamp_file, stamp_lines
 
@@ -256,6 +256,19 @@ def _require_status(claim: Claim, status: Status) -> None:
         raise WorkflowError("wrong_status")
 
 
+def stamp_attachment(claim: Claim, att: Attachment, name: str, when: datetime) -> None:
+    """Zet de paraaf van de voorzitter op een bijlage; een mislukte paraaf houdt de declaratie niet op."""
+    lang = get_settings().default_language
+    if when.tzinfo is None:
+        when = when.replace(tzinfo=UTC)
+    lines = stamp_lines(translate("stamp.title", lang), name, when.astimezone(_tz()), claim.reference)
+    try:
+        stamped = stamp_file(storage.absolute(att.stored_path), att.content_type, lines)
+        att.stamped_path = str(stamped.relative_to(storage.upload_root().resolve()))
+    except Exception:
+        log.exception("Paraaf zetten op bijlage %s mislukt", att.id)
+
+
 def approve(db: Session, claim: Claim, user: User, via_link: bool = False) -> None:
     """Voorzitter keurt goed; de bonnen krijgen een paraaf.
 
@@ -263,14 +276,8 @@ def approve(db: Session, claim: Claim, user: User, via_link: bool = False) -> No
     _require(user, Role.CHAIR)
     _require_status(claim, Status.SUBMITTED)
     now = utcnow()
-    lang = get_settings().default_language
-    lines = stamp_lines(translate("stamp.title", lang), user.name, now.astimezone(_tz()), claim.reference)
     for att in claim.attachments:
-        try:
-            stamped = stamp_file(storage.absolute(att.stored_path), att.content_type, lines)
-            att.stamped_path = str(stamped.relative_to(storage.upload_root().resolve()))
-        except Exception:
-            log.exception("Paraaf zetten op bijlage %s mislukt", att.id)
+        stamp_attachment(claim, att, user.name, now)
     set_status(claim, Status.APPROVED)
     claim.approved_at = now
     claim.approved_by_id = user.id
@@ -391,6 +398,43 @@ def undo(db: Session, claim: Claim, user: User) -> list[str]:
     notify_role(db, claim)
     notifications.status_changed(db, claim, "undone", user)
     return stale
+
+
+def replace_attachment(db: Session, claim: Claim, att: Attachment, filename: str, content_type: str,
+                       data: bytes, user: User) -> list[str]:
+    """Vervang het bestand van een bijlage, bijvoorbeeld door een met de hand getekende versie.
+
+    Was de declaratie al goedgekeurd, dan krijgt het nieuwe bestand dezelfde paraaf
+    (naam en tijdstip van de oorspronkelijke goedkeuring). Geeft de oude bestanden
+    terug die na de commit weg mogen."""
+    stale = [p for p in (att.stored_path, att.stamped_path) if p]
+    old_name = att.original_filename
+    att.stored_path = storage.write_file(claim, content_type, data)
+    att.original_filename = storage.safe_filename(filename)
+    att.content_type = content_type
+    att.size = len(data)
+    att.stamped_path = None
+    if claim.approved_at is not None:
+        approver = db.get(User, claim.approved_by_id) if claim.approved_by_id else None
+        stamp_attachment(claim, att, approver.name if approver else "", claim.approved_at)
+    log_event(db, claim, "attachment_replaced", user, note=f"{old_name} → {att.original_filename}")
+    return stale
+
+
+def change_submitter(db: Session, claim: Claim, email: str) -> None:
+    """Koppel de declaratie aan een ander e-mailadres, bijvoorbeeld na een typefout.
+
+    Het oude adres wordt vergeten als er verder geen declaraties aan hangen."""
+    old = claim.submitter
+    new = get_or_create_submitter(db, email, old.name, language=old.language)
+    if new is old:
+        return
+    if not new.iban and not new.account_holder:
+        new.iban, new.account_holder = old.iban, old.account_holder
+    claim.submitter = new
+    db.flush()
+    if not db.scalar(select(func.count(Claim.id)).where(Claim.submitter_id == old.id)):
+        db.delete(old)
 
 
 def remove_files(paths: list[str]) -> None:

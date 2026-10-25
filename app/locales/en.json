@@ -241,7 +241,7 @@
   "nav.menu": "Menu",
   "users.read_only": "Only an administrator can add or change users.",
   "claim.edit": "Edit claim",
-  "claim.edit_intro": "As an administrator you can always change the details, even after approval. The status does not change and the submitter gets no email. The change is recorded in the history.",
+  "claim.edit_intro": "As an administrator you can always change the details, even after approval. The status does not change and the submitter gets no email, unless you change the email address and tick the box below. The change is recorded in the history.",
   "claim.delete": "Delete claim",
   "claim.delete_warning": "The claim is permanently deleted, including all attachments, the history and the internal notes. This cannot be undone.",
   "claim.delete_check": "Yes, I am sure I want to delete this claim",
@@ -385,5 +385,17 @@
   "approve_link.problem.disabled": "Approving by link is not (or no longer) enabled for your account. Log in to view the claim.",
   "approve_link.setting": "May approve via a link in the email (without logging in)",
   "approve_link.setting_help": "Only for the chair. The email about a new claim and the daily reminder then contain a link to approve directly. The link works once, only for that claim, and expires after a few days. Anyone who can read the email can therefore approve; the treasurer and secretary still check afterwards.",
-  "event.approved_link": "via link in email"
+  "event.approved_link": "via link in email",
+  "claim.edit_resend": "If you change the email address: send the submitter the link and current status at the new address",
+  "attachment.replace": "Replace attachment",
+  "attachment.replace_intro": "Upload a new version, for example a signed invoice. The old file is removed and the replacement is recorded in the history.",
+  "attachment.replace_intro_stamped": "Upload a new version, for example an invoice signed by hand. The new file gets the same initials stamp as at approval (name and time). The old file is removed and the replacement is recorded in the history.",
+  "attachment.replace_file": "New file (pdf or photo)",
+  "event.attachment_replaced": "Attachment replaced by administrator",
+  "edited.name": "name",
+  "edited.email": "email address",
+  "edited.description": "description",
+  "edited.amount": "amount",
+  "edited.iban": "account number",
+  "edited.account_holder": "account holder"
 }

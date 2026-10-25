@@ -138,6 +138,8 @@ form.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,
 }
 .hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
 .attachment { margin: 0 0 1rem; }
+details.replace { margin: -.5rem 0 1rem; font-size: .9rem; }
+details.replace summary { cursor: pointer; color: var(--primary); }
 .attachment .thumb-row { display: flex; align-items: center; gap: .75rem; padding: .4rem; border: 1px solid var(--line); border-radius: 8px; }
 .attachment summary.thumb-row { cursor: pointer; list-style: none; }
 .attachment summary.thumb-row::-webkit-details-marker { display: none; }
