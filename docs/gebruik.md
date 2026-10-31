@@ -5,7 +5,7 @@
 1. Mail een foto of pdf van de bon naar het declaratie-adres. Heb je een account met de rol **Gebruiker**, dan kun je ook inloggen en de bon toevoegen via **Nieuwe declaratie**. Meerdere bonnen in één mail worden één declaratie. Het onderwerp van de mail wordt alvast als omschrijving ingevuld.
 2. Je krijgt een bevestiging met een persoonlijke link.
 3. Vul via die link het bedrag, de omschrijving, je IBAN en de tenaamstelling in. Vink "onthouden" aan, dan staan je rekeninggegevens er de volgende keer al.
-4. Je krijgt een mail bij elke stap: goedgekeurd, betaling klaargezet, betaald (of afgewezen, met reden). Via dezelfde link kun je altijd de status bekijken.
+4. Je krijgt een mail als de declaratie is betaald (of afgewezen, met reden). Wil je ook een mail bij de tussenstappen (goedgekeurd, betaling klaargezet), vink dat dan aan op je declaratiepagina; die keuze geldt ook voor volgende declaraties en is altijd weer uit te zetten. Via dezelfde link kun je altijd de status bekijken.
 
 Tot de voorzitter heeft goedgekeurd kun je je gegevens nog aanpassen.
 
@@ -91,7 +91,9 @@ Indieners zonder account hebben geen portaal; hun eigen pagina open je via de li
 
 ## Herinneringen
 
-Elke ochtend (instelbaar) krijgt iedereen met openstaande taken één mail met een overzicht. Bestuursleden die het aanzetten krijgen in dezelfde ronde ook een melding van taken die te lang openstaan (zie [Beheer](#beheer)). Indieners die hun gegevens nog niet hebben ingevuld krijgen ook een herinnering, standaard maximaal 14 dagen lang.
+Elke ochtend (instelbaar) krijgt iedereen met openstaande taken één mail met een overzicht. Bestuursleden die het aanzetten krijgen in dezelfde ronde ook een melding van taken die te lang openstaan (zie [Beheer](#beheer)). Indieners die hun gegevens nog niet hebben ingevuld krijgen ook een herinnering, niet elke dag maar 2, 5 en 10 dagen na binnenkomst. Verder krijgt een indiener alleen mail als de status van de declaratie verandert.
+
+Antwoordt iemand op een mail van de tool (onderwerp met Re:, Fwd: en het kenmerk van een bestaande declaratie), dan wordt dat geen nieuwe declaratie, ook niet als er een logo of foto in de handtekening zit. Zat er een bijlage bij, dan krijgt de afzender een mail dat een nieuwe bon via een nieuwe mail moet. In het logboek staat zo'n mail als "Antwoord op een eerdere mail".
 
 ## Beheer
 

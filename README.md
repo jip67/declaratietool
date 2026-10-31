@@ -6,7 +6,7 @@ Een kleine, zelf te hosten webapplicatie om declaraties van een vereniging of st
 - **Aanvullen via een link.** Via die link vult de indiener bedrag, omschrijving, IBAN en tenaamstelling in. Rekeninggegevens worden onthouden voor een volgende keer (en blijven aan te passen).
 - **Goedkeuren met paraaf.** De voorzitter krijgt een mail, keurt goed in het portaal en de bonnen krijgen automatisch een paraaf (stempel met naam, datum en kenmerk) als pdf.
 - **Betalen.** De boekhouder krijgt een mail met alle gegevens en de geparafeerde bonnen en zet de betaling klaar bij de bank. Daarna krijgt de secretaris bericht om de betaling uit te voeren.
-- **Altijd op de hoogte.** De indiener krijgt bij elke stap een update. Wie nog een taak open heeft, krijgt elke dag een herinnering.
+- **Altijd op de hoogte.** De indiener krijgt bericht bij ontvangst en als er betaald (of afgewezen) is, en desgewenst bij elke tussenstap. Wie nog een taak open heeft, krijgt elke dag een herinnering.
 - **Portaal.** Voorzitter, boekhouder en secretaris loggen in om de status van alle declaraties te zien en kunnen zelf een declaratie aanmaken namens iemand.
 - **Meertalig.** Nederlands en Engels; een taal toevoegen is één bestand vertalen.
 - **Docker.** Draait met `docker compose` op een eigen server, met automatisch https voor je eigen domein. Bijwerken via GitHub.

@@ -57,6 +57,7 @@ def claim_page(token: str, request: Request, db: Session = Depends(get_db)):
         errors={},
         editable=claim.status_enum in EDITABLE,
         saved=request.query_params.get("saved") == "1",
+        updates_saved=request.query_params.get("updates_saved") == "1",
     )
 
 
@@ -69,6 +70,7 @@ def claim_submit(
     description: str = Form(""),
     amount: str = Form(""),
     remember: bool = Form(False),
+    updates: bool = Form(False),
     db: Session = Depends(get_db),
 ):
     claim = _claim(db, token)
@@ -80,14 +82,24 @@ def claim_submit(
         form = {"iban": iban, "account_holder": account_holder, "description": description, "amount": amount}
         return render(
             request, "public/claim.html", lang, status_code=422,
-            claim=claim, form=form, errors=errors, editable=True, saved=False,
+            claim=claim, form=form, errors=errors, editable=True, saved=False, updates_saved=False,
         )
+    claim.submitter.status_updates = updates
     workflow.complete_details(
         db, claim, iban=iban, account_holder=account_holder, description=description,
         amount_cents=cents, remember=remember,
     )
     db.commit()
     return RedirectResponse(f"/c/{token}?saved=1", status_code=303)
+
+
+@router.post("/c/{token}/updates")
+def claim_updates(token: str, updates: bool = Form(False), db: Session = Depends(get_db)):
+    """De indiener zet de mails bij tussenstappen aan of uit (geldt voor al zijn declaraties)."""
+    claim = _claim(db, token)
+    claim.submitter.status_updates = updates
+    db.commit()
+    return RedirectResponse(f"/c/{token}?updates_saved=1", status_code=303)
 
 
 @router.get("/c/{token}/files/{attachment_id}")

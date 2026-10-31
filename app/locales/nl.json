@@ -83,7 +83,7 @@
   "public.title": "Declaratie {reference}",
   "public.intro": "Vul de gegevens hieronder in. Daarna gaat je declaratie naar de voorzitter ter goedkeuring.",
   "public.remember": "Onthoud mijn rekeningnummer en tenaamstelling voor een volgende keer",
-  "public.saved": "Dank je! Je gegevens zijn opgeslagen. Je krijgt per mail bericht bij elke stap.",
+  "public.saved": "Dank je! Je gegevens zijn opgeslagen. Je krijgt een mail als de declaratie is betaald (of afgewezen).",
   "public.submit": "Declaratie indienen",
   "error.required": "Dit veld is verplicht.",
   "error.iban": "Dit is geen geldig IBAN-rekeningnummer.",
@@ -103,7 +103,7 @@
   "msg.saved": "Opgeslagen.",
   "stamp.title": "GOEDGEKEURD",
   "mail.received.subject": "Declaratie {reference} ontvangen",
-  "mail.received.body": "Beste {name},\n\nWe hebben je declaratie ontvangen ({count} bijlage(n)).\n\nVul via deze link het bedrag, een omschrijving, je rekeningnummer en de tenaamstelling in:\n{link}\n\nPas daarna kan de declaratie worden goedgekeurd. Je krijgt bij elke stap een bericht.\n\nMet vriendelijke groet,\n{org}",
+  "mail.received.body": "Beste {name},\n\nWe hebben je declaratie ontvangen ({count} bijlage(n)).\n\nVul via deze link het bedrag, een omschrijving, je rekeningnummer en de tenaamstelling in:\n{link}\n\nPas daarna kan de declaratie worden goedgekeurd. Je krijgt een mail als hij is betaald (of afgewezen); wil je ook bij de tussenstappen een mail, zet dat dan aan op die pagina.\n\nMet vriendelijke groet,\n{org}",
   "mail.no_attachment.subject": "Declaratie niet ontvangen: geen bijlage",
   "mail.no_attachment.body": "Hallo,\n\nIn je mail zat geen bon of factuur. Stuur je declaratie opnieuw met een foto of pdf van de bon als bijlage.\n\nMet vriendelijke groet,\n{org}",
   "mail.status.subject": "Declaratie {reference}: {status}",
@@ -397,5 +397,10 @@
   "edited.description": "omschrijving",
   "edited.amount": "bedrag",
   "edited.iban": "rekeningnummer",
-  "edited.account_holder": "tenaamstelling"
+  "edited.account_holder": "tenaamstelling",
+  "log.result.ignored_reply": "Antwoord op een eerdere mail; geen nieuwe declaratie",
+  "mail.reply_ignored.subject": "Je antwoord over declaratie {reference}",
+  "mail.reply_ignored.body": "Beste,\n\nWe hebben je antwoord op de mail over declaratie {reference} ontvangen. Antwoorden op onze mails worden niet als nieuwe declaratie ingediend, ook niet als er een bijlage bij zit.\n\nWil je een nieuwe bon declareren? Stuur dan een nieuwe mail (dus geen antwoord) met de bon als bijlage.\n\nMet vriendelijke groet,\n{org}",
+  "public.updates": "Stuur me ook een mail bij elke tussenstap (goedgekeurd, betaling klaargezet)",
+  "public.updates_saved": "Je keuze is opgeslagen."
 }

@@ -123,6 +123,9 @@ class Submitter(Base):
     iban: Mapped[str] = mapped_column(String(64), default="")
     account_holder: Mapped[str] = mapped_column(String(255), default="")
     language: Mapped[str] = mapped_column(String(8), default="nl")
+    # Ook een mail bij de tussenstappen (ingediend, goedgekeurd, betaling klaargezet)?
+    # Ontvangen, betaald en afgewezen krijgt iedereen altijd.
+    status_updates: Mapped[bool] = mapped_column(Boolean, default=False, server_default=false())
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
 

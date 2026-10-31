@@ -117,7 +117,9 @@ def test_full_flow(db, client, staff):
     client.post(f"/portal/claims/{claim.id}/action", data={"action": "pay"})
     db.expire_all()
     assert claim.status == Status.PAID.value
-    assert len(sent_to("piet@example.org")) == 5  # ontvangen + 4 statusupdates
+    # Standaard alleen ontvangen en betaald, geen tussenstappen.
+    piet = [m["Subject"] for m in sent_to("piet@example.org")]
+    assert len(piet) == 2 and "ontvangen" in piet[0] and claim.reference in piet[1]
     assert [e.action for e in claim.events] == ["created", "submitted", "approved", "payment_prepared", "paid"]
 
     # Volgende declaratie: rekeninggegevens zijn al ingevuld
@@ -125,6 +127,64 @@ def test_full_flow(db, client, staff):
     second = db.scalars(select(Claim).order_by(Claim.id.desc())).first()
     assert second.iban == IBAN and second.account_holder == "P. Jansen"
     assert second.reference != claim.reference
+
+
+def _walk_to_paid(db, client, claim):
+    for email, action in (("voorzitter@example.org", "approve"), ("boekhouder@example.org", "prepare"),
+                          ("secretaris@example.org", "pay")):
+        login(client, email)
+        client.post(f"/portal/claims/{claim.id}/action", data={"action": action})
+    db.expire_all()
+    assert claim.status == Status.PAID.value
+
+
+def test_submitter_can_choose_intermediate_updates(db, client, staff):
+    intake.process_message(db, make_mail([("bon.jpg", "image/jpeg", jpeg_bytes())]))
+    claim = db.scalar(select(Claim))
+    page = client.get(f"/c/{claim.token}")
+    assert 'name="updates"' in page.text and 'name="updates" value="true" checked' not in page.text
+    client.post(f"/c/{claim.token}", data={"iban": IBAN, "account_holder": "P. Jansen", "description": "x",
+                                           "amount": "5,00", "updates": "true"})
+    db.expire_all()
+    assert claim.submitter.status_updates is True
+    _walk_to_paid(db, client, claim)
+    # ontvangen + ingediend + goedgekeurd + klaargezet + betaald
+    assert len(sent_to("piet@example.org")) == 5
+
+
+def test_submitter_can_switch_updates_off_later(db, client, staff):
+    intake.process_message(db, make_mail([("bon.jpg", "image/jpeg", jpeg_bytes())]))
+    claim = db.scalar(select(Claim))
+    client.post(f"/c/{claim.token}", data={"iban": IBAN, "account_holder": "P. Jansen", "description": "x",
+                                           "amount": "5,00", "updates": "true"})
+    login(client, "voorzitter@example.org")
+    client.post(f"/portal/claims/{claim.id}/action", data={"action": "approve"})
+    client.cookies.clear()
+    # Na goedkeuren is het formulier dicht, maar de keuze is nog te wijzigen.
+    page = client.get(f"/c/{claim.token}")
+    assert f'action="/c/{claim.token}/updates"' in page.text
+    r = client.post(f"/c/{claim.token}/updates", data={}, follow_redirects=False)
+    assert r.status_code == 303
+    db.expire_all()
+    assert claim.submitter.status_updates is False
+    mailer.outbox.clear()
+    login(client, "boekhouder@example.org")
+    client.post(f"/portal/claims/{claim.id}/action", data={"action": "prepare"})
+    assert not sent_to("piet@example.org")
+
+
+def test_undo_of_paid_is_always_told(db, client, staff):
+    intake.process_message(db, make_mail([("bon.jpg", "image/jpeg", jpeg_bytes())]))
+    claim = db.scalar(select(Claim))
+    client.post(f"/c/{claim.token}", data={"iban": IBAN, "account_holder": "P. Jansen", "description": "x",
+                                           "amount": "5,00"})
+    _walk_to_paid(db, client, claim)
+    mailer.outbox.clear()
+    login(client, "secretaris@example.org")
+    client.post(f"/portal/claims/{claim.id}/action", data={"action": "undo"})
+    db.expire_all()
+    assert claim.status == Status.PAYMENT_PREPARED.value
+    assert sent_to("piet@example.org")
 
 
 def test_staff_creates_claim_for_someone(db, client, staff):
@@ -165,6 +225,62 @@ def test_reminders(db, staff):
     mailer.outbox.clear()
     assert reminders.send_reminders(db) == 1
     assert "Herinnering" in sent_to("voorzitter@example.org")[0]["Subject"]
+
+
+def test_submitter_reminder_not_every_day(db, staff):
+    """Een indiener die zijn gegevens niet invult krijgt een paar herinneringen, niet elke dag een."""
+    from datetime import timedelta
+
+    from app.models import utcnow
+
+    intake.process_message(db, make_mail([("bon.jpg", "image/jpeg", jpeg_bytes())]))
+    claim = db.scalar(select(Claim))
+    created = utcnow()
+    days_with_mail = []
+    for day in range(1, 16):
+        claim.created_at = claim.status_changed_at = created - timedelta(days=day, hours=1)
+        db.commit()
+        mailer.outbox.clear()
+        reminders.send_reminders(db)
+        if sent_to("piet@example.org"):
+            days_with_mail.append(day)
+    assert days_with_mail == list(reminders.SUBMITTER_REMINDER_SCHEDULE)
+
+
+def test_waiting_on_secretary_sends_nothing_to_submitter(db, staff):
+    """Klaargezette betaling: alleen de secretaris wordt herinnerd, de indiener niet."""
+    from datetime import timedelta
+
+    from app.models import utcnow
+
+    intake.process_message(db, make_mail([("bon.jpg", "image/jpeg", jpeg_bytes())]))
+    claim = db.scalar(select(Claim))
+    claim.status = Status.PAYMENT_PREPARED.value
+    for day in range(1, 8):
+        claim.status_changed_at = utcnow() - timedelta(days=day)
+        db.commit()
+        mailer.outbox.clear()
+        reminders.send_reminders(db)
+        assert not sent_to("piet@example.org")
+        assert sent_to("secretaris@example.org")
+
+
+def test_reply_to_our_mail_is_not_a_new_claim(db):
+    """Een bedankje met een logo in de handtekening wordt geen tweede declaratie."""
+    intake.process_message(db, make_mail([("bon.jpg", "image/jpeg", jpeg_bytes())]))
+    claim = db.scalar(select(Claim))
+    mailer.outbox.clear()
+    reply = make_mail([("logo.jpg", "image/jpeg", jpeg_bytes())],
+                      subject=f"RE: Declaratie {claim.reference}: Betaling klaargezet")
+    assert intake.process_message(db, reply) == "ignored:reply"
+    assert len(db.scalars(select(Claim)).all()) == 1
+    assert claim.reference in sent_to("piet@example.org")[0]["Subject"]
+    # Zonder bijlage geen mail terug (en ook geen "geen bijlage"-mail).
+    mailer.outbox.clear()
+    assert intake.process_message(db, make_mail([], subject=f"Re: Declaratie {claim.reference}")) == "ignored:reply"
+    assert not mailer.outbox
+    # Een nieuwe mail die toevallig met Re: begint maar geen kenmerk heeft, is gewoon een declaratie.
+    assert intake.process_message(db, make_mail([("bon.jpg", "image/jpeg", jpeg_bytes())], subject="Re: etentje")).startswith("created:")
 
 
 def test_reminders_run_once_per_day(db, monkeypatch):
