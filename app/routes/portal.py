@@ -293,7 +293,7 @@ def edit_claim(
         if claim.status_enum == Status.RECEIVED:
             workflow.notify_received(claim)
         else:
-            workflow.notify_submitter_status(claim)
+            workflow.notify_submitter_status(claim, always=True)
     return RedirectResponse(f"/portal/claims/{claim_id}", status_code=303)
 
 

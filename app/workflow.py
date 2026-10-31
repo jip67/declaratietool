@@ -112,8 +112,15 @@ def notify_received(claim: Claim) -> None:
     )
 
 
-def notify_submitter_status(claim: Claim) -> None:
+# Deze statussen krijgt de indiener altijd per mail; de tussenstappen alleen als hij dat aanzette.
+ALWAYS_TELL_SUBMITTER = (Status.PAID, Status.REJECTED)
+
+
+def notify_submitter_status(claim: Claim, always: bool = False) -> None:
+    """Statusmail aan de indiener. always: ook bij een tussenstap als hij die niet wil."""
     s = claim.submitter
+    if not (always or s.status_updates or claim.status_enum in ALWAYS_TELL_SUBMITTER):
+        return
     lang = s.language
     extra = ""
     if claim.status_enum == Status.REJECTED and claim.rejection_reason:
@@ -394,7 +401,8 @@ def undo(db: Session, claim: Claim, user: User) -> list[str]:
         set_status(claim, _status_before_rejection(claim))
     log_event(db, claim, "undone", user, note=step)
     db.flush()
-    notify_submitter_status(claim)
+    # Kreeg de indiener "betaald" of "afgewezen", dan moet hij ook horen dat dat is teruggedraaid.
+    notify_submitter_status(claim, always=step in ("paid", "rejected"))
     notify_role(db, claim)
     notifications.status_changed(db, claim, "undone", user)
     return stale

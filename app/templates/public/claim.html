@@ -33,6 +33,7 @@
       {% if errors.account_holder %}<span class="error">{{ t(errors.account_holder) }}</span>{% endif %}
     </label>
     <label class="check"><input type="checkbox" name="remember" value="true" checked> {{ t('public.remember') }}</label>
+    <label class="check"><input type="checkbox" name="updates" value="true"{% if claim.submitter.status_updates %} checked{% endif %}> {{ t('public.updates') }}</label>
     <button class="primary">{{ t('public.submit') if claim.status == 'received' else t('action.save') }}</button>
   </form>
   {% else %}
@@ -42,6 +43,13 @@
     <dt>{{ t('field.iban') }}</dt><dd>{{ claim.iban|iban }}</dd>
     <dt>{{ t('field.account_holder') }}</dt><dd>{{ claim.account_holder }}</dd>
   </dl>
+  {% if claim.status in ('submitted', 'approved', 'payment_prepared') %}
+  <form method="post" action="/c/{{ claim.token }}/updates" class="updates">
+    {% if updates_saved %}<p class="success">{{ t('public.updates_saved') }}</p>{% endif %}
+    <label class="check"><input type="checkbox" name="updates" value="true"{% if claim.submitter.status_updates %} checked{% endif %}> {{ t('public.updates') }}</label>
+    <button>{{ t('action.save') }}</button>
+  </form>
+  {% endif %}
   {% endif %}
 </section>
 {% endblock %}

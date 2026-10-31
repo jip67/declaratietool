@@ -7,7 +7,7 @@ Van idee naar een werkende declaratietool op je eigen domein. Stappen met ✅ zi
 1. ✅ Datamodel: indieners (met onthouden rekeninggegevens), declaraties, bijlagen, gebruikers met rollen en een logboek per declaratie.
 2. ✅ Mail ophalen (IMAP): elke minuut nieuwe mail lezen, bijlagen (foto/pdf) opslaan, declaratie aanmaken met een kenmerk zoals `D2026-0001`, bevestiging met persoonlijke link sturen. Mails zonder bijlage krijgen een nette weigering; automatische antwoorden worden genegeerd.
 3. ✅ Formulier voor de indiener: bedrag, omschrijving, IBAN (met controle) en tenaamstelling. Rekeninggegevens worden vooraf ingevuld en zijn aan te passen.
-4. ✅ Workflow met vaste volgorde: voorzitter → boekhouder → secretaris. Bij elke stap mail naar de indiener en naar wie daarna aan zet is.
+4. ✅ Workflow met vaste volgorde: voorzitter → boekhouder → secretaris. Bij elke stap mail naar wie daarna aan zet is; de indiener krijgt bericht bij betaald of afgewezen, en bij de tussenstappen als hij dat aanzet.
 5. ✅ Paraaf: bij goedkeuring krijgt elke bon een stempel (GOEDGEKEURD, naam, datum, kenmerk) en wordt hij opgeslagen als pdf. De boekhouder krijgt de geparafeerde pdf's als bijlage.
 6. ✅ Portaal met inloggen: overzicht, "mijn taken", details, geschiedenis, afwijzen met reden, declaratie aanmaken namens iemand, gebruikersbeheer.
 7. ✅ Dagelijkse herinneringen voor openstaande taken (ook voor indieners die hun gegevens nog niet hebben ingevuld, standaard maximaal 14 dagen).

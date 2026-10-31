@@ -117,7 +117,9 @@ def test_full_flow(db, client, staff):
     client.post(f"/portal/claims/{claim.id}/action", data={"action": "pay"})
     db.expire_all()
     assert claim.status == Status.PAID.value
-    assert len(sent_to("piet@example.org")) == 5  # ontvangen + 4 statusupdates
+    # Standaard alleen ontvangen en betaald, geen tussenstappen.
+    piet = [m["Subject"] for m in sent_to("piet@example.org")]
+    assert len(piet) == 2 and "ontvangen" in piet[0] and claim.reference in piet[1]
     assert [e.action for e in claim.events] == ["created", "submitted", "approved", "payment_prepared", "paid"]
 
     # Volgende declaratie: rekeninggegevens zijn al ingevuld
@@ -125,6 +127,64 @@ def test_full_flow(db, client, staff):
     second = db.scalars(select(Claim).order_by(Claim.id.desc())).first()
     assert second.iban == IBAN and second.account_holder == "P. Jansen"
     assert second.reference != claim.reference
+
+
+def _walk_to_paid(db, client, claim):
+    for email, action in (("voorzitter@example.org", "approve"), ("boekhouder@example.org", "prepare"),
+                          ("secretaris@example.org", "pay")):
+        login(client, email)
+        client.post(f"/portal/claims/{claim.id}/action", data={"action": action})
+    db.expire_all()
+    assert claim.status == Status.PAID.value
+
+
+def test_submitter_can_choose_intermediate_updates(db, client, staff):
+    intake.process_message(db, make_mail([("bon.jpg", "image/jpeg", jpeg_bytes())]))
+    claim = db.scalar(select(Claim))
+    page = client.get(f"/c/{claim.token}")
+    assert 'name="updates"' in page.text and 'name="updates" value="true" checked' not in page.text
+    client.post(f"/c/{claim.token}", data={"iban": IBAN, "account_holder": "P. Jansen", "description": "x",
+                                           "amount": "5,00", "updates": "true"})
+    db.expire_all()
+    assert claim.submitter.status_updates is True
+    _walk_to_paid(db, client, claim)
+    # ontvangen + ingediend + goedgekeurd + klaargezet + betaald
+    assert len(sent_to("piet@example.org")) == 5
+
+
+def test_submitter_can_switch_updates_off_later(db, client, staff):
+    intake.process_message(db, make_mail([("bon.jpg", "image/jpeg", jpeg_bytes())]))
+    claim = db.scalar(select(Claim))
+    client.post(f"/c/{claim.token}", data={"iban": IBAN, "account_holder": "P. Jansen", "description": "x",
+                                           "amount": "5,00", "updates": "true"})
+    login(client, "voorzitter@example.org")
+    client.post(f"/portal/claims/{claim.id}/action", data={"action": "approve"})
+    client.cookies.clear()
+    # Na goedkeuren is het formulier dicht, maar de keuze is nog te wijzigen.
+    page = client.get(f"/c/{claim.token}")
+    assert f'action="/c/{claim.token}/updates"' in page.text
+    r = client.post(f"/c/{claim.token}/updates", data={}, follow_redirects=False)
+    assert r.status_code == 303
+    db.expire_all()
+    assert claim.submitter.status_updates is False
+    mailer.outbox.clear()
+    login(client, "boekhouder@example.org")
+    client.post(f"/portal/claims/{claim.id}/action", data={"action": "prepare"})
+    assert not sent_to("piet@example.org")
+
+
+def test_undo_of_paid_is_always_told(db, client, staff):
+    intake.process_message(db, make_mail([("bon.jpg", "image/jpeg", jpeg_bytes())]))
+    claim = db.scalar(select(Claim))
+    client.post(f"/c/{claim.token}", data={"iban": IBAN, "account_holder": "P. Jansen", "description": "x",
+                                           "amount": "5,00"})
+    _walk_to_paid(db, client, claim)
+    mailer.outbox.clear()
+    login(client, "secretaris@example.org")
+    client.post(f"/portal/claims/{claim.id}/action", data={"action": "undo"})
+    db.expire_all()
+    assert claim.status == Status.PAYMENT_PREPARED.value
+    assert sent_to("piet@example.org")
 
 
 def test_staff_creates_claim_for_someone(db, client, staff):
