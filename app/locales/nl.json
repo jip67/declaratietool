@@ -397,5 +397,8 @@
   "edited.description": "omschrijving",
   "edited.amount": "bedrag",
   "edited.iban": "rekeningnummer",
-  "edited.account_holder": "tenaamstelling"
+  "edited.account_holder": "tenaamstelling",
+  "log.result.ignored_reply": "Antwoord op een eerdere mail; geen nieuwe declaratie",
+  "mail.reply_ignored.subject": "Je antwoord over declaratie {reference}",
+  "mail.reply_ignored.body": "Beste,\n\nWe hebben je antwoord op de mail over declaratie {reference} ontvangen. Antwoorden op onze mails worden niet als nieuwe declaratie ingediend, ook niet als er een bijlage bij zit.\n\nWil je een nieuwe bon declareren? Stuur dan een nieuwe mail (dus geen antwoord) met de bon als bijlage.\n\nMet vriendelijke groet,\n{org}"
 }

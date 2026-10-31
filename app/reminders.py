@@ -18,6 +18,9 @@ log = logging.getLogger(__name__)
 LAST_RUN_KEY = "reminders_last_run"
 # Wie vandaag pas een taak kreeg, heeft al een bericht gehad.
 MIN_AGE = timedelta(hours=12)
+# Een indiener die zijn gegevens nog niet invulde krijgt niet elke dag een mail, maar alleen
+# zoveel dagen na binnenkomst (en nooit na SUBMITTER_REMINDER_DAYS).
+SUBMITTER_REMINDER_SCHEDULE = (2, 5, 10)
 
 
 def _aware(value: datetime) -> datetime:
@@ -37,7 +40,8 @@ def send_reminders(db: Session) -> int:
         if now - _aware(claim.status_changed_at) < MIN_AGE:
             continue
         if claim.status_enum == Status.RECEIVED:
-            if now - _aware(claim.created_at) > timedelta(days=settings.submitter_reminder_days):
+            age_days = (now - _aware(claim.created_at)).days
+            if age_days > settings.submitter_reminder_days or age_days not in SUBMITTER_REMINDER_SCHEDULE:
                 continue
             s = claim.submitter
             mailer.send(

@@ -69,10 +69,10 @@ Voorbeeld voor Proton Mail (met een SMTP-token uit de Proton-instellingen): `SMT
 | Instelling | Standaard | Betekenis |
 | --- | --- | --- |
 | `REMINDER_HOUR` | 9 | Vanaf dit uur (lokale tijd) gaat één keer per dag de herinneringsronde |
-| `SUBMITTER_REMINDER_DAYS` | 14 | Hoe lang indieners herinnerd worden om hun gegevens aan te vullen |
+| `SUBMITTER_REMINDER_DAYS` | 14 | Hoe lang indieners herinnerd worden om hun gegevens aan te vullen (niet dagelijks: na 2, 5 en 10 dagen) |
 | `APPROVAL_LINK_DAYS` | 7 | Hoe lang een link om via de mail goed te keuren geldig is (alleen voor een voorzitter bij wie dat aanstaat) |
 
-Medewerkers krijgen één mail met al hun openstaande taken. Wie een taak minder dan 12 uur geleden kreeg, wordt die dag nog niet herinnerd.
+Medewerkers krijgen één mail met al hun openstaande taken. Wie een taak minder dan 12 uur geleden kreeg, wordt die dag nog niet herinnerd. Indieners krijgen alleen een herinnering zolang hun declaratie op *Ontvangen* staat, en dan 2, 5 en 10 dagen na binnenkomst; daarna alleen nog een mail als de status verandert.
 
 ## Logboek
 

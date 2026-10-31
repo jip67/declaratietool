@@ -397,5 +397,8 @@
   "edited.description": "description",
   "edited.amount": "amount",
   "edited.iban": "account number",
-  "edited.account_holder": "account holder"
+  "edited.account_holder": "account holder",
+  "log.result.ignored_reply": "Reply to an earlier mail; no new claim",
+  "mail.reply_ignored.subject": "Your reply about claim {reference}",
+  "mail.reply_ignored.body": "Hello,\n\nWe received your reply to the email about claim {reference}. Replies to our emails are not submitted as a new claim, not even when they have an attachment.\n\nWant to claim a new receipt? Please send a new email (not a reply) with the receipt attached.\n\nKind regards,\n{org}"
 }

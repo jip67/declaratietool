@@ -167,6 +167,62 @@ def test_reminders(db, staff):
     assert "Herinnering" in sent_to("voorzitter@example.org")[0]["Subject"]
 
 
+def test_submitter_reminder_not_every_day(db, staff):
+    """Een indiener die zijn gegevens niet invult krijgt een paar herinneringen, niet elke dag een."""
+    from datetime import timedelta
+
+    from app.models import utcnow
+
+    intake.process_message(db, make_mail([("bon.jpg", "image/jpeg", jpeg_bytes())]))
+    claim = db.scalar(select(Claim))
+    created = utcnow()
+    days_with_mail = []
+    for day in range(1, 16):
+        claim.created_at = claim.status_changed_at = created - timedelta(days=day, hours=1)
+        db.commit()
+        mailer.outbox.clear()
+        reminders.send_reminders(db)
+        if sent_to("piet@example.org"):
+            days_with_mail.append(day)
+    assert days_with_mail == list(reminders.SUBMITTER_REMINDER_SCHEDULE)
+
+
+def test_waiting_on_secretary_sends_nothing_to_submitter(db, staff):
+    """Klaargezette betaling: alleen de secretaris wordt herinnerd, de indiener niet."""
+    from datetime import timedelta
+
+    from app.models import utcnow
+
+    intake.process_message(db, make_mail([("bon.jpg", "image/jpeg", jpeg_bytes())]))
+    claim = db.scalar(select(Claim))
+    claim.status = Status.PAYMENT_PREPARED.value
+    for day in range(1, 8):
+        claim.status_changed_at = utcnow() - timedelta(days=day)
+        db.commit()
+        mailer.outbox.clear()
+        reminders.send_reminders(db)
+        assert not sent_to("piet@example.org")
+        assert sent_to("secretaris@example.org")
+
+
+def test_reply_to_our_mail_is_not_a_new_claim(db):
+    """Een bedankje met een logo in de handtekening wordt geen tweede declaratie."""
+    intake.process_message(db, make_mail([("bon.jpg", "image/jpeg", jpeg_bytes())]))
+    claim = db.scalar(select(Claim))
+    mailer.outbox.clear()
+    reply = make_mail([("logo.jpg", "image/jpeg", jpeg_bytes())],
+                      subject=f"RE: Declaratie {claim.reference}: Betaling klaargezet")
+    assert intake.process_message(db, reply) == "ignored:reply"
+    assert len(db.scalars(select(Claim)).all()) == 1
+    assert claim.reference in sent_to("piet@example.org")[0]["Subject"]
+    # Zonder bijlage geen mail terug (en ook geen "geen bijlage"-mail).
+    mailer.outbox.clear()
+    assert intake.process_message(db, make_mail([], subject=f"Re: Declaratie {claim.reference}")) == "ignored:reply"
+    assert not mailer.outbox
+    # Een nieuwe mail die toevallig met Re: begint maar geen kenmerk heeft, is gewoon een declaratie.
+    assert intake.process_message(db, make_mail([("bon.jpg", "image/jpeg", jpeg_bytes())], subject="Re: etentje")).startswith("created:")
+
+
 def test_reminders_run_once_per_day(db, monkeypatch):
     monkeypatch.setenv("REMINDER_HOUR", "0")
     from app.config import get_settings
