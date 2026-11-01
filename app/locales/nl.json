@@ -74,7 +74,6 @@
   "event.paid": "Betaling uitgevoerd",
   "event.rejected": "Afgewezen",
   "portal.history": "Geschiedenis",
-  "portal.stamped": "met paraaf (pdf)",
   "portal.edit_hint": "Gegevens aanpassen kan tot de voorzitter heeft goedgekeurd.",
   "portal.open_form": "Open het formulier van de indiener",
   "portal.new_intro": "Maak een declaratie aan namens iemand. Vul je alle gegevens in, dan gaat hij direct naar de voorzitter. Laat je ze leeg, dan krijgt de indiener een mail met een link om ze zelf in te vullen.",
@@ -132,7 +131,6 @@
   "preview.show": "Voorbeeld tonen",
   "preview.hide": "Voorbeeld verbergen",
   "preview.open_new": "openen in nieuw venster",
-  "preview.showing_stamped": "in het voorbeeld",
   "nav.update": "Updates",
   "nav.update_available": "Nieuwe versie beschikbaar",
   "update.not_configured": "Bijwerken via het portaal is op deze server niet ingesteld. Draai het installatiescript deploy/install-vps.sh nog een keer, of werk bij via de opdrachtregel (zie docs/bijwerken.md).",
@@ -432,5 +430,7 @@
   "test.deleted": "{count} testdeclaratie(s) gewist.",
   "test.receipt.title": "VOORBEELDBON - TEST",
   "test.receipt.body": "Dit is een voorbeeldbon voor een testdeclaratie.\nEr hoeft niets betaald te worden.",
-  "test.receipt.filename": "voorbeeldbon-test.pdf"
+  "test.receipt.filename": "voorbeeldbon-test.pdf",
+  "preview.with_paraaf": "met paraaf",
+  "preview.original": "originele factuur (zonder paraaf)"
 }

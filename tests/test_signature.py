@@ -183,3 +183,21 @@ def test_account_signature(db, client, staff):
     login(client, "secretaris@example.org")
     assert "data-signature-pad" not in client.get("/account").text
     assert client.post("/account/signature", data={"signature": SIGNATURE}).status_code == 403
+
+
+def test_after_approval_preview_shows_initialled_version(db, client, staff):
+    make_claim(client)
+    claim = db.scalar(select(Claim))
+    att = claim.attachments[0]
+    page = client.get(f"/portal/claims/{claim.id}").text
+    assert "met paraaf" not in page and "originele factuur" not in page
+    login(client, "voorzitter@example.org")
+    client.post(ACTION.format(claim.id), data={"action": "approve", "signature": SIGNATURE})
+    login(client, "boekhouder@example.org")
+    page = client.get(f"/portal/claims/{claim.id}").text
+    stamped = f"/portal/files/{att.id}?stamped=1&amp;v="
+    # Het kader en "openen in nieuw venster" tonen de versie met paraaf; het origineel staat er klein onder.
+    assert re.search(r'<iframe class="preview pdf" src="' + re.escape(stamped), page)
+    assert re.search(r'<a href="' + re.escape(stamped) + r'[^"]*" target="_blank">openen in nieuw venster', page)
+    assert re.search(r'<a class="original" href="/portal/files/' + str(att.id) + r'\?v=[^"]*" target="_blank">originele factuur', page)
+    assert 'class="badge-paraaf">met paraaf<' in page
