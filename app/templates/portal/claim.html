@@ -6,6 +6,7 @@
   {% set simple = user.simple_view and user.is_staff %}
   {% if simple %}<p><a href="/portal">&larr; {{ t('simple.back') }}</a></p>{% endif %}
   {% if user.has_role(Role.ADMIN) and not simple %}<p class="admin-tools"><a class="button" href="/portal/claims/{{ claim.id }}/edit">{{ t('claim.edit') }}</a></p>{% endif %}
+  {% include "_test_banner.html" %}
   {% include "_steps.html" %}
   {% if error %}<p class="error">{{ t('error.' ~ error) }}</p>{% endif %}
 

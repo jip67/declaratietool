@@ -114,7 +114,7 @@ def request_language(request: Request, preferred: str | None = None) -> str:
 
 def is_my_task(claim: Claim, user: User) -> bool:
     role = ROLE_FOR_STATUS.get(claim.status_enum)
-    return role is not None and user.has_role(role)
+    return role is not None and claim.acts_as(user, role)
 
 
 def my_task_count(db: Session, user: User) -> int:

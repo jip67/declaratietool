@@ -23,8 +23,17 @@ router = APIRouter(prefix="/portal")
 
 
 def can_see(claim: Claim, user: User) -> bool:
-    """Medewerkers zien alles; een gebruiker alleen zijn eigen declaraties."""
+    """Medewerkers zien alles; een gebruiker alleen zijn eigen declaraties.
+
+    Een testdeclaratie ziet alleen de beheerder die hem maakte."""
+    if claim.is_test:
+        return claim.test_user_id == user.id
     return user.is_staff or claim.submitter.email == user.email
+
+
+def visible(query, user: User):
+    """Laat testdeclaraties van anderen weg uit een lijst."""
+    return query.where(or_(Claim.test_user_id.is_(None), Claim.test_user_id == user.id))
 
 
 def _claim(db: Session, claim_id: int, user: User) -> Claim:
@@ -36,7 +45,7 @@ def _claim(db: Session, claim_id: int, user: User) -> Claim:
 
 @router.get("")
 def dashboard(request: Request, view: str = "open", user: User = Depends(current_user), db: Session = Depends(get_db)):
-    query = select(Claim).order_by(Claim.created_at.desc())
+    query = visible(select(Claim).order_by(Claim.created_at.desc()), user)
     if not user.is_staff:
         claims = db.scalars(query.join(Claim.submitter).where(Submitter.email == user.email).limit(500)).all()
         return render(
@@ -66,7 +75,12 @@ def dashboard(request: Request, view: str = "open", user: User = Depends(current
         user=user, claims=claims, view=view, my_count=my_count, is_my_task=is_my_task,
         comments=comment_summary(db, [c.id for c in claims]),
         backup_warning=user.has_role(Role.ADMIN) and updates.backup_needs_attention(),
+        test_count=_test_count(db, user),
     )
+
+
+def _test_count(db: Session, user: User) -> int:
+    return db.scalar(select(func.count(Claim.id)).where(Claim.test_user_id == user.id)) or 0
 
 
 def comment_summary(db: Session, claim_ids: list[int]) -> dict[int, tuple[int, Comment]]:
@@ -177,7 +191,7 @@ def claim_action(
         if action == "approve":
             # De voorzitter tekent zijn paraaf; zonder paraaf geen goedkeuring.
             # (Mag deze gebruiker niet goedkeuren, dan meldt approve dat, ook zonder paraaf.)
-            can_approve = user.has_role(Role.CHAIR) and claim.status == Status.SUBMITTED.value
+            can_approve = claim.acts_as(user, Role.CHAIR) and claim.status == Status.SUBMITTED.value
             drawn = workflow.parse_signature(signature) if can_approve else None
             workflow.approve(db, claim, user, signature=drawn, remember_signature=remember_signature)
         elif action == "undo":
@@ -345,23 +359,67 @@ def delete_claim(
     claim = _claim(db, claim_id, user)
     if confirm != "yes":
         return RedirectResponse(f"/portal/claims/{claim_id}?error=delete_confirm#delete", status_code=303)
-    paths = []
-    for att in claim.attachments:
-        for rel in (att.stored_path, att.stamped_path):
-            if rel:
-                try:
-                    paths.append(storage.absolute(rel))
-                except ValueError:
-                    pass
-    folder = storage.upload_root() / str(claim.id)
-    db.execute(update(IncomingMail).where(IncomingMail.claim_id == claim.id).values(claim_id=None))
-    db.delete(claim)
+    _delete_claims(db, [claim])
+    return RedirectResponse("/portal?deleted=1", status_code=303)
+
+
+def _delete_claims(db: Session, claims: list[Claim]) -> None:
+    """Wis declaraties met bijlagen, geschiedenis en opmerkingen; bestanden pas na de commit."""
+    paths, folders = [], []
+    for claim in claims:
+        for att in claim.attachments:
+            for rel in (att.stored_path, att.stamped_path):
+                if rel:
+                    try:
+                        paths.append(storage.absolute(rel))
+                    except ValueError:
+                        pass
+        folders.append(storage.upload_root() / str(claim.id))
+        db.execute(update(IncomingMail).where(IncomingMail.claim_id == claim.id).values(claim_id=None))
+        db.delete(claim)
     db.commit()
     # Bestanden pas weghalen als de database-wijziging gelukt is.
     for path in paths:
         path.unlink(missing_ok=True)
-    shutil.rmtree(folder, ignore_errors=True)
-    return RedirectResponse("/portal?deleted=1", status_code=303)
+    for folder in folders:
+        shutil.rmtree(folder, ignore_errors=True)
+
+
+# ---------------------------------------------------------------- testdeclaraties
+
+
+@router.post("/test-claims")
+async def new_test_claim(
+    files: list[UploadFile] = File(default=[]),
+    user: User = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    """Testdeclaratie: de beheerder speelt alle rollen; niemand anders merkt er iets van."""
+    max_bytes = get_settings().max_upload_mb * 1024 * 1024
+    uploads = []
+    for upload in files:
+        if not upload.filename:
+            continue
+        data = await upload.read()
+        ctype = storage.guess_type(upload.filename, upload.content_type)
+        if ctype is None or len(data) > max_bytes:
+            return RedirectResponse("/portal/claims/new?error=file_type#test", status_code=303)
+        uploads.append((upload.filename, ctype, data))
+    claim = workflow.create_test_claim(db, user, uploads)
+    db.commit()
+    # Net als een echte indiener krijgt de beheerder de bevestiging met de link om de gegevens in te vullen.
+    workflow.notify_received(claim)
+    return RedirectResponse(f"/portal/claims/{claim.id}", status_code=303)
+
+
+@router.post("/test-claims/delete")
+def delete_test_claims(confirm: str = Form(""), user: User = Depends(require_admin), db: Session = Depends(get_db)):
+    """Wis al je eigen testdeclaraties in één keer."""
+    if confirm != "yes":
+        return RedirectResponse("/portal?error=delete_confirm", status_code=303)
+    claims = db.scalars(select(Claim).where(Claim.test_user_id == user.id)).all()
+    _delete_claims(db, list(claims))
+    return RedirectResponse(f"/portal?tests_deleted={len(claims)}", status_code=303)
 
 
 @router.get("/files/{attachment_id}")
@@ -518,6 +576,10 @@ def delete_user(user_id: int, request: Request, user: User = Depends(require_adm
     target = _target(db, user_id)
     if target.id == user.id:
         return _render_edit(request, db, user, target, error="error.delete_self", status_code=422)
+    # Testdeclaraties ziet niemand anders; ze gaan mee met de gebruiker.
+    tests = db.scalars(select(Claim).where(Claim.test_user_id == target.id)).all()
+    if tests:
+        _delete_claims(db, list(tests))
     if has_history(db, target):
         # Bewaar het logboek: maak het account onbruikbaar en anoniem in plaats van het te wissen.
         target.name = f"Verwijderde gebruiker {target.id}"

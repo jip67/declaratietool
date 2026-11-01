@@ -50,10 +50,14 @@ def set_status(claim: Claim, status: Status) -> None:
     claim.status_changed_at = utcnow()
 
 
+TEST_PREFIX = "TEST-"
+
+
 def assign_reference(db: Session, claim: Claim) -> None:
+    """Kenmerk zoals D2026-0001; een testdeclaratie telt apart (TEST-D2026-0001) en kost geen echt nummer."""
     db.flush()
     year = utcnow().year
-    prefix = f"{get_settings().reference_prefix}{year}-"
+    prefix = f"{TEST_PREFIX if claim.is_test else ''}{get_settings().reference_prefix}{year}-"
     count = db.scalar(select(func.count(Claim.id)).where(Claim.reference.like(prefix + "%"))) or 0
     claim.reference = f"{prefix}{count + 1:04d}"
 
@@ -61,6 +65,14 @@ def assign_reference(db: Session, claim: Claim) -> None:
 def users_with_role(db: Session, role: Role) -> list[User]:
     users = db.scalars(select(User).where(User.active.is_(True))).all()
     return [u for u in users if u.has_role(role)]
+
+
+def role_holders(db: Session, claim: Claim, role: Role) -> list[User]:
+    """Wie bij deze declaratie de stap van deze rol zet; bij een testdeclaratie alleen de beheerder die hem maakte."""
+    if claim.is_test:
+        owner = db.get(User, claim.test_user_id)
+        return [owner] if owner is not None and owner.active else []
+    return users_with_role(db, role)
 
 
 def get_or_create_submitter(db: Session, email: str, name: str = "", language: str | None = None) -> Submitter:
@@ -162,7 +174,7 @@ def task_attachments(claim: Claim) -> list[mailer.MailAttachment]:
 
 def approval_link_text(db: Session, claim: Claim, user: User, key: str = "mail.approve_link") -> str:
     """Extra tekst met een goedkeurlink voor een voorzitter die dat aan heeft staan, anders leeg."""
-    if claim.status_enum != Status.SUBMITTED or not approval_links.enabled_for(user):
+    if claim.status_enum != Status.SUBMITTED or not approval_links.enabled_for(user, claim):
         return ""
     url, expires = approval_links.create(db, claim, user)
     return translate(key, user.language, link=url, until=local_time(expires))
@@ -172,7 +184,7 @@ def notify_role(db: Session, claim: Claim) -> None:
     role = ROLE_FOR_STATUS.get(claim.status_enum)
     if role is None:
         return
-    for user in users_with_role(db, role):
+    for user in role_holders(db, claim, role):
         lang = user.language
         body = translate(
             "mail.task.body",
@@ -201,9 +213,13 @@ def create_claim(
     files: list[tuple[str, str, bytes]],
     source: str = "email",
     created_by: User | None = None,
+    test_user: User | None = None,
 ) -> Claim:
-    """Maakt een nieuwe declaratie met bijlagen. files = [(bestandsnaam, content_type, data)]."""
-    claim = Claim(submitter=submitter, source=source, created_by_id=created_by.id if created_by else None)
+    """Maakt een nieuwe declaratie met bijlagen. files = [(bestandsnaam, content_type, data)].
+
+    test_user: maak een testdeclaratie waarin deze beheerder alle rollen speelt (zie create_test_claim)."""
+    claim = Claim(submitter=submitter, source=source, created_by_id=created_by.id if created_by else None,
+                  test_user_id=test_user.id if test_user else None)
     # Onthouden rekeninggegevens alvast invullen (aan te passen door de indiener).
     claim.iban = submitter.iban
     claim.account_holder = submitter.account_holder
@@ -213,6 +229,43 @@ def create_claim(
         storage.save_attachment(db, claim, filename, ctype, data)
     log_event(db, claim, "created", created_by, note=source)
     db.flush()
+    return claim
+
+
+def can_test(user: User) -> bool:
+    return user.active and user.has_role(Role.ADMIN)
+
+
+def sample_receipt(lang: str) -> tuple[str, str, bytes]:
+    """Een voorbeeldbon (pdf) voor een testdeclaratie zonder eigen bijlage."""
+    import io
+
+    from reportlab.lib.pagesizes import A4
+    from reportlab.pdfgen import canvas
+
+    buf = io.BytesIO()
+    c = canvas.Canvas(buf, pagesize=A4)
+    _, height = A4
+    c.setFont("Helvetica-Bold", 20)
+    c.drawString(72, height - 100, translate("test.receipt.title", lang))
+    c.setFont("Helvetica", 12)
+    for i, line in enumerate(translate("test.receipt.body", lang).split("\n")):
+        c.drawString(72, height - 140 - i * 18, line)
+    c.save()
+    return translate("test.receipt.filename", lang), "application/pdf", buf.getvalue()
+
+
+def create_test_claim(db: Session, admin: User, files: list[tuple[str, str, bytes]], source: str = "portal") -> Claim:
+    """Testdeclaratie: de beheerder is indiener, voorzitter, boekhouder en secretaris tegelijk.
+
+    Alleen hij ziet de declaratie en krijgt er mail over; de andere bestuursleden merken er niets van
+    (geen taken, herinneringen, meldingen of teller op het app-icoon). Zonder bijlage komt er een voorbeeldbon bij."""
+    if not can_test(admin):
+        raise WorkflowError("not_allowed")
+    submitter = get_or_create_submitter(db, admin.email, admin.name, language=admin.language)
+    claim = create_claim(db, submitter, files or [sample_receipt(admin.language)], source=source,
+                         created_by=admin if source == "portal" else None, test_user=admin)
+    log_event(db, claim, "test_created", admin)
     return claim
 
 
@@ -253,9 +306,10 @@ def complete_details(
             notifications.status_changed(db, claim, "submitted", user)
 
 
-def _require(user: User, role: Role) -> None:
+def _require(claim: Claim, user: User, role: Role) -> None:
     # Alleen wie de rol zelf heeft mag de stap zetten; beheerder geeft geen extra rechten.
-    if not user.has_role(role):
+    # Uitzondering: bij een testdeclaratie speelt de beheerder die hem maakte alle rollen.
+    if not claim.acts_as(user, role):
         raise WorkflowError("not_allowed")
 
 
@@ -301,7 +355,7 @@ def approve(db: Session, claim: Claim, user: User, via_link: bool = False,
     via_link: goedgekeurd met de link uit de mail in plaats van in het portaal (komt in de geschiedenis).
     signature: de getekende paraaf (zie parse_signature); de routes eisen die, zonder komt er een stempel.
     remember_signature: bewaar de paraaf bij de gebruiker voor de volgende keer; zo niet, dan vergeten we een eerder bewaarde."""
-    _require(user, Role.CHAIR)
+    _require(claim, user, Role.CHAIR)
     _require_status(claim, Status.SUBMITTED)
     now = utcnow()
     claim.approval_signature = signature
@@ -321,7 +375,7 @@ def approve(db: Session, claim: Claim, user: User, via_link: bool = False,
 
 def prepare_payment(db: Session, claim: Claim, user: User) -> None:
     """Boekhouder heeft de betaling klaargezet bij de bank."""
-    _require(user, Role.TREASURER)
+    _require(claim, user, Role.TREASURER)
     _require_status(claim, Status.APPROVED)
     set_status(claim, Status.PAYMENT_PREPARED)
     claim.prepared_at = utcnow()
@@ -335,7 +389,7 @@ def prepare_payment(db: Session, claim: Claim, user: User) -> None:
 
 def mark_paid(db: Session, claim: Claim, user: User) -> None:
     """Secretaris heeft de betaling uitgevoerd bij de bank."""
-    _require(user, Role.SECRETARY)
+    _require(claim, user, Role.SECRETARY)
     _require_status(claim, Status.PAYMENT_PREPARED)
     set_status(claim, Status.PAID)
     claim.paid_at = utcnow()
@@ -347,7 +401,7 @@ def mark_paid(db: Session, claim: Claim, user: User) -> None:
 
 
 def reject(db: Session, claim: Claim, user: User, reason: str) -> None:
-    if not user.is_staff:
+    if not user.is_staff or not claim.visible_to(user):
         raise WorkflowError("not_allowed")
     if claim.status_enum in (Status.PAID, Status.REJECTED):
         raise WorkflowError("wrong_status")
@@ -387,7 +441,7 @@ def undo_info(claim: Claim) -> tuple[str, int | None] | None:
 def can_undo(claim: Claim, user: User) -> bool:
     """Wie de laatste stap zette, of een beheerder, mag hem terugdraaien."""
     info = undo_info(claim)
-    if info is None or not user.is_staff:
+    if info is None or not user.is_staff or not claim.visible_to(user):
         return False
     return info[1] == user.id or user.has_role(Role.ADMIN)
 

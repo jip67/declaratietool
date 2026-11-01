@@ -329,3 +329,10 @@ button.approve-link { font-size: 1.2rem; padding: .9rem 1.6rem; margin-top: 1rem
 .signature-tools label.check { margin: 0; }
 .signature-saved { display: block; max-width: 240px; max-height: 120px; background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: .4rem; margin: .5rem 0; }
 .task form.approve { display: block; margin-top: .5rem; }
+
+/* Testdeclaraties: duidelijk herkenbaar, zodat niemand ze voor echt aanziet */
+.badge.test { color: var(--s-submitted); background: transparent; border: 1px dashed var(--s-submitted); }
+.test-banner { border: 2px dashed var(--s-submitted); background: var(--s-submitted-bg); color: var(--s-submitted); border-radius: 10px; padding: .7rem 1rem; font-weight: 600; }
+.test-card { border-style: dashed; }
+.test-tools { margin: .5rem 0 1rem; }
+.test-tools form { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; margin-top: .5rem; }

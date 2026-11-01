@@ -3,6 +3,7 @@
 {% block content %}
 <section class="card">
   <h1>{{ t('public.title', reference=claim.reference) }}</h1>
+  {% include "_test_banner.html" %}
   {% include "_steps.html" %}
   {% if saved %}<p class="success">{{ t('public.saved') }}</p>{% endif %}
 

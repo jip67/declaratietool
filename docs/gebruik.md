@@ -103,6 +103,27 @@ Meekijken is alleen-lezen. Een gele balk bovenaan laat zien met wie je meekijkt;
 
 Indieners zonder account hebben geen portaal; hun eigen pagina open je via de link bij de declaratie.
 
+## Het hele proces testen (beheerder)
+
+Met een **testdeclaratie** loop je als beheerder het hele proces zelf door, zonder dat de andere bestuursleden er iets van merken. Je bent de indiener en speelt bij die declaratie ook de voorzitter, de boekhouder en de secretaris.
+
+Zo maak je er een:
+
+- stuur vanaf het e-mailadres van je account een mail met als onderwerp **proces test** naar het declaratie-adres (hoofdletters maken niet uit; een bijlage mag, maar hoeft niet), of
+- klik onder **Nieuwe declaratie** op **Testdeclaratie maken**.
+
+Heb je geen bon toegevoegd, dan krijgt de declaratie een voorbeeldbon (pdf). Daarna gaat alles zoals bij een echte declaratie: je krijgt de bevestiging met de link om de gegevens in te vullen, de taakmails met de bijlagen, de goedkeurlink (die krijg je bij een testdeclaratie altijd, zodat je ook die kunt proberen), de paraaf op de bon, de herinneringen, je eigen meldingen en de teller op het app-icoon.
+
+Wat je anders ziet en wat de anderen níet merken:
+
+- het kenmerk begint met **TEST-** (bijvoorbeeld TEST-D2026-0001); echte declaraties houden hun eigen doorlopende nummering;
+- de declaratie heeft een gestreept label **TEST** en een balk bovenaan de pagina;
+- alleen jij ziet de declaratie, in het overzicht, bij **Mijn taken** en op het app-icoon. De andere bestuursleden krijgen er geen taak, herinnering of melding over en kunnen hem niet openen.
+
+Een mail met onderwerp **proces test** van iemand die geen beheerder is, wordt gewoon een gewone declaratie.
+
+Ben je klaar, dan wis je al je testdeclaraties in één keer: in het overzicht staat bovenaan **Je hebt … testdeclaratie(s)**; vink aan en klik **Testdeclaraties wissen**. Eén testdeclaratie wissen kan ook, net als elke andere declaratie, onderaan de declaratie zelf. Verwijder je een beheerder, dan gaan zijn testdeclaraties mee.
+
 ## Herinneringen
 
 Elke ochtend (instelbaar) krijgt iedereen met openstaande taken één mail met een overzicht. Bestuursleden die het aanzetten krijgen in dezelfde ronde ook een melding van taken die te lang openstaan (zie [Beheer](#beheer)). Indieners die hun gegevens nog niet hebben ingevuld krijgen ook een herinnering, niet elke dag maar 2, 5 en 10 dagen na binnenkomst. Verder krijgt een indiener alleen mail als de status van de declaratie verandert.

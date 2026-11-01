@@ -9,6 +9,17 @@
   </div>
   {% if backup_warning %}<p class="error">{{ t('backup.warning') }} <a href="/portal/update#backup">{{ t('backup.details') }}</a></p>{% endif %}
   {% if request.query_params.get('deleted') == '1' %}<p class="success">{{ t('claim.deleted') }}</p>{% endif %}
+  {% if request.query_params.get('tests_deleted') %}<p class="success">{{ t('test.deleted', count=request.query_params.get('tests_deleted')) }}</p>{% endif %}
+  {% if request.query_params.get('error') == 'delete_confirm' %}<p class="error">{{ t('error.delete_confirm') }}</p>{% endif %}
+  {% if test_count %}
+  <details class="test-tools">
+    <summary>{{ t('test.count', count=test_count) }}</summary>
+    <form method="post" action="/portal/test-claims/delete">
+      <label class="check"><input type="checkbox" name="confirm" value="yes" required> {{ t('test.delete_check') }}</label>
+      <button class="danger">{{ t('test.delete_all') }}</button>
+    </form>
+  </details>
+  {% endif %}
   {% if user.is_staff %}
   <nav class="tabs">
     <a href="?view=open" {% if view == 'open' %}class="active"{% endif %}>{{ t('view.open') }}</a>

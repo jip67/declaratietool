@@ -29,7 +29,10 @@ def _aware(value: datetime) -> datetime:
     return value if value.tzinfo else value.replace(tzinfo=UTC)
 
 
-def enabled_for(user: User) -> bool:
+def enabled_for(user: User, claim: Claim | None = None) -> bool:
+    """Bij een testdeclaratie krijgt de beheerder die hem maakte altijd een link, zodat hij die ook kan testen."""
+    if claim is not None and claim.is_test:
+        return user.active and user.id == claim.test_user_id
     return user.approve_by_link and user.active and user.has_role(Role.CHAIR)
 
 
@@ -58,7 +61,7 @@ def problem(link: ApprovalLink) -> str | None:
         return "handled"
     if utcnow() > _aware(link.expires_at):
         return "expired"
-    if user is None or not enabled_for(user):
+    if user is None or not enabled_for(user, claim):
         return "disabled"
     return None
 

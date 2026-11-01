@@ -1,1 +1,2 @@
 <span class="badge status-{{ claim.status }}">{{ t('status.' ~ claim.status) }}</span>
+{% if claim.is_test %} <span class="badge test" title="{{ t('test.badge_title') }}">{{ t('test.badge') }}</span>{% endif %}
