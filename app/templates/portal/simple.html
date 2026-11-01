@@ -13,7 +13,7 @@
       <a class="task-card" href="/portal/claims/{{ claim.id }}">
         <span class="tc-amount">{{ claim.amount_display }}</span>
         <span class="tc-what">{{ claim.description or '-' }}</span>
-        <span class="tc-who">{{ claim.submitter.name or claim.submitter.email }} · {{ claim.created_at|localtime }}</span>
+        <span class="tc-who">{{ claim.submitter.name or claim.submitter.email }} · {{ claim.created_at|localtime }}{% if claim.is_test %} · {{ t('test.badge') }}{% endif %}</span>
         <span class="button primary tc-go">{{ t('simple.open_' ~ role.value) }}</span>
       </a>
     </li>

@@ -59,7 +59,7 @@ def send_reminders(db: Session) -> int:
             )
             sent += 1
             continue
-        for user in workflow.users_with_role(db, ROLE_FOR_STATUS[claim.status_enum]):
+        for user in workflow.role_holders(db, claim, ROLE_FOR_STATUS[claim.status_enum]):
             users[user.id] = user
             per_user[user.id].append(claim)
 

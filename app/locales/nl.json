@@ -417,5 +417,20 @@
   "signature.delete": "Bewaarde paraaf verwijderen",
   "signature.saved": "Je paraaf is bewaard.",
   "signature.deleted": "Je bewaarde paraaf is verwijderd.",
-  "error.signature_required": "Zet eerst je paraaf in het witte vak."
+  "error.signature_required": "Zet eerst je paraaf in het witte vak.",
+  "event.test_created": "Testdeclaratie aangemaakt",
+  "test.badge": "TEST",
+  "test.badge_title": "Testdeclaratie: alleen zichtbaar voor de beheerder die hem maakte",
+  "test.banner": "Testdeclaratie. Alleen de beheerder die hem aanmaakte ziet deze declaratie en zet zelf alle stappen: indiener, voorzitter, boekhouder en secretaris. De andere bestuursleden krijgen er geen mail, taak, herinnering of melding over. Er wordt niets betaald.",
+  "test.title": "Testdeclaratie maken",
+  "test.intro": "Loop het hele proces zelf door zonder de anderen lastig te vallen. Jij bent de indiener en speelt bij deze declaratie ook de voorzitter, boekhouder en secretaris. Alle mails gaan alleen naar jou; de anderen zien de declaratie niet. Zonder bijlage krijg je een voorbeeldbon. Je kunt ook een mail met als onderwerp 'proces test' vanaf je eigen adres naar het declaratie-adres sturen.",
+  "test.file": "Bon (mag leeg blijven)",
+  "test.create": "Testdeclaratie maken",
+  "test.count": "Je hebt {count} testdeclaratie(s)",
+  "test.delete_check": "Ja, wis al mijn testdeclaraties",
+  "test.delete_all": "Testdeclaraties wissen",
+  "test.deleted": "{count} testdeclaratie(s) gewist.",
+  "test.receipt.title": "VOORBEELDBON - TEST",
+  "test.receipt.body": "Dit is een voorbeeldbon voor een testdeclaratie.\nEr hoeft niets betaald te worden.",
+  "test.receipt.filename": "voorbeeldbon-test.pdf"
 }

@@ -417,5 +417,20 @@
   "signature.delete": "Delete saved initials",
   "signature.saved": "Your initials have been saved.",
   "signature.deleted": "Your saved initials have been deleted.",
-  "error.signature_required": "Please draw your initials in the white box first."
+  "error.signature_required": "Please draw your initials in the white box first.",
+  "event.test_created": "Test claim created",
+  "test.badge": "TEST",
+  "test.badge_title": "Test claim: only visible to the administrator who created it",
+  "test.banner": "Test claim. Only the administrator who created it can see this claim, and they take every step themselves: submitter, chair, treasurer and secretary. The other board members get no mail, task, reminder or notification about it. Nothing is paid.",
+  "test.title": "Create a test claim",
+  "test.intro": "Run through the whole process yourself without bothering the others. You are the submitter and, for this claim, also the chair, treasurer and secretary. All mails go to you only; the others do not see the claim. Without an attachment you get a sample receipt. You can also send a mail with the subject 'proces test' from your own address to the claims address.",
+  "test.file": "Receipt (may be left empty)",
+  "test.create": "Create test claim",
+  "test.count": "You have {count} test claim(s)",
+  "test.delete_check": "Yes, delete all my test claims",
+  "test.delete_all": "Delete test claims",
+  "test.deleted": "{count} test claim(s) deleted.",
+  "test.receipt.title": "SAMPLE RECEIPT - TEST",
+  "test.receipt.body": "This is a sample receipt for a test claim.\nNothing needs to be paid.",
+  "test.receipt.filename": "sample-receipt-test.pdf"
 }

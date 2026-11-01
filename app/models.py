@@ -159,6 +159,8 @@ class Claim(Base):
     rejection_reason: Mapped[str] = mapped_column(Text, default="")
     # De paraaf (PNG) die de voorzitter bij het goedkeuren tekende; nodig om een vervangen bon opnieuw te paraferen.
     approval_signature: Mapped[bytes | None] = mapped_column(LargeBinary, nullable=True, deferred=True)
+    # Testdeclaratie: deze beheerder speelt alle rollen en is de enige die hem ziet of er mail over krijgt.
+    test_user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True, index=True)
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     status_changed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
@@ -182,6 +184,22 @@ class Claim(Base):
     @property
     def status_enum(self) -> Status:
         return Status(self.status)
+
+    @property
+    def is_test(self) -> bool:
+        return self.test_user_id is not None
+
+    def acts_as(self, user: User, role: Role) -> bool:
+        """Mag deze gebruiker bij deze declaratie de stap van deze rol zetten?
+
+        Bij een testdeclaratie is dat alleen de beheerder die hem aanmaakte, voor elke rol."""
+        if self.is_test:
+            return user.id == self.test_user_id
+        return user.has_role(role)
+
+    def visible_to(self, user: User) -> bool:
+        """Een testdeclaratie hoort alleen bij de beheerder die hem aanmaakte."""
+        return not self.is_test or user.id == self.test_user_id
 
     @property
     def is_complete(self) -> bool:

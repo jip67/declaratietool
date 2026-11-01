@@ -138,7 +138,8 @@ def new_claim(db: Session, claim: Claim, actor: User | None = None) -> None:
     """Er is een declaratie binnengekomen (per mail of via het portaal)."""
     try:
         exclude = {actor.id} if actor else set()
-        _send(db, "new_claim", recipients(db, "new_claim", exclude), rollback=False,
+        users = [u for u in recipients(db, "new_claim", exclude) if claim.visible_to(u)]
+        _send(db, "new_claim", users, rollback=False,
               translated={"status": f"status.{claim.status}", "source": f"notify.source.{claim.source}"},
               per_user=_summary(claim), attachments=len(claim.attachments), **_claim_values(claim))
     except Exception:
@@ -161,7 +162,8 @@ def status_changed(db: Session, claim: Claim, action: str, actor: User | None = 
     try:
         exclude = {actor.id} if actor else set()
         role = ROLE_FOR_STATUS.get(claim.status_enum)
-        users = [u for u in recipients(db, "status", exclude) if role is None or not u.has_role(role)]
+        users = [u for u in recipients(db, "status", exclude)
+                 if claim.visible_to(u) and (role is None or not claim.acts_as(u, role))]
         _send(db, "status", users, rollback=False,
               translated={"status": f"status.{claim.status}", "event": f"event.{action}"},
               per_user=extra, **_claim_values(claim))
@@ -192,6 +194,8 @@ def overdue(db: Session, now: datetime | None = None) -> int:
             limit = timedelta(days=user.notify_overdue_days)
             due = []
             for claim in claims:
+                if not claim.visible_to(user):
+                    continue  # testdeclaratie van een ander
                 since = _aware(claim.status_changed_at)
                 if now - since < limit:
                     continue

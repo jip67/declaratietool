@@ -26,4 +26,15 @@
     <button class="primary">{{ t('action.create') }}</button>
   </form>
 </section>
+{% if user.has_role(Role.ADMIN) %}
+<section class="card test-card" id="test">
+  <h2>{{ t('test.title') }}</h2>
+  <p class="muted">{{ t('test.intro') }}</p>
+  {% if request.query_params.get('error') == 'file_type' %}<p class="error">{{ t('error.file_type') }}</p>{% endif %}
+  <form method="post" action="/portal/test-claims" enctype="multipart/form-data">
+    <label>{{ t('test.file') }}<input type="file" name="files" accept="application/pdf,image/*" multiple></label>
+    <button>{{ t('test.create') }}</button>
+  </form>
+</section>
+{% endif %}
 {% endblock %}

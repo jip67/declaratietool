@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 from . import activity, mailconfig, mailer, notifications, workflow
 from .config import get_settings
 from .i18n import pick_language, translate
-from .models import Claim
+from .models import Claim, User
 from .storage import guess_type
 
 log = logging.getLogger(__name__)
@@ -21,6 +21,8 @@ log = logging.getLogger(__name__)
 # Kleine inline-afbeeldingen zijn meestal logo's in een handtekening.
 MIN_INLINE_IMAGE_BYTES = 30_000
 # Antwoorden en doorgestuurde mails (Nederlands, Engels, Duits, Frans).
+# Onderwerp waarmee een beheerder een testdeclaratie maakt (hoofdletters en spaties maken niet uit).
+TEST_SUBJECTS = {"proces test", "procestest", "process test"}
 REPLY_PREFIX = re.compile(r"^\s*((re|aw|antw|sv|fw|fwd|wg|tr|doorgestuurd)\s*:\s*)+", re.IGNORECASE)
 
 
@@ -55,11 +57,20 @@ def replied_claim(db: Session, msg: Message) -> Claim | None:
     if not REPLY_PREFIX.match(subject):
         return None
     prefix = re.escape(get_settings().reference_prefix)
-    for reference in re.findall(rf"\b{prefix}\d{{4}}-\d{{3,}}\b", subject):
+    for reference in re.findall(rf"\b(?:{workflow.TEST_PREFIX})?{prefix}\d{{4}}-\d{{3,}}\b", subject):
         claim = db.scalar(select(Claim).where(Claim.reference == reference))
         if claim is not None:
             return claim
     return None
+
+
+def test_admin(db: Session, msg: Message, address: str) -> User | None:
+    """De beheerder die met onderwerp 'proces test' een testdeclaratie aanvraagt, of None."""
+    subject = " ".join(str(msg.get("Subject") or "").split()).lower()
+    if subject not in TEST_SUBJECTS:
+        return None
+    user = db.scalar(select(User).where(User.email == address))
+    return user if user is not None and workflow.can_test(user) else None
 
 
 def is_automatic(msg: Message) -> bool:
@@ -121,6 +132,15 @@ def _process(db: Session, msg: Message, files: list[tuple[str, str, bytes]]):
                 )
             )
         return "ignored:reply", replied
+    admin = test_admin(db, msg, address)
+    if admin is not None:
+        # Testdeclaratie: zonder bijlage komt er een voorbeeldbon bij.
+        claim = workflow.create_test_claim(db, admin, files, source="email")
+        db.commit()
+        workflow.notify_received(claim)
+        notifications.new_claim(db, claim)
+        log.info("Testdeclaratie %s aangemaakt vanuit mail van %s", claim.reference, address)
+        return f"created:{claim.reference}", claim
     if not files:
         mailer.send(
             mailer.Mail(
