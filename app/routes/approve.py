@@ -31,7 +31,8 @@ def _page(request: Request, link: ApprovalLink, token: str, status_code: int = 2
     return render(
         request, "public/approve.html", lang, status_code=status_code,
         claim=link.claim, token=token, problem=approval_links.problem(link),
-        fingerprint=approval_links.fingerprint(link.claim), **context,
+        fingerprint=approval_links.fingerprint(link.claim),
+        claim_user_signature=link.user.signature if link.user else None, **context,
     )
 
 
@@ -42,7 +43,8 @@ def approve_page(token: str, request: Request, db: Session = Depends(get_db)):
 
 
 @router.post("/a/{token}")
-def approve_submit(token: str, request: Request, fingerprint: str = Form(""), db: Session = Depends(get_db)):
+def approve_submit(token: str, request: Request, fingerprint: str = Form(""), signature: str = Form(""),
+                   remember_signature: bool = Form(False), db: Session = Depends(get_db)):
     link = _link(db, token)
     if approval_links.problem(link):
         return RedirectResponse(f"/a/{token}", status_code=303)
@@ -50,9 +52,13 @@ def approve_submit(token: str, request: Request, fingerprint: str = Form(""), db
     if fingerprint != approval_links.fingerprint(claim):
         # De gegevens zijn gewijzigd sinds de pagina werd geopend: eerst opnieuw laten bekijken.
         return _page(request, link, token, status_code=409, changed=True)
+    try:
+        drawn = workflow.parse_signature(signature)
+    except workflow.WorkflowError:
+        return _page(request, link, token, status_code=422, error="signature_required")
     ip = request.client.host if request.client else ""
     try:
-        workflow.approve(db, claim, link.user, via_link=True)
+        workflow.approve(db, claim, link.user, via_link=True, signature=drawn, remember_signature=remember_signature)
     except workflow.WorkflowError:
         db.rollback()
         return RedirectResponse(f"/a/{token}", status_code=303)

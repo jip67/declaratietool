@@ -1,5 +1,6 @@
 """Gedeelde hulpmiddelen voor de webpagina's."""
 
+import base64
 from pathlib import Path
 
 from fastapi import Depends, HTTPException, Request
@@ -33,6 +34,14 @@ def preview_kind(content_type: str) -> str | None:
 
 
 templates.env.filters["preview_kind"] = preview_kind
+
+
+def png_data_url(data: bytes | None) -> str:
+    """Een PNG (zoals een bewaarde paraaf) direct in de pagina, zonder aparte url."""
+    return "data:image/png;base64," + base64.b64encode(data).decode() if data else ""
+
+
+templates.env.filters["png_data_url"] = png_data_url
 
 
 def file_response(path: Path, media_type: str, filename: str) -> FileResponse:

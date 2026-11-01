@@ -7,7 +7,7 @@ from app.models import Attachment, Claim, Comment, Event, IncomingMail, Status, 
 from app.security import hash_password
 from app.models import User
 
-from .conftest import jpeg_bytes, login, pdf_bytes
+from .conftest import SIGNATURE, jpeg_bytes, login, pdf_bytes
 
 IBAN = "NL91ABNA0417164300"
 
@@ -66,7 +66,7 @@ def test_admin_deletes_claim_and_files(db, client, staff):
     claim = db.scalar(select(Claim))
     claim_id = claim.id
     login(client, "voorzitter@example.org")
-    client.post(f"/portal/claims/{claim_id}/action", data={"action": "approve"})
+    client.post(f"/portal/claims/{claim_id}/action", data={"action": "approve", "signature": SIGNATURE})
     login(client, "boekhouder@example.org")
     db.refresh(claim)
     att = claim.attachments[0]
@@ -201,7 +201,7 @@ def test_replaced_attachment_keeps_approval_stamp(db, client, staff):
     make_claim(client)
     claim = db.scalar(select(Claim))
     login(client, "voorzitter@example.org")
-    client.post(f"/portal/claims/{claim.id}/action", data={"action": "approve"})
+    client.post(f"/portal/claims/{claim.id}/action", data={"action": "approve", "signature": SIGNATURE})
     # Alleen de beheerder mag vervangen.
     att = db.scalar(select(Attachment))
     r = client.post(f"/portal/claims/{claim.id}/attachments/{att.id}/replace",

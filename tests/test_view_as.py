@@ -2,7 +2,7 @@ from sqlalchemy import select
 
 from app.models import Claim, LoginAttempt, Status
 
-from .conftest import login
+from .conftest import SIGNATURE, login
 from .test_claim_admin import make_claim
 from .test_users import add_user
 
@@ -24,7 +24,7 @@ def test_admin_sees_what_chair_sees_but_cannot_approve(db, client, staff):
     assert 'value="approve"' in detail.text  # de knop is te zien, zoals bij de voorzitter
 
     r = client.post(
-        f"/portal/claims/{claim.id}/action", data={"action": "approve"},
+        f"/portal/claims/{claim.id}/action", data={"action": "approve", "signature": SIGNATURE},
         headers={"referer": f"http://testserver/portal/claims/{claim.id}"}, follow_redirects=False,
     )
     assert r.status_code == 303 and r.headers["location"] == f"/portal/claims/{claim.id}"

@@ -13,15 +13,29 @@ Tot de voorzitter heeft goedgekeurd kun je je gegevens nog aanpassen.
 
 1. Je krijgt een mail als er een declaratie klaarstaat.
 2. Log in, open de declaratie (of kijk onder **Mijn taken**) en bekijk de bon.
-3. Klik op **Goedkeuren en paraferen**. Elke bon krijgt een stempel met je naam, datum en kenmerk; de geparafeerde versie staat als pdf bij de declaratie.
+3. Zet je paraaf in het witte vak, met je vinger, een pen of de muis, en klik op **Goedkeuren en paraferen**. Je getekende paraaf komt rechtsonder op elke bon, met daaronder je naam, de datum en het kenmerk; de geparafeerde versie staat als pdf bij de declaratie.
 4. Klopt er iets niet? Gebruik **Afwijzen** en geef een reden; de indiener krijgt die te zien.
+
+### Je paraaf
+
+<img src="img/paraaf-tekenen.png" alt="Vak om de paraaf te zetten" width="320"> <img src="img/paraaf-op-bon.png" alt="De paraaf op de bon" width="320">
+
+Zonder paraaf kun je niet goedkeuren. Mislukt hij, klik dan op **Opnieuw**. Vink je
+*Bewaar mijn paraaf voor de volgende keer* aan, dan staat hij bij de volgende declaratie al in het vak
+en hoef je alleen nog op de knop te klikken (of op **Opnieuw** om hem opnieuw te zetten). Laat je het
+vinkje uit, dan wordt een eerder bewaarde paraaf vergeten. Onder **Mijn account → Paraaf** zie je de
+bewaarde paraaf, kun je alvast een paraaf tekenen of hem verwijderen.
+
+De paraaf wordt bij de declaratie bewaard. Vervangt de beheerder later een bijlage, dan krijgt het nieuwe
+bestand dezelfde paraaf. Goedkeuringen van vóór deze functie houden hun oude stempel.
 
 ### Goedkeuren via een link in de mail
 
 Voor een voorzitter die liever niet inlogt kan de beheerder **goedkeuren via een link** aanzetten
 (Instellingen → Gebruikers → Bewerken → *Mag goedkeuren via een link in de e-mail*). De mail over een
 nieuwe declaratie en de dagelijkse herinnering bevatten dan een extra link. Die opent een pagina met de
-gegevens en de bonnen en één grote knop **Goedkeuren en paraferen**. De paraaf is dezelfde als in het portaal.
+gegevens en de bonnen, het vak voor je paraaf en één grote knop **Goedkeuren en paraferen**. Dat werkt
+hetzelfde als in het portaal, ook het bewaren van je paraaf.
 
 - Openen alleen keurt niets goed; pas de knop doet dat. Zo kan een virusscanner die links in mail opent
   niet per ongeluk goedkeuren.
@@ -71,7 +85,7 @@ Een beheerder ziet bij elke declaratie de knop **Declaratie bewerken**. Daarmee 
 
 Een typefout in het e-mailadres herstel je hier ook. De declaratie wordt dan gekoppeld aan het nieuwe adres; hangen aan het foute adres geen andere declaraties, dan wordt het vergeten. Laat het vinkje aan om de indiener op het nieuwe adres de link en de huidige stand te sturen, want eerdere mails gingen naar het verkeerde adres.
 
-Onder elke bijlage staat **Bijlage vervangen**. Daarmee zet je een nieuwe versie in de plaats van de bon of factuur, bijvoorbeeld een met de hand getekende factuur van de voorzitter. Het oude bestand wordt verwijderd. Was de declaratie al goedgekeurd, dan krijgt het nieuwe bestand dezelfde paraaf (naam van de voorzitter en tijdstip van de goedkeuring), zodat de boekhouder en secretaris de geparafeerde versie blijven zien. In de geschiedenis staat "Bijlage vervangen door beheerder" met de oude en de nieuwe bestandsnaam.
+Onder elke bijlage staat **Bijlage vervangen**. Daarmee zet je een nieuwe versie in de plaats van de bon of factuur, bijvoorbeeld een met de hand getekende factuur van de voorzitter. Het oude bestand wordt verwijderd. Was de declaratie al goedgekeurd, dan krijgt het nieuwe bestand dezelfde paraaf (de getekende paraaf, naam van de voorzitter en tijdstip van de goedkeuring), zodat de boekhouder en secretaris de geparafeerde versie blijven zien. In de geschiedenis staat "Bijlage vervangen door beheerder" met de oude en de nieuwe bestandsnaam.
 
 Onderaan de declaratie staat **Declaratie wissen**. Na het aanvinken van de bevestiging wordt de declaratie definitief verwijderd, met de bijlagen (ook de geparafeerde versies) op schijf, de geschiedenis en de interne opmerkingen. Handig om testdata op te ruimen; het kan niet ongedaan worden gemaakt.
 

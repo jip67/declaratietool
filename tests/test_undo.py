@@ -3,7 +3,7 @@ from sqlalchemy import select
 from app import storage
 from app.models import Claim, Status
 
-from .conftest import login
+from .conftest import SIGNATURE, login
 from .test_claim_admin import make_claim
 
 ACTION = "/portal/claims/{}/action"
@@ -13,7 +13,7 @@ def approved_claim(db, client):
     make_claim(client)  # door boekhouder+beheerder aangemaakt, status ingediend
     claim = db.scalar(select(Claim))
     login(client, "voorzitter@example.org")
-    client.post(ACTION.format(claim.id), data={"action": "approve"})
+    client.post(ACTION.format(claim.id), data={"action": "approve", "signature": SIGNATURE})
     db.expire_all()
     assert claim.status == Status.APPROVED.value
     return claim
@@ -35,7 +35,7 @@ def test_chair_undoes_own_approval(db, client, staff):
     assert "Stap ongedaan gemaakt" in client.get(f"/portal/claims/{claim.id}").text
 
     # Opnieuw goedkeuren werkt gewoon.
-    client.post(ACTION.format(claim.id), data={"action": "approve"})
+    client.post(ACTION.format(claim.id), data={"action": "approve", "signature": SIGNATURE})
     db.expire_all()
     assert claim.status == Status.APPROVED.value and claim.attachments[0].stamped_path
 

@@ -12,6 +12,7 @@
     <p><a class="button" href="/portal/claims/{{ claim.id }}">{{ t('approve_link.login') }}</a></p>
   {% else %}
     {% if changed %}<p class="error">{{ t('approve_link.changed') }}</p>{% endif %}
+    {% if error %}<p class="error">{{ t('error.' ~ error) }}</p>{% endif %}
     <p>{{ t('approve_link.intro') }}</p>
     <dl class="details">
       <dt>{{ t('field.submitter') }}</dt><dd>{{ claim.submitter.name or claim.submitter.email }}</dd>
@@ -30,6 +31,7 @@
 
     <form method="post">
       <input type="hidden" name="fingerprint" value="{{ fingerprint }}">
+      {% with saved=claim_user_signature %}{% include "_signature_pad.html" %}{% endwith %}
       <button class="primary approve-link">{{ t('action.approve') }}</button>
     </form>
     <p class="muted">{{ t('approve_link.other') }} <a href="/portal/claims/{{ claim.id }}">{{ t('approve_link.login') }}</a></p>

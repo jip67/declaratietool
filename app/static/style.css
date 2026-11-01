@@ -319,3 +319,13 @@ ul.recovery-codes li { padding: .2rem 0; }
 
 /* Goedkeuren via link: één grote, duidelijke knop. */
 button.approve-link { font-size: 1.2rem; padding: .9rem 1.6rem; margin-top: 1rem; }
+
+/* Tekenvlak voor de paraaf: altijd wit, zoals papier, ook in donkere modus. */
+.signature-pad { margin: .5rem 0 1rem; }
+.signature-pad .signature-label { margin: 0; }
+.signature-pad .signature-help { margin: .15rem 0 .5rem; font-size: .9rem; }
+.signature-canvas { display: block; width: 100%; max-width: 480px; height: 200px; background: #fff; border: 2px dashed #98a2b3; border-radius: 8px; touch-action: none; cursor: crosshair; }
+.signature-tools { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; margin-top: .5rem; }
+.signature-tools label.check { margin: 0; }
+.signature-saved { display: block; max-width: 240px; max-height: 120px; background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: .4rem; margin: .5rem 0; }
+.task form.approve { display: block; margin-top: .5rem; }

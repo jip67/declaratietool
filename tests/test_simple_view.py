@@ -2,7 +2,7 @@ from sqlalchemy import select
 
 from app.models import Claim, Status
 
-from .conftest import login
+from .conftest import SIGNATURE, login
 from .test_claim_admin import make_claim
 
 
@@ -23,7 +23,7 @@ def test_chair_sees_only_own_tasks_as_cards_and_returns_after_approving(db, clie
     assert "/portal/mail" not in page.text and "/portal/users" not in page.text  # geen instellingen
     assert 'href="/portal/claims/new"' not in page.text
 
-    r = client.post(f"/portal/claims/{claim.id}/action", data={"action": "approve"}, follow_redirects=False)
+    r = client.post(f"/portal/claims/{claim.id}/action", data={"action": "approve", "signature": SIGNATURE}, follow_redirects=False)
     assert r.headers["location"] == f"/portal?done={claim.reference}"
     page = client.get(r.headers["location"])
     assert "Gelukt" in page.text and "Er wacht nu niets op jou" in page.text

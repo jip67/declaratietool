@@ -6,7 +6,7 @@ from sqlalchemy import select
 from app import mailer, reminders, workflow
 from app.models import ApprovalLink, Claim, Event, Status, utcnow
 
-from .conftest import login
+from .conftest import SIGNATURE, login
 from .test_claim_admin import make_claim
 
 LINK = re.compile(r"http://testserver(/a/[\w-]+)")
@@ -46,7 +46,7 @@ def test_chair_approves_with_link_after_confirming(db, client, staff):
     assert claim.status == Status.SUBMITTED.value  # openen alleen keurt niets goed
 
     fp = re.search(r'name="fingerprint" value="(\w+)"', page.text).group(1)
-    r = client.post(path, data={"fingerprint": fp}, follow_redirects=False)
+    r = client.post(path, data={"fingerprint": fp, "signature": SIGNATURE}, follow_redirects=False)
     assert r.status_code == 303
     assert "Goedgekeurd en geparafeerd. Dank je wel!" in client.get(r.headers["location"]).text
     db.expire_all()
@@ -62,7 +62,7 @@ def test_chair_approves_with_link_after_confirming(db, client, staff):
     # Tweede keer: link is gebruikt, bijlagen niet meer via de link te zien.
     assert "al gebruikt" in client.get(path).text
     assert client.get(path + f"/files/{claim.attachments[0].id}").status_code == 404
-    client.post(path, data={"fingerprint": fp})
+    client.post(path, data={"fingerprint": fp, "signature": SIGNATURE})
     login(client, "boekhouder@example.org")
     assert "via link in e-mail" in client.get(f"/portal/claims/{claim.id}").text
 
@@ -122,7 +122,7 @@ def test_changed_details_need_a_second_look(db, client, staff):
     fp = re.search(r'name="fingerprint" value="(\w+)"', client.get(path).text).group(1)
     claim.amount_cents = 99900
     db.commit()
-    r = client.post(path, data={"fingerprint": fp})
+    r = client.post(path, data={"fingerprint": fp, "signature": SIGNATURE})
     assert r.status_code == 409 and "gewijzigd" in r.text and "999,00" in r.text
     db.expire_all()
     assert claim.status == Status.SUBMITTED.value

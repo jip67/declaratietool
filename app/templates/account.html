@@ -25,6 +25,24 @@
     <button class="primary">{{ t('action.save') }}</button>
   </form>
 
+  {% if user.has_role(Role.CHAIR) %}
+  <h2 id="paraaf">{{ t('signature.account_title') }}</h2>
+  {% if user.signature %}
+  <p>{{ t('signature.account_saved') }}</p>
+  <img class="signature-saved" src="{{ user.signature|png_data_url }}" alt="{{ t('signature.label') }}">
+  <form method="post" action="/account/signature/delete"><button>{{ t('signature.delete') }}</button></form>
+  {% else %}
+  <p class="muted">{{ t('signature.account_none') }}</p>
+  {% endif %}
+  <details>
+    <summary>{{ t('signature.account_draw') }}</summary>
+    <form method="post" action="/account/signature">
+      {% with saved=None, remember=False %}{% include "_signature_pad.html" %}{% endwith %}
+      <button class="primary">{{ t('signature.account_save') }}</button>
+    </form>
+  </details>
+  {% endif %}
+
   <h2>{{ t('2fa.title') }}</h2>
   {% if user.has_2fa %}
   <p class="success">{{ t('2fa.status_on_' ~ user.twofa_method) }}</p>

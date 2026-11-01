@@ -1,4 +1,6 @@
-"""Paraaf: zet een goedkeuringsstempel op de bon en sla het resultaat op als pdf."""
+"""Paraaf: zet de getekende paraaf van de voorzitter op de bon en sla het resultaat op als pdf.
+
+Zonder getekende paraaf (oude goedkeuringen) komt er een tekststempel op, zoals vroeger."""
 
 import io
 from datetime import datetime
@@ -7,6 +9,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 from pypdf import PdfReader, PdfWriter
 from reportlab.lib.colors import Color
+from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas
 
 try:  # foto's van iPhones
@@ -17,10 +20,68 @@ except ImportError:  # pragma: no cover
     pass
 
 STAMP_COLOR = (20, 90, 200)
+INK_COLOR = (16, 42, 140)  # donkerblauw, zoals een balpen
+
+# Grenzen voor een getekende paraaf (een PNG uit het tekenvlak in de browser).
+SIGNATURE_MAX_BYTES = 1_000_000
+SIGNATURE_MAX_SIDE = 4000
+SIGNATURE_STORE_SIZE = (900, 450)
+
+
+class SignatureError(ValueError):
+    """De paraaf is leeg of geen bruikbare afbeelding."""
+
+
+def normalize_signature(data: bytes) -> bytes:
+    """Maak van een getekende paraaf een nette PNG: bijgesneden, transparant, in inktkleur.
+
+    Accepteert een PNG met transparante achtergrond (het tekenvlak) of een afbeelding met
+    donkere lijnen op een lichte achtergrond. Gooit SignatureError als er niets op staat."""
+    if not data or len(data) > SIGNATURE_MAX_BYTES:
+        raise SignatureError("size")
+    try:
+        with Image.open(io.BytesIO(data)) as img:
+            if max(img.size) > SIGNATURE_MAX_SIDE:
+                raise SignatureError("size")
+            img = img.convert("RGBA")
+    except SignatureError:
+        raise
+    except Exception as exc:
+        raise SignatureError("format") from exc
+    alpha = img.getchannel("A")
+    if alpha.getextrema()[0] == 255:
+        # Geen transparantie: de donkere pixels zijn de lijnen.
+        alpha = ImageOps.invert(img.convert("L"))
+    alpha = alpha.point(lambda v: 0 if v < 24 else v)
+    box = alpha.getbbox()
+    if box is None or (box[2] - box[0]) * (box[3] - box[1]) < 100 or sum(alpha.histogram()[24:]) < 30:
+        raise SignatureError("empty")
+    pad = 4
+    box = (max(0, box[0] - pad), max(0, box[1] - pad), min(img.width, box[2] + pad), min(img.height, box[3] + pad))
+    alpha = alpha.crop(box)
+    out = Image.new("RGBA", alpha.size, INK_COLOR + (0,))
+    out.putalpha(alpha)
+    out.thumbnail(SIGNATURE_STORE_SIZE)
+    buf = io.BytesIO()
+    out.save(buf, "PNG", optimize=True)
+    return buf.getvalue()
 
 
 def stamp_lines(title: str, name: str, when: datetime, reference: str) -> list[str]:
     return [title, name, when.strftime("%d-%m-%Y %H:%M"), reference]
+
+
+def signature_caption(lines: list[str]) -> list[str]:
+    """Onder een getekende paraaf: naam, en tijdstip met kenmerk (zonder het woord 'goedgekeurd')."""
+    _title, name, when, reference = lines
+    return [line for line in (name, f"{when} · {reference}") if line.strip(" ·")]
+
+
+def _font_regular(size: int):
+    try:
+        return ImageFont.truetype("DejaVuSans.ttf", size)
+    except OSError:
+        return ImageFont.load_default(size=size)
 
 
 def _font(size: int):
@@ -30,9 +91,35 @@ def _font(size: int):
         return ImageFont.load_default(size=size)
 
 
-def stamp_image(source: Path, target: Path, lines: list[str]) -> None:
+def _signature_on_image(img: Image.Image, signature: bytes, lines: list[str]) -> None:
+    width, height = img.size
+    with Image.open(io.BytesIO(signature)) as sig:
+        sig = sig.convert("RGBA")
+    target_w = max(120, width // 4)
+    scale = min(target_w / sig.width, (height / 6) / sig.height)
+    sig = sig.resize((max(1, int(sig.width * scale)), max(1, int(sig.height * scale))), Image.LANCZOS)
+    caption = signature_caption(lines)
+    size = max(11, width // 70)
+    font = _font_regular(size)
+    draw = ImageDraw.Draw(img, "RGBA")
+    pad = size // 2
+    text_w = max((draw.textlength(line, font=font) for line in caption), default=0)
+    box_w = int(max(sig.width, text_w) + 2 * pad)
+    box_h = int(sig.height + len(caption) * size * 1.3 + 2 * pad)
+    x1, y1 = width - box_w - pad * 2, height - box_h - pad * 2
+    draw.rectangle([x1, y1, x1 + box_w, y1 + box_h], fill=(255, 255, 255, 170))
+    img.paste(sig, (x1 + pad + (box_w - 2 * pad - sig.width) // 2, y1 + pad), sig)
+    for i, line in enumerate(caption):
+        draw.text((x1 + pad, y1 + pad + sig.height + i * size * 1.3), line, fill=INK_COLOR, font=font)
+
+
+def stamp_image(source: Path, target: Path, lines: list[str], signature: bytes | None = None) -> None:
     with Image.open(source) as img:
         img = ImageOps.exif_transpose(img).convert("RGB")
+    if signature:
+        _signature_on_image(img, signature, lines)
+        img.save(target, "PDF", resolution=150)
+        return
     draw = ImageDraw.Draw(img, "RGBA")
     width, height = img.size
     size = max(14, width // 40)
@@ -70,19 +157,46 @@ def _overlay(width: float, height: float, lines: list[str]) -> PdfReader:
     return PdfReader(buf)
 
 
-def stamp_pdf(source: Path, target: Path, lines: list[str]) -> None:
+def _signature_overlay(width: float, height: float, signature: bytes, lines: list[str]) -> PdfReader:
+    buf = io.BytesIO()
+    c = canvas.Canvas(buf, pagesize=(width, height))
+    reader = ImageReader(io.BytesIO(signature))
+    sig_w, sig_h = reader.getSize()
+    scale = min(150 / sig_w, 70 / sig_h)
+    w, h = sig_w * scale, sig_h * scale
+    caption = signature_caption(lines)
+    size, pad = 7, 5
+    text_w = max((c.stringWidth(line, "Helvetica", size) for line in caption), default=0)
+    box_w = max(w, text_w) + 2 * pad
+    box_h = h + len(caption) * size * 1.3 + 2 * pad
+    x, y = width - box_w - 20, 20
+    c.setFillColor(Color(1, 1, 1, alpha=0.7))
+    c.rect(x, y, box_w, box_h, fill=1, stroke=0)
+    c.drawImage(reader, x + (box_w - w) / 2, y + box_h - pad - h, width=w, height=h, mask="auto")
+    c.setFillColor(Color(*(v / 255 for v in INK_COLOR)))
+    c.setFont("Helvetica", size)
+    for i, line in enumerate(caption):
+        c.drawString(x + pad, y + box_h - pad - h - (i + 1) * size * 1.3 + 2, line)
+    c.save()
+    buf.seek(0)
+    return PdfReader(buf)
+
+
+def stamp_pdf(source: Path, target: Path, lines: list[str], signature: bytes | None = None) -> None:
     writer = PdfWriter(clone_from=str(source))
     page = writer.pages[0]
     box = page.mediabox
-    page.merge_page(_overlay(float(box.width), float(box.height), lines).pages[0])
+    width, height = float(box.width), float(box.height)
+    overlay = _signature_overlay(width, height, signature, lines) if signature else _overlay(width, height, lines)
+    page.merge_page(overlay.pages[0])
     with target.open("wb") as fh:
         writer.write(fh)
 
 
-def stamp_file(source: Path, content_type: str, lines: list[str]) -> Path:
+def stamp_file(source: Path, content_type: str, lines: list[str], signature: bytes | None = None) -> Path:
     target = source.with_name(source.stem + "-paraaf.pdf")
     if content_type == "application/pdf":
-        stamp_pdf(source, target, lines)
+        stamp_pdf(source, target, lines, signature)
     else:
-        stamp_image(source, target, lines)
+        stamp_image(source, target, lines, signature)
     return target

@@ -164,6 +164,8 @@ def claim_action(
     claim_id: int,
     action: str = Form(...),
     reason: str = Form(""),
+    signature: str = Form(""),
+    remember_signature: bool = Form(False),
     user: User = Depends(current_user),
     db: Session = Depends(get_db),
 ):
@@ -172,7 +174,13 @@ def claim_action(
     claim = _claim(db, claim_id, user)
     stale: list[str] = []
     try:
-        if action == "undo":
+        if action == "approve":
+            # De voorzitter tekent zijn paraaf; zonder paraaf geen goedkeuring.
+            # (Mag deze gebruiker niet goedkeuren, dan meldt approve dat, ook zonder paraaf.)
+            can_approve = user.has_role(Role.CHAIR) and claim.status == Status.SUBMITTED.value
+            drawn = workflow.parse_signature(signature) if can_approve else None
+            workflow.approve(db, claim, user, signature=drawn, remember_signature=remember_signature)
+        elif action == "undo":
             stale = workflow.undo(db, claim, user)
         elif action == "reject":
             if not reason.strip():
@@ -518,6 +526,7 @@ def delete_user(user_id: int, request: Request, user: User = Depends(require_adm
         target.roles = ""
         target.active = False
         target.approve_by_link = False
+        target.signature = None
     else:
         db.delete(target)
     db.commit()

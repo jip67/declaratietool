@@ -13,11 +13,18 @@
   <div class="task">
     {% set role = ROLE_FOR_STATUS[Status(claim.status)] %}
     <p><strong>{{ t('task.yours') }}:</strong> {{ t('task.' ~ role.value) }}</p>
+    {% if claim.status == 'submitted' %}
+    <form method="post" action="/portal/claims/{{ claim.id }}/action" class="approve">
+      <input type="hidden" name="action" value="approve">
+      {% with saved=user.signature %}{% include "_signature_pad.html" %}{% endwith %}
+      <button class="primary">{{ t('action.approve') }}</button>
+    </form>
+    {% else %}
     <form method="post" action="/portal/claims/{{ claim.id }}/action" class="inline">
-      {% if claim.status == 'submitted' %}<input type="hidden" name="action" value="approve"><button class="primary">{{ t('action.approve') }}</button>
-      {% elif claim.status == 'approved' %}<input type="hidden" name="action" value="prepare"><button class="primary">{{ t('action.prepare') }}</button>
+      {% if claim.status == 'approved' %}<input type="hidden" name="action" value="prepare"><button class="primary">{{ t('action.prepare') }}</button>
       {% elif claim.status == 'payment_prepared' %}<input type="hidden" name="action" value="pay"><button class="primary">{{ t('action.pay') }}</button>{% endif %}
     </form>
+    {% endif %}
     {% if claim.status == 'payment_prepared' %}<p class="muted task-hint">{{ t('task.secretary_hint') }}</p>{% endif %}
   </div>
   {% endif %}
