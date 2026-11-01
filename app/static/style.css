@@ -336,3 +336,5 @@ button.approve-link { font-size: 1.2rem; padding: .9rem 1.6rem; margin-top: 1rem
 .test-card { border-style: dashed; }
 .test-tools { margin: .5rem 0 1rem; }
 .test-tools form { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; margin-top: .5rem; }
+.attachment .badge-paraaf { display: inline-block; width: fit-content; font-size: .75rem; font-weight: 600; padding: .05rem .5rem; border-radius: 999px; color: var(--s-approved); background: var(--s-approved-bg); }
+.attachment figcaption a.original { color: var(--muted); }

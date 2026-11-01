@@ -74,7 +74,6 @@
   "event.paid": "Payment made",
   "event.rejected": "Rejected",
   "portal.history": "History",
-  "portal.stamped": "initialled (pdf)",
   "portal.edit_hint": "Details can be changed until the chair has approved.",
   "portal.open_form": "Open the submitter's form",
   "portal.new_intro": "Create a claim on someone's behalf. If you fill in all details it goes straight to the chair. If you leave them empty, the submitter receives an email with a link to complete them.",
@@ -132,7 +131,6 @@
   "preview.show": "Show preview",
   "preview.hide": "Hide preview",
   "preview.open_new": "open in new window",
-  "preview.showing_stamped": "shown in preview",
   "nav.update": "Updates",
   "nav.update_available": "New version available",
   "update.not_configured": "Updating from the portal is not set up on this server. Run the install script deploy/install-vps.sh once more, or update from the command line (see docs/bijwerken.md).",
@@ -432,5 +430,7 @@
   "test.deleted": "{count} test claim(s) deleted.",
   "test.receipt.title": "SAMPLE RECEIPT - TEST",
   "test.receipt.body": "This is a sample receipt for a test claim.\nNothing needs to be paid.",
-  "test.receipt.filename": "sample-receipt-test.pdf"
+  "test.receipt.filename": "sample-receipt-test.pdf",
+  "preview.with_paraaf": "initialled",
+  "preview.original": "original invoice (without initials)"
 }

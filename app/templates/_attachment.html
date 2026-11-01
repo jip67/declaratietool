@@ -1,4 +1,5 @@
-{# Eén bijlage als miniatuur; tik erop om het voorbeeld te openen. Verwacht: name, url, kind ('image', 'pdf' of none) en optioneel stamped_url. #}
+{# Eén bijlage als miniatuur; tik erop om het voorbeeld te openen. Verwacht: name, url, kind ('image', 'pdf' of none) en optioneel stamped_url.
+   Met stamped_url (na goedkeuring) gaat alles over de versie met paraaf; het origineel is alleen nog via een kleine link te zien. #}
 <figure class="attachment">
   {% set preview_url = stamped_url or url %}
   {% set ext = (name.rsplit('.', 1)[-1] if '.' in name else '')|upper|truncate(4, True, '') %}
@@ -12,6 +13,7 @@
       {% endif %}
       <span class="thumb-text">
         <span class="thumb-name">{{ name }}</span>
+        {% if stamped_url %}<span class="badge-paraaf">{{ t('preview.with_paraaf') }}</span>{% endif %}
         <span class="thumb-hint show">{{ t('preview.show') }}</span>
         <span class="thumb-hint hide">{{ t('preview.hide') }}</span>
       </span>
@@ -29,7 +31,7 @@
   </div>
   {% endif %}
   <figcaption>
-    <a href="{{ url }}" target="_blank">{{ t('preview.open_new') }}</a>
-    {% if stamped_url %} · <a href="{{ stamped_url }}" target="_blank">{{ t('portal.stamped') }}</a> <span class="muted">({{ t('preview.showing_stamped') }})</span>{% endif %}
+    <a href="{{ stamped_url or url }}" target="_blank">{{ t('preview.open_new') }}</a>
+    {% if stamped_url %} · <a class="original" href="{{ url }}" target="_blank">{{ t('preview.original') }}</a>{% endif %}
   </figcaption>
 </figure>
