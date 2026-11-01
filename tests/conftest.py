@@ -1,3 +1,4 @@
+import base64
 import io
 
 import pytest
@@ -76,3 +77,18 @@ def pdf_bytes() -> bytes:
     c.drawString(100, 750, "Factuur 123")
     c.save()
     return buf.getvalue()
+
+
+def signature_png(size=(400, 160)) -> bytes:
+    """Een getekende paraaf zoals het tekenvlak hem stuurt: lijnen op een transparante achtergrond."""
+    from PIL import ImageDraw
+
+    img = Image.new("RGBA", size, (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    draw.line([(30, 120), (90, 30), (140, 120), (200, 40), (330, 110)], fill=(16, 42, 140, 255), width=6)
+    buf = io.BytesIO()
+    img.save(buf, "PNG")
+    return buf.getvalue()
+
+
+SIGNATURE = "data:image/png;base64," + base64.b64encode(signature_png()).decode()

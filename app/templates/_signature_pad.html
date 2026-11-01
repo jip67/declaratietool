@@ -1,0 +1,17 @@
+{# Tekenvlak voor de paraaf (zie static/js/signature.js). Hoort in een <form>.
+   Verwacht: saved (bewaarde paraaf of None) en optioneel remember (false = geen 'bewaren'-vinkje). #}
+<div class="signature-pad" data-signature-pad>
+  <p class="signature-label"><strong>{{ t('signature.label') }}</strong></p>
+  <p class="muted signature-help">{{ t('signature.help_saved' if saved else 'signature.help') }}</p>
+  <canvas class="signature-canvas" aria-label="{{ t('signature.label') }}"{% if saved %} data-saved="{{ saved|png_data_url }}"{% endif %}></canvas>
+  <input type="hidden" name="signature" value="">
+  <div class="signature-tools">
+    <button type="button" data-signature-clear>{{ t('signature.clear') }}</button>
+    {% if remember is not defined or remember %}
+    <label class="check"><input type="checkbox" name="remember_signature" value="true" {% if saved %}checked{% endif %}> {{ t('signature.remember') }}</label>
+    {% endif %}
+  </div>
+  <p class="error" data-signature-missing hidden>{{ t('error.signature_required') }}</p>
+  <noscript><p class="error">{{ t('signature.noscript') }}</p></noscript>
+</div>
+<script src="/static/js/signature.js" defer></script>

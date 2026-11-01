@@ -4,15 +4,15 @@ import time
 from collections import defaultdict
 from datetime import UTC, datetime, timedelta
 
-from fastapi import APIRouter, BackgroundTasks, Depends, Form, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, Form, HTTPException, Request
 from fastapi.responses import RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from .. import activity, mailer, notifications, totp
+from .. import activity, mailer, notifications, totp, workflow
 from ..db import get_db
 from ..i18n import available_languages, translate
-from ..models import User
+from ..models import Role, User
 from ..security import hash_password, verify_password
 from ..config import get_settings
 from ..web import current_user, render, request_language
@@ -246,6 +246,26 @@ def account_update(
         return _render_account(request, user, error=error, status_code=422)
     db.commit()
     return _render_account(request, user, message="msg.saved")
+
+
+@router.post("/account/signature")
+def account_signature(request: Request, signature: str = Form(""), user: User = Depends(current_user), db: Session = Depends(get_db)):
+    """De voorzitter tekent alvast een paraaf, die bij het goedkeuren klaarstaat."""
+    if not user.has_role(Role.CHAIR):
+        raise HTTPException(status_code=403)
+    try:
+        user.signature = workflow.parse_signature(signature)
+    except workflow.WorkflowError:
+        return _render_account(request, user, error="error.signature_required", status_code=422)
+    db.commit()
+    return _render_account(request, user, message="signature.saved")
+
+
+@router.post("/account/signature/delete")
+def account_signature_delete(request: Request, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    user.signature = None
+    db.commit()
+    return _render_account(request, user, message="signature.deleted")
 
 
 # ---------------------------------------------------------------- tweestapsverificatie

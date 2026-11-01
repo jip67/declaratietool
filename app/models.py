@@ -4,7 +4,7 @@ import enum
 import secrets
 from datetime import UTC, datetime
 
-from sqlalchemy import ForeignKey, Integer, String, Text, DateTime, Boolean, false
+from sqlalchemy import ForeignKey, Integer, LargeBinary, String, Text, DateTime, Boolean, false
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .db import Base
@@ -77,6 +77,8 @@ class User(Base):
     notify_overdue_days: Mapped[int] = mapped_column(Integer, default=3, server_default="3")
     # Voorzitter mag goedkeuren via een link in de mail, zonder inloggen (zie approval_links.py).
     approve_by_link: Mapped[bool] = mapped_column(Boolean, default=False, server_default=false())
+    # Bewaarde getekende paraaf (PNG) van de voorzitter, als die ervoor kiest hem te onthouden.
+    signature: Mapped[bytes | None] = mapped_column(LargeBinary, nullable=True, deferred=True)
 
     # Niet opgeslagen: de beheerder die op dit moment met deze gebruiker meekijkt (alleen-lezen).
     viewed_by = None
@@ -155,6 +157,8 @@ class Claim(Base):
     paid_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
     rejected_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
     rejection_reason: Mapped[str] = mapped_column(Text, default="")
+    # De paraaf (PNG) die de voorzitter bij het goedkeuren tekende; nodig om een vervangen bon opnieuw te paraferen.
+    approval_signature: Mapped[bytes | None] = mapped_column(LargeBinary, nullable=True, deferred=True)
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     status_changed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)

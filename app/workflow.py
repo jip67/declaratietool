@@ -7,6 +7,7 @@ ontvangen -> (indiener vult aan) -> ingediend -> (voorzitter keurt goed + paraaf
 Bij elke stap krijgt de indiener een update en krijgt wie daarna aan zet is een bericht.
 """
 
+import base64
 import logging
 from datetime import UTC, datetime
 from pathlib import Path
@@ -20,7 +21,7 @@ from .config import get_settings
 from .i18n import translate
 from .models import ROLE_FOR_STATUS, Attachment, Claim, Event, Role, Status, Submitter, User, utcnow
 from .security import format_iban, normalize_iban
-from .stamping import stamp_file, stamp_lines
+from .stamping import SignatureError, normalize_signature, stamp_file, stamp_lines
 
 log = logging.getLogger(__name__)
 
@@ -263,28 +264,51 @@ def _require_status(claim: Claim, status: Status) -> None:
         raise WorkflowError("wrong_status")
 
 
-def stamp_attachment(claim: Claim, att: Attachment, name: str, when: datetime) -> None:
-    """Zet de paraaf van de voorzitter op een bijlage; een mislukte paraaf houdt de declaratie niet op."""
+def parse_signature(value: str) -> bytes:
+    """Lees de getekende paraaf uit het formulier (een data-url met een PNG) en maak hem netjes.
+
+    Gooit WorkflowError('signature_required') als er niets getekend is."""
+    value = (value or "").strip()
+    prefix = "data:image/png;base64,"
+    if not value.startswith(prefix):
+        raise WorkflowError("signature_required")
+    try:
+        data = base64.b64decode(value[len(prefix):], validate=True)
+        return normalize_signature(data)
+    except (ValueError, SignatureError) as exc:
+        raise WorkflowError("signature_required") from exc
+
+
+def stamp_attachment(claim: Claim, att: Attachment, name: str, when: datetime, signature: bytes | None = None) -> None:
+    """Zet de paraaf van de voorzitter op een bijlage; een mislukte paraaf houdt de declaratie niet op.
+
+    signature: de getekende paraaf (PNG); zonder komt er een tekststempel op."""
     lang = get_settings().default_language
     if when.tzinfo is None:
         when = when.replace(tzinfo=UTC)
     lines = stamp_lines(translate("stamp.title", lang), name, when.astimezone(_tz()), claim.reference)
     try:
-        stamped = stamp_file(storage.absolute(att.stored_path), att.content_type, lines)
+        stamped = stamp_file(storage.absolute(att.stored_path), att.content_type, lines, signature)
         att.stamped_path = str(stamped.relative_to(storage.upload_root().resolve()))
     except Exception:
         log.exception("Paraaf zetten op bijlage %s mislukt", att.id)
 
 
-def approve(db: Session, claim: Claim, user: User, via_link: bool = False) -> None:
-    """Voorzitter keurt goed; de bonnen krijgen een paraaf.
+def approve(db: Session, claim: Claim, user: User, via_link: bool = False,
+            signature: bytes | None = None, remember_signature: bool = False) -> None:
+    """Voorzitter keurt goed; de bonnen krijgen zijn getekende paraaf.
 
-    via_link: goedgekeurd met de link uit de mail in plaats van in het portaal (komt in de geschiedenis)."""
+    via_link: goedgekeurd met de link uit de mail in plaats van in het portaal (komt in de geschiedenis).
+    signature: de getekende paraaf (zie parse_signature); de routes eisen die, zonder komt er een stempel.
+    remember_signature: bewaar de paraaf bij de gebruiker voor de volgende keer; zo niet, dan vergeten we een eerder bewaarde."""
     _require(user, Role.CHAIR)
     _require_status(claim, Status.SUBMITTED)
     now = utcnow()
+    claim.approval_signature = signature
+    if signature:
+        user.signature = signature if remember_signature else None
     for att in claim.attachments:
-        stamp_attachment(claim, att, user.name, now)
+        stamp_attachment(claim, att, user.name, now, signature)
     set_status(claim, Status.APPROVED)
     claim.approved_at = now
     claim.approved_by_id = user.id
@@ -385,6 +409,7 @@ def undo(db: Session, claim: Claim, user: User) -> list[str]:
                 stale.append(att.stamped_path)
                 att.stamped_path = None
         claim.approved_at = None
+        claim.approval_signature = None
         claim.approved_by_id = None
         set_status(claim, Status.SUBMITTED)
     elif step == "payment_prepared":
@@ -413,7 +438,7 @@ def replace_attachment(db: Session, claim: Claim, att: Attachment, filename: str
     """Vervang het bestand van een bijlage, bijvoorbeeld door een met de hand getekende versie.
 
     Was de declaratie al goedgekeurd, dan krijgt het nieuwe bestand dezelfde paraaf
-    (naam en tijdstip van de oorspronkelijke goedkeuring). Geeft de oude bestanden
+    (de getekende paraaf, naam en tijdstip van de oorspronkelijke goedkeuring). Geeft de oude bestanden
     terug die na de commit weg mogen."""
     stale = [p for p in (att.stored_path, att.stamped_path) if p]
     old_name = att.original_filename
@@ -424,7 +449,7 @@ def replace_attachment(db: Session, claim: Claim, att: Attachment, filename: str
     att.stamped_path = None
     if claim.approved_at is not None:
         approver = db.get(User, claim.approved_by_id) if claim.approved_by_id else None
-        stamp_attachment(claim, att, approver.name if approver else "", claim.approved_at)
+        stamp_attachment(claim, att, approver.name if approver else "", claim.approved_at, claim.approval_signature)
     log_event(db, claim, "attachment_replaced", user, note=f"{old_name} → {att.original_filename}")
     return stale
 

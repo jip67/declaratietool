@@ -84,7 +84,7 @@ flowchart LR
    Rekeninggegevens worden per e-mailadres onthouden en de volgende keer vooraf ingevuld (en zijn
    aan te passen).
 3. **Goedkeuren.** De voorzitter krijgt een mail, keurt goed in het portaal, en elke bon krijgt
-   automatisch een paraaf: een stempel met GOEDGEKEURD, naam, datum en kenmerk, opgeslagen als pdf.
+   de paraaf die hij of zij met vinger, pen of muis tekent, met naam, datum en kenmerk, opgeslagen als pdf.
    Als de beheerder het voor de voorzitter aanzet, kan dat ook met een eenmalige link in de mail,
    zonder inloggen (zie [gebruik.md](gebruik.md#goedkeuren-via-een-link-in-de-mail)).
 4. **Betaling klaarzetten.** De boekhouder krijgt een mail met alle gegevens en de
@@ -594,6 +594,7 @@ op GitHub; dit is het overzicht.
 | 15 okt | #29, #30 | **App op de telefoon** (PWA) met teller op het icoon |
 | 18 okt | | SSH alleen met sleutel; dit beheerdocument |
 | 25 okt | | Voorzitter kan **goedkeuren via een link** in de mail (per persoon aan te zetten) |
+| 1 nov | | **Getekende paraaf** van de voorzitter op de bonnen in plaats van een stempel; paraaf kan bewaard worden |
 
 De volledige lijst: `git log` of https://github.com/jip67/declaratietool/pulls?q=is%3Apr.
 

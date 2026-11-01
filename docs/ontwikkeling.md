@@ -34,7 +34,7 @@ app/
   intake.py       mail ophalen (IMAP) en omzetten in declaraties
   reminders.py    dagelijkse herinneringen
   worker.py       achtergrondproces (mail + herinneringen)
-  stamping.py     paraaf op foto's en pdf's
+  stamping.py     getekende paraaf op foto's en pdf's
   mailer.py       mail versturen (SMTP)
   i18n.py         vertalingen
   locales/        nl.json, en.json

@@ -7,7 +7,7 @@ from app.models import Claim, KeyValue, Status, Submitter, User
 from app.security import hash_password
 from app.storage import absolute
 
-from .conftest import jpeg_bytes, login, pdf_bytes
+from .conftest import SIGNATURE, jpeg_bytes, login, pdf_bytes
 
 IBAN = "NL91ABNA0417164300"
 
@@ -71,7 +71,7 @@ def test_full_flow(db, client, staff):
 
     # Alleen de juiste rol mag de stap zetten
     login(client, "secretaris@example.org")
-    client.post(f"/portal/claims/{claim.id}/action", data={"action": "approve"})
+    client.post(f"/portal/claims/{claim.id}/action", data={"action": "approve", "signature": SIGNATURE})
     db.expire_all()
     assert claim.status == Status.SUBMITTED.value
 
@@ -79,7 +79,7 @@ def test_full_flow(db, client, staff):
     login(client, "boekhouder@example.org")
     page = client.get(f"/portal/claims/{claim.id}")
     assert 'value="approve"' not in page.text
-    client.post(f"/portal/claims/{claim.id}/action", data={"action": "approve"})
+    client.post(f"/portal/claims/{claim.id}/action", data={"action": "approve", "signature": SIGNATURE})
     db.expire_all()
     assert claim.status == Status.SUBMITTED.value
 
@@ -87,7 +87,7 @@ def test_full_flow(db, client, staff):
     login(client, "voorzitter@example.org")
     mine = client.get("/portal?view=mine")
     assert claim.reference in mine.text
-    client.post(f"/portal/claims/{claim.id}/action", data={"action": "approve"})
+    client.post(f"/portal/claims/{claim.id}/action", data={"action": "approve", "signature": SIGNATURE})
     db.expire_all()
     assert claim.status == Status.APPROVED.value
     for att in claim.attachments:
@@ -133,7 +133,7 @@ def _walk_to_paid(db, client, claim):
     for email, action in (("voorzitter@example.org", "approve"), ("boekhouder@example.org", "prepare"),
                           ("secretaris@example.org", "pay")):
         login(client, email)
-        client.post(f"/portal/claims/{claim.id}/action", data={"action": action})
+        client.post(f"/portal/claims/{claim.id}/action", data={"action": action, "signature": SIGNATURE})
     db.expire_all()
     assert claim.status == Status.PAID.value
 
@@ -158,7 +158,7 @@ def test_submitter_can_switch_updates_off_later(db, client, staff):
     client.post(f"/c/{claim.token}", data={"iban": IBAN, "account_holder": "P. Jansen", "description": "x",
                                            "amount": "5,00", "updates": "true"})
     login(client, "voorzitter@example.org")
-    client.post(f"/portal/claims/{claim.id}/action", data={"action": "approve"})
+    client.post(f"/portal/claims/{claim.id}/action", data={"action": "approve", "signature": SIGNATURE})
     client.cookies.clear()
     # Na goedkeuren is het formulier dicht, maar de keuze is nog te wijzigen.
     page = client.get(f"/c/{claim.token}")

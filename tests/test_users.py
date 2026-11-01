@@ -3,7 +3,7 @@ from sqlalchemy import select
 from app.models import Claim, Submitter, User
 from app.security import hash_password, verify_password
 
-from .conftest import login, pdf_bytes
+from .conftest import SIGNATURE, login, pdf_bytes
 
 IBAN = "NL91ABNA0417164300"
 
@@ -93,7 +93,7 @@ def test_delete_user_with_history_anonymises(db, client, staff):
     claim = db.scalar(select(Claim))
     client.cookies.clear()
     login(client, "voorzitter@example.org")
-    client.post(f"/portal/claims/{claim.id}/action", data={"action": "approve"})
+    client.post(f"/portal/claims/{claim.id}/action", data={"action": "approve", "signature": SIGNATURE})
     client.cookies.clear()
     login(client, "boekhouder@example.org")
     r = client.post(f"/portal/users/{chair.id}/delete", follow_redirects=False)
