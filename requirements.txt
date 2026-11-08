@@ -5,7 +5,7 @@ psycopg[binary]==3.3.6
 alembic==1.20.1
 pydantic-settings==2.16.2
 Jinja2==3.1.6
-python-multipart==0.0.32
+python-multipart==0.0.33
 itsdangerous==2.2.0
 pillow==13.0.0
 pillow-heif==1.8.1
