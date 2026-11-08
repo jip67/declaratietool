@@ -23,8 +23,20 @@
     {% else %}
     <form method="post" action="/portal/claims/{{ claim.id }}/action" class="inline">
       {% if claim.status == 'approved' %}<input type="hidden" name="action" value="prepare"><button class="primary">{{ t('action.prepare') }}</button>
-      {% elif claim.status == 'payment_prepared' %}<input type="hidden" name="action" value="pay"><button class="primary">{{ t('action.pay') }}</button>{% endif %}
+      {% endif %}
     </form>
+    {% if claim.status == 'payment_prepared' %}
+    <form method="post" action="/portal/claims/{{ claim.id }}/action" class="pay">
+      <input type="hidden" name="action" value="pay">
+      {% set first, today, last = payment_date_bounds() %}
+      <label>{{ t('field.payment_date') }}
+        <input type="date" name="payment_date" value="{{ today.isoformat() }}" required
+               min="{{ first.isoformat() }}" max="{{ last.isoformat() }}">
+        <span class="muted small">{{ t('field.payment_date_hint') }}</span>
+      </label>
+      <button class="primary">{{ t('action.pay') }}</button>
+    </form>
+    {% endif %}
     {% endif %}
     {% if claim.status == 'payment_prepared' %}<p class="muted task-hint">{{ t('task.secretary_hint') }}</p>{% endif %}
   </div>
@@ -116,7 +128,7 @@
   <h2>{{ t('portal.history') }}</h2>
   <ul class="history">
   {% for ev in claim.events %}
-    <li><span class="muted">{{ ev.at|localtime }}</span> {{ t('event.' ~ ev.action) }}{% if ev.user %} · {{ ev.user.name }}{% endif %}{% if ev.note and ev.action == 'rejected' %}: {{ ev.note }}{% elif ev.note == 'link' and ev.action == 'approved' %} ({{ t('event.approved_link') }}){% elif ev.note and ev.action == 'undone' %}: {{ t('event.' ~ ev.note) }}{% elif ev.note and ev.action == 'edited' %}: {% for f in ev.note.split(',') %}{{ t('edited.' ~ f) }}{% if not loop.last %}, {% endif %}{% endfor %}{% elif ev.note and ev.action == 'attachment_replaced' %}: {{ ev.note }}{% endif %}</li>
+    <li><span class="muted">{{ ev.at|localtime }}</span> {{ t('event.' ~ ev.action) }}{% if ev.user %} · {{ ev.user.name }}{% endif %}{% if ev.note and ev.action == 'rejected' %}: {{ ev.note }}{% elif ev.note == 'link' and ev.action == 'approved' %} ({{ t('event.approved_link') }}){% elif ev.note and ev.action == 'undone' %}: {{ t('event.' ~ ev.note) }}{% elif ev.note and ev.action == 'edited' %}: {% for f in ev.note.split(',') %}{{ t('edited.' ~ f) }}{% if not loop.last %}, {% endif %}{% endfor %}{% elif ev.note and ev.action == 'attachment_replaced' %}: {{ ev.note }}{% elif ev.note and ev.action == 'paid' %} ({{ t('event.payment_date', date=ev.note|longdate(lang)) }}){% endif %}</li>
   {% endfor %}
   </ul>
 </section>

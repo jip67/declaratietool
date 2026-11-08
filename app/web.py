@@ -15,11 +15,15 @@ from .db import get_db, new_session
 from .i18n import available_languages, pick_language, translator
 from .models import ROLE_FOR_STATUS, Claim, Role, Status, User
 from .security import format_iban
-from .workflow import local_time
+from .workflow import local_time, long_date_text, payment_date_bounds, payment_note, payment_scheduled
 
 templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
 templates.env.filters["localtime"] = local_time
 templates.env.filters["iban"] = format_iban
+templates.env.globals["payment_note"] = payment_note
+templates.env.globals["payment_scheduled"] = payment_scheduled
+templates.env.globals["payment_date_bounds"] = payment_date_bounds
+templates.env.filters["longdate"] = long_date_text
 
 # Bijlagen die een browser zelf kan tonen; HEIC/HEIF lukt alleen in Safari.
 PREVIEW_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp"}

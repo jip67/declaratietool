@@ -9,7 +9,7 @@ Bij elke stap krijgt de indiener een update en krijgt wie daarna aan zet is een 
 
 import base64
 import logging
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -138,7 +138,9 @@ def notify_submitter_status(claim: Claim, always: bool = False) -> None:
     extra = ""
     if claim.status_enum == Status.REJECTED and claim.rejection_reason:
         extra = translate("mail.status.reason", lang, reason=claim.rejection_reason)
-    status_label = translate(f"status.{claim.status}", lang)
+    status_label = status_text(claim, lang)
+    if claim.status_enum == Status.PAID:
+        extra = payment_note(claim, lang) + "\n"
     mailer.send(
         mailer.Mail(
             to=[s.email],
@@ -387,14 +389,45 @@ def prepare_payment(db: Session, claim: Claim, user: User) -> None:
     notifications.status_changed(db, claim, "payment_prepared", user)
 
 
-def mark_paid(db: Session, claim: Claim, user: User) -> None:
-    """Secretaris heeft de betaling uitgevoerd bij de bank."""
+# Hoe ver de betaaldatum van vandaag af mag liggen: een vergeten klik achteraf, of een betaling ver vooruit ingepland.
+PAYMENT_DATE_PAST_DAYS = 90
+PAYMENT_DATE_FUTURE_DAYS = 365
+
+
+def local_today() -> date:
+    return datetime.now(_tz()).date()
+
+
+def payment_date_bounds() -> tuple[date, date, date]:
+    """Vroegste, standaard (vandaag) en laatste betaaldatum die het formulier toestaat."""
+    today = local_today()
+    return today - timedelta(days=PAYMENT_DATE_PAST_DAYS), today, today + timedelta(days=PAYMENT_DATE_FUTURE_DAYS)
+
+
+def parse_payment_date(value: str) -> date:
+    """De datum uit het formulier (jjjj-mm-dd); leeg is vandaag."""
+    value = (value or "").strip()
+    if not value:
+        return local_today()
+    try:
+        result = date.fromisoformat(value)
+    except ValueError:
+        raise WorkflowError("payment_date_invalid") from None
+    first, _, last = payment_date_bounds()
+    if not first <= result <= last:
+        raise WorkflowError("payment_date_range")
+    return result
+
+
+def mark_paid(db: Session, claim: Claim, user: User, payment_date: date | None = None) -> None:
+    """Secretaris heeft de betaling uitgevoerd of ingepland bij de bank (payment_date, standaard vandaag)."""
     _require(claim, user, Role.SECRETARY)
     _require_status(claim, Status.PAYMENT_PREPARED)
     set_status(claim, Status.PAID)
     claim.paid_at = utcnow()
     claim.paid_by_id = user.id
-    log_event(db, claim, "paid", user)
+    claim.payment_date = payment_date or local_today()
+    log_event(db, claim, "paid", user, note=claim.payment_date.isoformat())
     db.flush()
     notify_submitter_status(claim)
     notifications.status_changed(db, claim, "paid", user)
@@ -473,6 +506,7 @@ def undo(db: Session, claim: Claim, user: User) -> list[str]:
     elif step == "paid":
         claim.paid_at = None
         claim.paid_by_id = None
+        claim.payment_date = None
         set_status(claim, Status.PAYMENT_PREPARED)
     else:
         claim.rejected_by_id = None
@@ -537,6 +571,53 @@ def remove_files(paths: list[str]) -> None:
 
 def _tz() -> ZoneInfo:
     return ZoneInfo(get_settings().timezone)
+
+
+def effective_payment_date(claim: Claim) -> date | None:
+    """De betaaldatum; bij declaraties van voor dit veld de dag waarop op 'betaald' werd geklikt."""
+    if claim.payment_date:
+        return claim.payment_date
+    if claim.paid_at:
+        value = claim.paid_at if claim.paid_at.tzinfo else claim.paid_at.replace(tzinfo=UTC)
+        return value.astimezone(_tz()).date()
+    return None
+
+
+def payment_scheduled(claim: Claim) -> bool:
+    """Betaald, maar met een datum in de toekomst: de betaling staat ingepland bij de bank."""
+    when = effective_payment_date(claim)
+    return claim.status_enum == Status.PAID and when is not None and when > local_today()
+
+
+def long_date(value: date, lang: str | None = None) -> str:
+    """Bijvoorbeeld '10 november 2026' (of 'November 10, 2026' in het Engels, volgens de vertaling)."""
+    months = translate("date.months", lang).split(",")
+    month = months[value.month - 1] if len(months) == 12 else str(value.month)
+    return translate("date.long", lang, day=value.day, month=month, year=value.year)
+
+
+def long_date_text(value: str, lang: str | None = None) -> str:
+    """long_date voor een datum als tekst (jjjj-mm-dd), zoals in de geschiedenis; anders de tekst zelf."""
+    try:
+        return long_date(date.fromisoformat(value), lang)
+    except (TypeError, ValueError):
+        return value or ""
+
+
+def payment_note(claim: Claim, lang: str | None = None) -> str:
+    """'Betaling ingepland op 10 november 2026' of 'Betaald op 8 november 2026'; leeg als nog niet betaald."""
+    when = effective_payment_date(claim)
+    if claim.status_enum != Status.PAID or when is None:
+        return ""
+    key = "payment.scheduled_on" if payment_scheduled(claim) else "payment.paid_on"
+    return translate(key, lang, date=long_date(when, lang))
+
+
+def status_text(claim: Claim, lang: str | None = None) -> str:
+    """De status zoals de indiener hem ziet: bij een ingeplande betaling 'Betaling ingepland'."""
+    if payment_scheduled(claim):
+        return translate("status.paid_scheduled", lang)
+    return translate(f"status.{claim.status}", lang)
 
 
 def local_time(value: datetime | None) -> str:

@@ -59,7 +59,7 @@
   "task.chair": "approve and initial",
   "task.treasurer": "prepare the payment at the bank",
   "task.secretary": "make the payment at the bank",
-  "task.secretary_hint": "Click the button once you have made the payment at the bank. The claim is then marked as paid and everyone, including the submitter, knows it has been paid.",
+  "task.secretary_hint": "Click the button once you have made or scheduled the payment at the bank. If you scheduled it, pick that date. The claim is then marked as paid and everyone, including the submitter, sees the date on which it was or will be paid.",
   "action.save": "Save",
   "action.create": "Create",
   "action.approve": "Approve and initial",
@@ -435,5 +435,15 @@
   "preview.original": "original invoice (without initials)",
   "preview.open_pdf": "open PDF in new window",
   "preview.page_hint": "Tap the page to zoom in. The initials are at the bottom right of the first page.",
-  "preview.zoom": "enlarge"
+  "preview.zoom": "enlarge",
+  "date.months": "January,February,March,April,May,June,July,August,September,October,November,December",
+  "date.long": "{month} {day}, {year}",
+  "status.paid_scheduled": "Payment scheduled",
+  "payment.paid_on": "Paid on {date}.",
+  "payment.scheduled_on": "The payment is scheduled for {date}.",
+  "field.payment_date": "Payment date",
+  "field.payment_date_hint": "Today, or the date on which you scheduled the payment at the bank.",
+  "event.payment_date": "payment date {date}",
+  "error.payment_date_invalid": "Enter a valid payment date.",
+  "error.payment_date_range": "The payment date can be at most 90 days ago and at most a year ahead."
 }

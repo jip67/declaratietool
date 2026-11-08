@@ -180,6 +180,7 @@ def claim_action(
     reason: str = Form(""),
     signature: str = Form(""),
     remember_signature: bool = Form(False),
+    payment_date: str = Form(""),
     user: User = Depends(current_user),
     db: Session = Depends(get_db),
 ):
@@ -194,6 +195,10 @@ def claim_action(
             can_approve = claim.acts_as(user, Role.CHAIR) and claim.status == Status.SUBMITTED.value
             drawn = workflow.parse_signature(signature) if can_approve else None
             workflow.approve(db, claim, user, signature=drawn, remember_signature=remember_signature)
+        elif action == "pay":
+            # Alleen de datum controleren als deze gebruiker de stap ook mag zetten; anders meldt mark_paid dat.
+            when = workflow.parse_payment_date(payment_date) if claim.acts_as(user, Role.SECRETARY) else None
+            workflow.mark_paid(db, claim, user, payment_date=when)
         elif action == "undo":
             stale = workflow.undo(db, claim, user)
         elif action == "reject":

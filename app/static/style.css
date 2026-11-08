@@ -48,6 +48,8 @@ form.inline { display: inline; }
 .row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
 .error { color: var(--danger); font-weight: 400; }
 .success { color: var(--success); }
+.payment-note.scheduled { color: var(--muted); font-weight: 600; }
+form.pay label { max-width: 20rem; }
 .muted { color: var(--muted); }
 .small { font-size: .85rem; font-weight: 400; }
 .visually-hidden { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
