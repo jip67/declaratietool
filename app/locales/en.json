@@ -432,5 +432,8 @@
   "test.receipt.body": "This is a sample receipt for a test claim.\nNothing needs to be paid.",
   "test.receipt.filename": "sample-receipt-test.pdf",
   "preview.with_paraaf": "initialled",
-  "preview.original": "original invoice (without initials)"
+  "preview.original": "original invoice (without initials)",
+  "preview.open_pdf": "open PDF in new window",
+  "preview.page_hint": "Tap the page to zoom in. The initials are at the bottom right of the first page.",
+  "preview.zoom": "enlarge"
 }

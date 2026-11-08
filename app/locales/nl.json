@@ -432,5 +432,8 @@
   "test.receipt.body": "Dit is een voorbeeldbon voor een testdeclaratie.\nEr hoeft niets betaald te worden.",
   "test.receipt.filename": "voorbeeldbon-test.pdf",
   "preview.with_paraaf": "met paraaf",
-  "preview.original": "originele factuur (zonder paraaf)"
+  "preview.original": "originele factuur (zonder paraaf)",
+  "preview.open_pdf": "pdf openen in nieuw venster",
+  "preview.page_hint": "Tik op de pagina om in te zoomen. De paraaf staat rechtsonder op de eerste pagina.",
+  "preview.zoom": "vergroten"
 }

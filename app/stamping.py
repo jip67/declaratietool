@@ -12,6 +12,11 @@ from reportlab.lib.colors import Color
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas
 
+try:  # zet een pdf-pagina om in een afbeelding (voor het voorbeeld met paraaf)
+    import pypdfium2 as pdfium
+except ImportError:  # pragma: no cover
+    pdfium = None
+
 try:  # foto's van iPhones
     from pillow_heif import register_heif_opener
 
@@ -199,4 +204,39 @@ def stamp_file(source: Path, content_type: str, lines: list[str], signature: byt
         stamp_pdf(source, target, lines, signature)
     else:
         stamp_image(source, target, lines, signature)
+    try:
+        render_preview(target)
+    except Exception:  # het voorbeeld is handig, niet nodig; zonder wordt het later opnieuw geprobeerd
+        pass
+    return target
+
+
+# Breedte van het voorbeeld met paraaf: scherp genoeg om op een telefoon in te zoomen.
+PREVIEW_WIDTH = 1400
+
+
+def preview_path(stamped: Path) -> Path:
+    """Het voorbeeld (PNG van pagina 1) staat naast de pdf met paraaf."""
+    return stamped.with_suffix(".png")
+
+
+def render_preview(stamped: Path) -> Path:
+    """Maak een afbeelding van de eerste pagina van de pdf met paraaf, zodat je op een telefoon
+    in één oogopslag de hele pagina met de paraaf ziet. Bestaat hij al, dan wordt hij hergebruikt."""
+    target = preview_path(stamped)
+    if target.exists() and target.stat().st_mtime >= stamped.stat().st_mtime:
+        return target
+    if pdfium is None:
+        raise RuntimeError("pypdfium2 ontbreekt")
+    pdf = pdfium.PdfDocument(str(stamped))
+    try:
+        page = pdf[0]
+        width = page.get_width() or 1
+        img = page.render(scale=PREVIEW_WIDTH / width).to_pil().convert("RGB")
+        page.close()
+    finally:
+        pdf.close()
+    tmp = target.with_name(target.name + ".tmp")
+    img.save(tmp, "PNG", optimize=True)
+    tmp.replace(target)
     return target

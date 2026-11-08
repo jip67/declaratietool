@@ -21,7 +21,7 @@ from .config import get_settings
 from .i18n import translate
 from .models import ROLE_FOR_STATUS, Attachment, Claim, Event, Role, Status, Submitter, User, utcnow
 from .security import format_iban, normalize_iban
-from .stamping import SignatureError, normalize_signature, stamp_file, stamp_lines
+from .stamping import SignatureError, normalize_signature, preview_path, stamp_file, stamp_lines
 
 log = logging.getLogger(__name__)
 
@@ -527,7 +527,10 @@ def change_submitter(db: Session, claim: Claim, email: str) -> None:
 def remove_files(paths: list[str]) -> None:
     for rel in paths:
         try:
-            storage.absolute(rel).unlink(missing_ok=True)
+            path = storage.absolute(rel)
+            path.unlink(missing_ok=True)
+            if path.name.endswith("-paraaf.pdf"):
+                preview_path(path).unlink(missing_ok=True)
         except (ValueError, OSError):
             log.warning("Bestand %s niet verwijderd", rel)
 

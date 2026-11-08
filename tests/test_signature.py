@@ -196,8 +196,41 @@ def test_after_approval_preview_shows_initialled_version(db, client, staff):
     login(client, "boekhouder@example.org")
     page = client.get(f"/portal/claims/{claim.id}").text
     stamped = f"/portal/files/{att.id}?stamped=1&amp;v="
-    # Het kader en "openen in nieuw venster" tonen de versie met paraaf; het origineel staat er klein onder.
-    assert re.search(r'<iframe class="preview pdf" src="' + re.escape(stamped), page)
-    assert re.search(r'<a href="' + re.escape(stamped) + r'[^"]*" target="_blank">openen in nieuw venster', page)
+    # De pagina met paraaf staat meteen open als afbeelding; de pdf met paraaf zit onder een link,
+    # het origineel staat er klein onder.
+    png = f"/portal/files/{att.id}/paraaf.png?v="
+    assert re.search(r'<details class="preview-toggle" open>', page)
+    assert re.search(r'<img class="preview page" src="' + re.escape(png), page)
+    assert re.search(r'<a href="' + re.escape(stamped) + r'[^"]*" target="_blank">pdf openen in nieuw venster', page)
     assert re.search(r'<a class="original" href="/portal/files/' + str(att.id) + r'\?v=[^"]*" target="_blank">originele factuur', page)
     assert 'class="badge-paraaf">met paraaf<' in page
+
+
+def test_initialled_page_as_image(db, client, staff):
+    """Op een telefoon zie je de hele eerste pagina met paraaf als afbeelding."""
+    make_claim(client)
+    claim = db.scalar(select(Claim))
+    att = claim.attachments[0]
+    assert client.get(f"/portal/files/{att.id}/paraaf.png").status_code == 404  # nog niet goedgekeurd
+    login(client, "voorzitter@example.org")
+    client.post(ACTION.format(claim.id), data={"action": "approve", "signature": SIGNATURE})
+    db.expire_all()
+    stamped = storage.absolute(att.stamped_path)
+    preview = stamped.with_suffix(".png")
+    assert preview.exists()  # bij het goedkeuren al gemaakt
+
+    preview.unlink()  # goedkeuring van voor deze functie: wordt bij de eerste keer gemaakt
+    response = client.get(f"/portal/files/{att.id}/paraaf.png")
+    assert response.status_code == 200 and response.headers["content-type"] == "image/png"
+    with Image.open(io.BytesIO(response.content)) as img:
+        assert abs(img.width - 1400) <= 1
+        # Rechtsonder staat de paraaf in inktkleur: daar zijn pixels duidelijk blauw.
+        corner = img.convert("RGB").crop((img.width * 2 // 3, img.height * 4 // 5, img.width, img.height))
+        assert any(b > r + 60 for r, g, b in corner.getdata())
+    assert preview.exists()
+
+    # Terugdraaien ruimt het voorbeeld mee op.
+    client.post(ACTION.format(claim.id), data={"action": "undo"})
+    db.expire_all()
+    assert att.stamped_path is None and not preview.exists()
+    assert client.get(f"/portal/files/{att.id}/paraaf.png").status_code == 404
