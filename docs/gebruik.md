@@ -198,4 +198,4 @@ Via **Help** rechtsboven staat deze uitleg ook in de tool zelf, in het Nederland
 
 ## Bijlagen bekijken
 
-Bonnen en facturen staan direct op de pagina van de declaratie: foto's als afbeelding, pdf's in een ingebouwde viewer. Na goedkeuring tonen het voorbeeld en "openen in nieuw venster" de versie met paraaf; de originele factuur zonder paraaf staat er als kleine link onder. HEIC-foto's (iPhone) kunnen de meeste browsers niet op de pagina tonen; open die via de link.
+Bonnen en facturen staan direct op de pagina van de declaratie: foto's als afbeelding, pdf's in een ingebouwde viewer. Na goedkeuring staat de eerste pagina met paraaf meteen open als afbeelding, zodat je ook op een telefoon in één oogopslag de hele pagina en de paraaf ziet (tik erop om in te zoomen); "pdf openen in nieuw venster" opent de pdf met paraaf; de originele factuur zonder paraaf staat er als kleine link onder. HEIC-foto's (iPhone) kunnen de meeste browsers niet op de pagina tonen; open die via de link.

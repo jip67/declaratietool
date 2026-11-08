@@ -131,6 +131,7 @@ form.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,
   /* Kleinere voorbeelden, zodat het formulier niet ver weg staat */
   .attachment iframe.preview { height: 50vh; min-height: 280px; }
   .attachment img.preview { max-height: 50vh; }
+  .attachment img.preview.page { max-height: 75vh; }
   form > button.primary { width: 100%; padding: .7rem 1rem; }
   form.search input { max-width: none; flex: 1; }
   .row h1 { margin-bottom: .25rem; }
@@ -156,6 +157,10 @@ details.replace summary { cursor: pointer; color: var(--primary); }
 .attachment .preview { display: block; width: 100%; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
 .attachment img.preview { width: auto; max-width: 100%; max-height: 80vh; object-fit: contain; }
 .attachment iframe.preview { height: 80vh; min-height: 420px; }
+/* Pagina met paraaf als afbeelding: altijd de hele pagina in beeld */
+.attachment .thumb.page { object-fit: contain; object-position: center top; }
+.attachment img.preview.page { max-height: 85vh; box-shadow: 0 1px 4px rgba(0, 0, 0, .12); }
+.attachment .page-hint { margin: .35rem 0 0; font-size: .85rem; }
 .attachment figcaption { margin-top: .35rem; font-size: .9rem; }
 .help h2 { scroll-margin-top: 1rem; }
 .help .toc { display: flex; flex-wrap: wrap; gap: .4rem; list-style: none; padding: 0; margin: 0 0 1rem; }

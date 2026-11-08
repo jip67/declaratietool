@@ -8,7 +8,7 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy import func, or_, select, update
 from sqlalchemy.orm import Session
 
-from .. import activity, mailconfig, notifications, storage, updates, workflow
+from .. import activity, mailconfig, notifications, stamping, storage, updates, workflow
 from ..config import get_settings
 from ..db import get_db
 from ..i18n import available_languages
@@ -431,6 +431,22 @@ def portal_file(attachment_id: int, stamped: bool = False, user: User = Depends(
         name = att.original_filename.rsplit(".", 1)[0] + "-paraaf.pdf"
         return file_response(storage.absolute(att.stamped_path), "application/pdf", name)
     return file_response(storage.absolute(att.stored_path), att.content_type, att.original_filename)
+
+
+@router.get("/files/{attachment_id}/paraaf.png")
+def portal_file_preview(attachment_id: int, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    """De eerste pagina met paraaf als afbeelding: op een telefoon in één oogopslag te zien.
+
+    Voor goedkeuringen van voor deze functie wordt het voorbeeld bij de eerste keer gemaakt."""
+    att = db.get(Attachment, attachment_id)
+    if att is None or not att.stamped_path or not can_see(att.claim, user):
+        raise HTTPException(status_code=404)
+    try:
+        path = stamping.render_preview(storage.absolute(att.stamped_path))
+    except Exception:
+        raise HTTPException(status_code=404)
+    name = att.original_filename.rsplit(".", 1)[0] + "-paraaf.png"
+    return file_response(path, "image/png", name)
 
 
 # ---------------------------------------------------------------- gebruikersbeheer
