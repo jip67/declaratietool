@@ -6,3 +6,4 @@
 {% endfor %}
 </ol>
 {% if claim.status == 'rejected' %}<p class="error">{{ t('status.rejected') }}{% if claim.rejection_reason %}: {{ claim.rejection_reason }}{% endif %}</p>{% endif %}
+{% if claim.status == 'paid' %}<p class="payment-note {{ 'scheduled' if payment_scheduled(claim) else 'success' }}">{{ payment_note(claim, lang) }}</p>{% endif %}

@@ -61,7 +61,8 @@ Boekhouder en secretaris controleren de declaratie daarna nog, en de tool betaal
 
 1. Je krijgt een mail zodra de boekhouder de betaling heeft klaargezet.
 2. Voer de betaling uit bij de bank.
-3. Klik in het portaal op **Betaling is uitgevoerd**. De declaratie staat dan op betaald en iedereen, ook de indiener, weet dat er betaald is.
+3. Kies bij **Datum van de betaling** de datum waarop de bank betaalt. Standaard is dat vandaag; heb je de betaling ingepland, kies dan die datum (hooguit 90 dagen terug of een jaar vooruit).
+4. Klik in het portaal op **Betaling is uitgevoerd**. De declaratie staat dan op betaald en iedereen, ook de indiener, ziet de datum. Ligt die in de toekomst, dan staat er op de pagina en in de mail aan de indiener "De betaling is ingepland op 10 november 2026"; vanaf die dag staat er "Betaald op 10 november 2026".
 
 ## Declaratie aanmaken namens iemand
 

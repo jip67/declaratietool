@@ -59,7 +59,7 @@
   "task.chair": "goedkeuren en paraferen",
   "task.treasurer": "betaling klaarzetten bij de bank",
   "task.secretary": "betaling uitvoeren bij de bank",
-  "task.secretary_hint": "Klik op de knop zodra je de betaling bij de bank hebt uitgevoerd. De declaratie staat dan op betaald en iedereen, ook de indiener, weet dat er betaald is.",
+  "task.secretary_hint": "Klik op de knop zodra je de betaling bij de bank hebt uitgevoerd of ingepland. Heb je hem ingepland, kies dan die datum. De declaratie staat dan op betaald en iedereen, ook de indiener, ziet op welke datum er betaald is of wordt.",
   "action.save": "Opslaan",
   "action.create": "Aanmaken",
   "action.approve": "Goedkeuren en paraferen",
@@ -435,5 +435,15 @@
   "preview.original": "originele factuur (zonder paraaf)",
   "preview.open_pdf": "pdf openen in nieuw venster",
   "preview.page_hint": "Tik op de pagina om in te zoomen. De paraaf staat rechtsonder op de eerste pagina.",
-  "preview.zoom": "vergroten"
+  "preview.zoom": "vergroten",
+  "date.months": "januari,februari,maart,april,mei,juni,juli,augustus,september,oktober,november,december",
+  "date.long": "{day} {month} {year}",
+  "status.paid_scheduled": "Betaling ingepland",
+  "payment.paid_on": "Betaald op {date}.",
+  "payment.scheduled_on": "De betaling is ingepland op {date}.",
+  "field.payment_date": "Datum van de betaling",
+  "field.payment_date_hint": "Vandaag, of de datum waarop je de betaling bij de bank hebt ingepland.",
+  "event.payment_date": "betaaldatum {date}",
+  "error.payment_date_invalid": "Vul een geldige betaaldatum in.",
+  "error.payment_date_range": "De betaaldatum mag hooguit 90 dagen terug en een jaar vooruit liggen."
 }

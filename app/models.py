@@ -2,9 +2,9 @@
 
 import enum
 import secrets
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 
-from sqlalchemy import ForeignKey, Integer, LargeBinary, String, Text, DateTime, Boolean, false
+from sqlalchemy import ForeignKey, Integer, LargeBinary, String, Text, Date, DateTime, Boolean, false
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .db import Base
@@ -168,6 +168,8 @@ class Claim(Base):
     approved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     prepared_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     paid_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    # De datum waarop de secretaris de betaling bij de bank deed of inplande (kan in de toekomst liggen).
+    payment_date: Mapped[date | None] = mapped_column(Date, nullable=True)
 
     submitter: Mapped[Submitter] = relationship(back_populates="claims")
     attachments: Mapped[list["Attachment"]] = relationship(
