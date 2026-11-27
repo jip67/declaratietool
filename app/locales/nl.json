@@ -445,5 +445,22 @@
   "field.payment_date_hint": "Vandaag, of de datum waarop je de betaling bij de bank hebt ingepland.",
   "event.payment_date": "betaaldatum {date}",
   "error.payment_date_invalid": "Vul een geldige betaaldatum in.",
-  "error.payment_date_range": "De betaaldatum mag hooguit 90 dagen terug en een jaar vooruit liggen."
+  "error.payment_date_range": "De betaaldatum mag hooguit 90 dagen terug en een jaar vooruit liggen.",
+  "signed.title": "Al getekend door de voorzitter?",
+  "signed.intro_submitted": "Kwam deze factuur al getekend door de voorzitter binnen, bijvoorbeeld per mail? Leg dat dan hier vast. De declaratie is dan goedgekeurd en gaat meteen naar de boekhouder. De bon krijgt geen extra paraaf, want de handtekening staat er al op.",
+  "signed.intro_received": "Kwam deze factuur al getekend door de voorzitter binnen, bijvoorbeeld per mail? Leg dat dan hier vast. Zodra de gegevens zijn ingevuld is de declaratie goedgekeurd en gaat hij meteen naar de boekhouder; de voorzitter krijgt er geen taak voor.",
+  "signed.chair": "Getekend door",
+  "signed.confirm": "Vastleggen: al getekend",
+  "signed.pending": "Al getekend door {name}. Zodra de gegevens zijn ingevuld gaat de declaratie meteen naar de boekhouder.",
+  "signed.cancel": "Toch niet getekend",
+  "signed.field": "Paraaf",
+  "signed.value": "Al getekend door {name} (buiten de tool)",
+  "signed.new_label": "Paraaf van de voorzitter",
+  "signed.new_no": "Nog niet getekend: de voorzitter keurt goed in de tool",
+  "signed.new_yes": "Al getekend door {name}",
+  "signed.new_hint": "Kies 'al getekend' voor een factuur die de voorzitter al tekende. Met alle gegevens ingevuld gaat hij dan meteen naar de boekhouder.",
+  "event.signed_on_paper": "Vastgelegd: al getekend door de voorzitter",
+  "event.signed_on_paper_cancelled": "Vastlegging 'al getekend' teruggenomen",
+  "event.approved_paper": "al getekend, buiten de tool",
+  "error.chair_required": "Kies de voorzitter die de bon tekende."
 }

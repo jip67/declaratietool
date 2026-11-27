@@ -120,6 +120,7 @@ persoonlijke link (`/c/<code>`).
 - **Eenvoudige weergave** voor bestuursleden die weinig met computers doen: alleen de eigen taken
   als grote kaarten.
 - **Goedkeuren via een link** in de mail, zonder inloggen, per voorzitter aan te zetten.
+- **Al getekend door de voorzitter**: een factuur die al getekend binnenkwam slaat de paraafstap over.
 - **Instellingen** (zijbalk):
   - **Gebruikers**: toevoegen, bewerken, uitzetten, verwijderen, 2FA resetten, **Meekijken**
     (alleen-lezen het portaal zien zoals iemand anders het ziet);
@@ -595,6 +596,7 @@ op GitHub; dit is het overzicht.
 | 18 okt | | SSH alleen met sleutel; dit beheerdocument |
 | 25 okt | | Voorzitter kan **goedkeuren via een link** in de mail (per persoon aan te zetten) |
 | 1 nov | | **Getekende paraaf** van de voorzitter op de bonnen in plaats van een stempel; paraaf kan bewaard worden |
+| 27 nov | | Factuur die **al getekend** is door de voorzitter: boekhouder legt dat vast, paraafstap vervalt |
 
 De volledige lijst: `git log` of https://github.com/jip67/declaratietool/pulls?q=is%3Apr.
 
