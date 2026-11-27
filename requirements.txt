@@ -9,7 +9,7 @@ python-multipart==0.0.33
 itsdangerous==2.2.0
 pillow==13.0.0
 pillow-heif==1.8.1
-pypdf==6.21.4
+pypdf==7.0.0
 reportlab==5.1.0
 cryptography==50.0.2
 segno==1.6.6
