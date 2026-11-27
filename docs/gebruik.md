@@ -72,6 +72,23 @@ Alle medewerkers kunnen via **Nieuwe declaratie** zelf een declaratie invoeren, 
 - Vul je ook bedrag, omschrijving, IBAN en tenaamstelling in, dan gaat de declaratie direct naar de voorzitter.
 - Laat je die leeg, dan krijgt de indiener een mail met de link om ze zelf aan te vullen.
 
+## Factuur die de voorzitter al tekende
+
+Komt er een factuur binnen die de voorzitter al heeft getekend, bijvoorbeeld per mail, dan hoeft hij
+hem niet nog eens in de tool te paraferen. De boekhouder of een beheerder legt dat vast:
+
+- **Bij een nieuwe declaratie**: kies onder **Paraaf van de voorzitter** de optie *Al getekend door ...*.
+  Vul je ook alle gegevens in, dan is de declaratie meteen goedgekeurd en gaat hij naar de boekhouder.
+- **Bij een bestaande declaratie** (bijvoorbeeld een doorgestuurde mail): open de declaratie, klik op
+  **Al getekend door de voorzitter?**, kies de voorzitter en klik op **Vastleggen: al getekend**.
+  Zijn de gegevens al ingevuld, dan gaat hij meteen naar de boekhouder. Zo niet, dan gebeurt dat zodra
+  de indiener ze invult; tot die tijd kun je het met **Toch niet getekend** terugnemen.
+
+De voorzitter krijgt er geen taak of herinnering voor. Op de bon komt geen extra paraaf, want de
+handtekening staat er al op. In de geschiedenis staat wie het vastlegde en "Goedgekeurd en geparafeerd
+(al getekend, buiten de tool)" op naam van de voorzitter. Met **Laatste stap ongedaan maken** gaat de
+declaratie terug naar de voorzitter, die hem dan gewoon in de tool goedkeurt.
+
 ## Interne opmerkingen
 
 Onderaan elke declaratie staat het blok **Interne opmerkingen**, met het label *intern, niet zichtbaar voor indiener*. Voorzitter, boekhouder, secretaris en beheerder kunnen daar extra informatie kwijt, bijvoorbeeld "bon nagevraagd bij de penningmeester". Elke opmerking krijgt naam en tijdstip. De indiener ziet ze nooit: niet op de pagina van de persoonlijke link, niet in mails en ook niet als hij inlogt met de rol Gebruiker.

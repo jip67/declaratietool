@@ -23,6 +23,16 @@
       <label>{{ t('field.account_holder') }}<input name="account_holder" value="{{ form.account_holder }}">
         {% if errors.account_holder %}<span class="error">{{ t(errors.account_holder) }}</span>{% endif %}</label>
     </fieldset>
+    {% if signers %}
+    <label>{{ t('signed.new_label') }}
+      <select name="signed_by">
+        <option value="">{{ t('signed.new_no') }}</option>
+        {% for c in signers %}<option value="{{ c.id }}"{% if form.signed_by == c.id|string %} selected{% endif %}>{{ t('signed.new_yes', name=c.name) }}</option>{% endfor %}
+      </select>
+      <span class="muted small">{{ t('signed.new_hint') }}</span>
+      {% if errors.signed_by %}<span class="error">{{ t(errors.signed_by) }}</span>{% endif %}
+    </label>
+    {% endif %}
     <button class="primary">{{ t('action.create') }}</button>
   </form>
 </section>

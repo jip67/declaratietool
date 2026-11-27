@@ -161,6 +161,8 @@ class Claim(Base):
     approval_signature: Mapped[bytes | None] = mapped_column(LargeBinary, nullable=True, deferred=True)
     # Testdeclaratie: deze beheerder speelt alle rollen en is de enige die hem ziet of er mail over krijgt.
     test_user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True, index=True)
+    # De voorzitter die de bon al op papier (of in het bestand) tekende; dan slaat de tool de paraafstap over.
+    signed_on_paper_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     status_changed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
@@ -182,6 +184,7 @@ class Claim(Base):
         back_populates="claim", cascade="all, delete-orphan", order_by="Comment.id"
     )
     approved_by: Mapped[User | None] = relationship(foreign_keys=[approved_by_id])
+    signed_on_paper_by: Mapped[User | None] = relationship(foreign_keys=[signed_on_paper_by_id])
 
     @property
     def status_enum(self) -> Status:

@@ -94,9 +94,21 @@ def comment_summary(db: Session, claim_ids: list[int]) -> dict[int, tuple[int, C
     return summary
 
 
+def _signers(db: Session, user: User) -> list[User]:
+    """De voorzitters die je op Nieuwe declaratie kunt kiezen als 'al getekend door'; leeg als dat voor jou niet kan."""
+    if not (user.has_role(Role.TREASURER) or user.has_role(Role.ADMIN)):
+        return []
+    return workflow.chairs(db)
+
+
+def _parse_id(value: str) -> int | None:
+    value = (value or "").strip()
+    return int(value) if value.isdigit() else None
+
+
 @router.get("/claims/new")
-def new_claim_page(request: Request, user: User = Depends(current_user)):
-    return render(request, "portal/new.html", user.language, user=user, form={}, errors={})
+def new_claim_page(request: Request, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    return render(request, "portal/new.html", user.language, user=user, form={}, errors={}, signers=_signers(db, user))
 
 
 @router.post("/claims/new")
@@ -108,6 +120,7 @@ async def new_claim(
     account_holder: str = Form(""),
     description: str = Form(""),
     amount: str = Form(""),
+    signed_by: str = Form(""),
     files: list[UploadFile] = File(default=[]),
     user: User = Depends(current_user),
     db: Session = Depends(get_db),
@@ -116,8 +129,14 @@ async def new_claim(
         # Een gebruiker dient altijd voor zichzelf in.
         email, name = user.email, user.name
     form = {"email": email, "name": name, "iban": iban, "account_holder": account_holder,
-            "description": description, "amount": amount}
+            "description": description, "amount": amount, "signed_by": signed_by}
     errors = {}
+    signers = _signers(db, user)
+    signer = None
+    if signed_by.strip():
+        signer = next((c for c in signers if c.id == _parse_id(signed_by)), None)
+        if signer is None:
+            errors["signed_by"] = "error.chair_required"
     if "@" not in email:
         errors["email"] = "error.email"
     max_bytes = get_settings().max_upload_mb * 1024 * 1024
@@ -140,10 +159,14 @@ async def new_claim(
         detail_errors, cents = validate_details(iban, account_holder, description, amount)
         errors.update(detail_errors)
     if errors:
-        return render(request, "portal/new.html", user.language, status_code=422, user=user, form=form, errors=errors)
+        return render(request, "portal/new.html", user.language, status_code=422, user=user, form=form, errors=errors,
+                      signers=signers)
 
     submitter = workflow.get_or_create_submitter(db, email, name)
     claim = workflow.create_claim(db, submitter, uploads, source="portal", created_by=user)
+    if signer is not None:
+        # Factuur die de voorzitter al tekende: de paraafstap vervalt zodra de gegevens compleet zijn.
+        workflow.mark_signed_on_paper(db, claim, user, signer)
     if details_given:
         workflow.complete_details(
             db, claim, iban=iban, account_holder=account_holder, description=description,
@@ -162,6 +185,8 @@ def claim_detail(claim_id: int, request: Request, user: User = Depends(current_u
     return render(
         request, "portal/claim.html", user.language,
         user=user, claim=claim, my_task=is_my_task(claim, user), can_undo=workflow.can_undo(claim, user),
+        can_mark_signed=workflow.can_mark_signed(claim, user), can_cancel_signed=workflow.can_cancel_signed(claim, user),
+        signers=workflow.chairs(db, claim) if workflow.can_mark_signed(claim, user) else [],
         error=request.query_params.get("error"), link=workflow.claim_link(claim),
     )
 
@@ -181,6 +206,7 @@ def claim_action(
     signature: str = Form(""),
     remember_signature: bool = Form(False),
     payment_date: str = Form(""),
+    chair_id: str = Form(""),
     user: User = Depends(current_user),
     db: Session = Depends(get_db),
 ):
@@ -199,6 +225,11 @@ def claim_action(
             # Alleen de datum controleren als deze gebruiker de stap ook mag zetten; anders meldt mark_paid dat.
             when = workflow.parse_payment_date(payment_date) if claim.acts_as(user, Role.SECRETARY) else None
             workflow.mark_paid(db, claim, user, payment_date=when)
+        elif action == "signed_on_paper":
+            chair = db.get(User, cid) if (cid := _parse_id(chair_id)) else None
+            workflow.mark_signed_on_paper(db, claim, user, chair)
+        elif action == "signed_on_paper_cancel":
+            workflow.cancel_signed_on_paper(db, claim, user)
         elif action == "undo":
             stale = workflow.undo(db, claim, user)
         elif action == "reject":
@@ -526,7 +557,8 @@ def _render_edit(request: Request, db: Session, user: User, target: User, error:
 
 def has_history(db: Session, target: User) -> bool:
     """Komt deze gebruiker voor in een declaratie of het logboek? Dan niet echt verwijderen."""
-    fields = (Claim.created_by_id, Claim.approved_by_id, Claim.prepared_by_id, Claim.paid_by_id, Claim.rejected_by_id)
+    fields = (Claim.created_by_id, Claim.approved_by_id, Claim.prepared_by_id, Claim.paid_by_id, Claim.rejected_by_id,
+              Claim.signed_on_paper_by_id)
     if db.scalar(select(Claim.id).where(or_(*(f == target.id for f in fields))).limit(1)):
         return True
     if db.scalar(select(Comment.id).where(Comment.user_id == target.id).limit(1)):

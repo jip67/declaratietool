@@ -42,6 +42,32 @@
   </div>
   {% endif %}
 
+  {% if claim.signed_on_paper_by and claim.status == 'received' %}
+  <div class="signed-paper-note">
+    <p>{{ t('signed.pending', name=claim.signed_on_paper_by.name) }}</p>
+    {% if can_cancel_signed %}
+    <form method="post" action="/portal/claims/{{ claim.id }}/action" class="inline">
+      <input type="hidden" name="action" value="signed_on_paper_cancel">
+      <button>{{ t('signed.cancel') }}</button>
+    </form>
+    {% endif %}
+  </div>
+  {% elif can_mark_signed and signers %}
+  <details class="signed-paper" id="signed">
+    <summary>{{ t('signed.title') }}</summary>
+    <p class="muted">{{ t('signed.intro_submitted' if claim.status == 'submitted' else 'signed.intro_received') }}</p>
+    <form method="post" action="/portal/claims/{{ claim.id }}/action">
+      <input type="hidden" name="action" value="signed_on_paper">
+      <label>{{ t('signed.chair') }}
+        <select name="chair_id" required>
+          {% for c in signers %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}
+        </select>
+      </label>
+      <button class="primary">{{ t('signed.confirm') }}</button>
+    </form>
+  </details>
+  {% endif %}
+
   <dl class="details">
     <dt>{{ t('field.submitter') }}</dt><dd>{{ claim.submitter.name }} &lt;{{ claim.submitter.email }}&gt;</dd>
     <dt>{{ t('field.amount') }}</dt><dd>{{ claim.amount_display }}</dd>
@@ -49,6 +75,7 @@
     <dt>{{ t('field.iban') }}</dt><dd>{{ claim.iban|iban or '-' }}</dd>
     <dt>{{ t('field.account_holder') }}</dt><dd>{{ claim.account_holder or '-' }}</dd>
     <dt>{{ t('field.source') }}</dt><dd>{{ t('source.' ~ claim.source) }}</dd>
+    {% if claim.signed_on_paper_by %}<dt>{{ t('signed.field') }}</dt><dd>{{ t('signed.value', name=claim.signed_on_paper_by.name) }}</dd>{% endif %}
   </dl>
 
   {% if claim.status in ['received', 'submitted'] %}
@@ -128,7 +155,7 @@
   <h2>{{ t('portal.history') }}</h2>
   <ul class="history">
   {% for ev in claim.events %}
-    <li><span class="muted">{{ ev.at|localtime }}</span> {{ t('event.' ~ ev.action) }}{% if ev.user %} · {{ ev.user.name }}{% endif %}{% if ev.note and ev.action == 'rejected' %}: {{ ev.note }}{% elif ev.note == 'link' and ev.action == 'approved' %} ({{ t('event.approved_link') }}){% elif ev.note and ev.action == 'undone' %}: {{ t('event.' ~ ev.note) }}{% elif ev.note and ev.action == 'edited' %}: {% for f in ev.note.split(',') %}{{ t('edited.' ~ f) }}{% if not loop.last %}, {% endif %}{% endfor %}{% elif ev.note and ev.action == 'attachment_replaced' %}: {{ ev.note }}{% elif ev.note and ev.action == 'paid' %} ({{ t('event.payment_date', date=ev.note|longdate(lang)) }}){% endif %}</li>
+    <li><span class="muted">{{ ev.at|localtime }}</span> {{ t('event.' ~ ev.action) }}{% if ev.user %} · {{ ev.user.name }}{% endif %}{% if ev.note and ev.action == 'rejected' %}: {{ ev.note }}{% elif ev.note == 'link' and ev.action == 'approved' %} ({{ t('event.approved_link') }}){% elif ev.note == 'paper' and ev.action == 'approved' %} ({{ t('event.approved_paper') }}){% elif ev.note and ev.action == 'signed_on_paper' %}: {{ ev.note }}{% elif ev.note and ev.action == 'undone' %}: {{ t('event.' ~ ev.note) }}{% elif ev.note and ev.action == 'edited' %}: {% for f in ev.note.split(',') %}{{ t('edited.' ~ f) }}{% if not loop.last %}, {% endif %}{% endfor %}{% elif ev.note and ev.action == 'attachment_replaced' %}: {{ ev.note }}{% elif ev.note and ev.action == 'paid' %} ({{ t('event.payment_date', date=ev.note|longdate(lang)) }}){% endif %}</li>
   {% endfor %}
   </ul>
 </section>

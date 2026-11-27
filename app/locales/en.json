@@ -445,5 +445,22 @@
   "field.payment_date_hint": "Today, or the date on which you scheduled the payment at the bank.",
   "event.payment_date": "payment date {date}",
   "error.payment_date_invalid": "Enter a valid payment date.",
-  "error.payment_date_range": "The payment date can be at most 90 days ago and at most a year ahead."
+  "error.payment_date_range": "The payment date can be at most 90 days ago and at most a year ahead.",
+  "signed.title": "Already signed by the chair?",
+  "signed.intro_submitted": "Did this invoice arrive already signed by the chair, for example by email? Record that here. The claim is then approved and goes straight to the treasurer. The receipt gets no extra initials, because the signature is already on it.",
+  "signed.intro_received": "Did this invoice arrive already signed by the chair, for example by email? Record that here. As soon as the details are filled in, the claim is approved and goes straight to the treasurer; the chair gets no task for it.",
+  "signed.chair": "Signed by",
+  "signed.confirm": "Record: already signed",
+  "signed.pending": "Already signed by {name}. As soon as the details are filled in, the claim goes straight to the treasurer.",
+  "signed.cancel": "Not signed after all",
+  "signed.field": "Initials",
+  "signed.value": "Already signed by {name} (outside the tool)",
+  "signed.new_label": "Chair's initials",
+  "signed.new_no": "Not signed yet: the chair approves in the tool",
+  "signed.new_yes": "Already signed by {name}",
+  "signed.new_hint": "Choose 'already signed' for an invoice the chair has already signed. With all details filled in it then goes straight to the treasurer.",
+  "event.signed_on_paper": "Recorded: already signed by the chair",
+  "event.signed_on_paper_cancelled": "'Already signed' record withdrawn",
+  "event.approved_paper": "already signed, outside the tool",
+  "error.chair_required": "Choose the chair who signed the receipt."
 }

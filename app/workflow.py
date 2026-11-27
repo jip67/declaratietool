@@ -302,6 +302,10 @@ def complete_details(
         set_status(claim, Status.SUBMITTED)
         claim.submitted_at = utcnow()
         db.flush()
+        if claim.signed_on_paper_by_id:
+            # De voorzitter tekende de bon al: meteen door naar de boekhouder.
+            _approve_on_paper(db, claim, user, inform=inform)
+            return
         notify_submitter_status(claim)
         notify_role(db, claim)
         if inform:
@@ -373,6 +377,80 @@ def approve(db: Session, claim: Claim, user: User, via_link: bool = False,
     notify_submitter_status(claim)
     notify_role(db, claim)
     notifications.status_changed(db, claim, "approved", user)
+
+
+# ---------------------------------------------------------------- al getekend door de voorzitter
+
+
+def can_mark_signed(claim: Claim, user: User) -> bool:
+    """Mag deze gebruiker vastleggen dat de voorzitter de bon al tekende (buiten de tool)?
+
+    Dat doet de boekhouder of een beheerder, zolang de voorzitter nog niet heeft goedgekeurd."""
+    return (
+        user.active
+        and claim.signed_on_paper_by_id is None
+        and claim.status_enum in (Status.RECEIVED, Status.SUBMITTED)
+        and (claim.acts_as(user, Role.TREASURER) or claim.acts_as(user, Role.ADMIN))
+    )
+
+
+def can_cancel_signed(claim: Claim, user: User) -> bool:
+    """Een vastgelegde handtekening terugnemen kan zolang de declaratie nog op de gegevens wacht."""
+    return (
+        user.active
+        and claim.signed_on_paper_by_id is not None
+        and claim.status_enum == Status.RECEIVED
+        and (claim.acts_as(user, Role.TREASURER) or claim.acts_as(user, Role.ADMIN))
+    )
+
+
+def chairs(db: Session, claim: Claim | None = None) -> list[User]:
+    """De voorzitters die je kunt kiezen als ondertekenaar; bij een testdeclaratie alleen de beheerder zelf."""
+    if claim is not None:
+        return role_holders(db, claim, Role.CHAIR)
+    return users_with_role(db, Role.CHAIR)
+
+
+def mark_signed_on_paper(db: Session, claim: Claim, user: User, chair: User | None) -> None:
+    """Leg vast dat de voorzitter de bon al tekende, bijvoorbeeld een factuur die getekend per mail binnenkwam.
+
+    Zijn de gegevens al ingevuld, dan is de declaratie meteen goedgekeurd en gaat hij naar de boekhouder.
+    Zo niet, dan gebeurt dat zodra de indiener (of een medewerker) de gegevens invult. De bon krijgt geen
+    extra paraaf: de handtekening staat er al op."""
+    if not can_mark_signed(claim, user):
+        if claim.status_enum not in (Status.RECEIVED, Status.SUBMITTED) or claim.signed_on_paper_by_id:
+            raise WorkflowError("wrong_status")
+        raise WorkflowError("not_allowed")
+    if chair is None or chair.id not in {c.id for c in chairs(db, claim)}:
+        raise WorkflowError("chair_required")
+    claim.signed_on_paper_by_id = chair.id
+    log_event(db, claim, "signed_on_paper", user, note=chair.name)
+    if claim.status_enum == Status.SUBMITTED:
+        db.flush()
+        _approve_on_paper(db, claim, user)
+
+
+def cancel_signed_on_paper(db: Session, claim: Claim, user: User) -> None:
+    if not can_cancel_signed(claim, user):
+        raise WorkflowError("not_allowed")
+    claim.signed_on_paper_by_id = None
+    log_event(db, claim, "signed_on_paper_cancelled", user)
+
+
+def _approve_on_paper(db: Session, claim: Claim, actor: User | None, inform: bool = True) -> None:
+    """Goedkeuring namens de voorzitter die al tekende; in de geschiedenis staat hij als goedkeurder."""
+    chair = db.get(User, claim.signed_on_paper_by_id)
+    set_status(claim, Status.APPROVED)
+    claim.approved_at = utcnow()
+    claim.approved_by_id = claim.signed_on_paper_by_id
+    claim.approval_signature = None
+    log_event(db, claim, "approved", chair, note="paper")
+    db.flush()
+    notify_submitter_status(claim)
+    notify_role(db, claim)
+    if inform:
+        # Meld het als goedkeuring door de voorzitter (die het ook tekende); wie het vastlegde ziet het al.
+        notifications.status_changed(db, claim, "approved", chair or actor)
 
 
 def prepare_payment(db: Session, claim: Claim, user: User) -> None:
@@ -498,6 +576,8 @@ def undo(db: Session, claim: Claim, user: User) -> list[str]:
         claim.approved_at = None
         claim.approval_signature = None
         claim.approved_by_id = None
+        # Was de bon al getekend, dan keurt de voorzitter hem na het terugdraaien gewoon in de tool goed.
+        claim.signed_on_paper_by_id = None
         set_status(claim, Status.SUBMITTED)
     elif step == "payment_prepared":
         claim.prepared_at = None
@@ -535,7 +615,8 @@ def replace_attachment(db: Session, claim: Claim, att: Attachment, filename: str
     att.content_type = content_type
     att.size = len(data)
     att.stamped_path = None
-    if claim.approved_at is not None:
+    if claim.approved_at is not None and not claim.signed_on_paper_by_id:
+        # (Was de bon al getekend door de voorzitter, dan moet het nieuwe bestand die handtekening zelf hebben.)
         approver = db.get(User, claim.approved_by_id) if claim.approved_by_id else None
         stamp_attachment(claim, att, approver.name if approver else "", claim.approved_at, claim.approval_signature)
     log_event(db, claim, "attachment_replaced", user, note=f"{old_name} → {att.original_filename}")
