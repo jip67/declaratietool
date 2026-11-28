@@ -623,20 +623,37 @@ def replace_attachment(db: Session, claim: Claim, att: Attachment, filename: str
     return stale
 
 
-def change_submitter(db: Session, claim: Claim, email: str) -> None:
-    """Koppel de declaratie aan een ander e-mailadres, bijvoorbeeld na een typefout.
+def change_submitter(db: Session, claim: Claim, email: str) -> bool:
+    """Koppel de declaratie aan een ander e-mailadres.
 
-    Het oude adres wordt vergeten als er verder geen declaraties aan hangen."""
+    Twee gevallen: een typefout in het adres (dezelfde persoon), of een declaratie die iemand anders
+    instuurde, bijvoorbeeld de boekhouder die een factuur doorstuurt (een andere persoon). Het oude adres
+    hoort bij een andere persoon als er nog andere declaraties aan hangen of als het het adres van een
+    gebruiker (bestuurslid) is. Dan gaan naam en rekeninggegevens niet mee. Een oud adres zonder andere
+    declaraties wordt vergeten.
+
+    Geeft True terug als het om dezelfde persoon gaat (typefout)."""
     old = claim.submitter
-    new = get_or_create_submitter(db, email, old.name, language=old.language)
+    others = db.scalar(select(func.count(Claim.id)).where(Claim.submitter_id == old.id, Claim.id != claim.id)) or 0
+    is_user = db.scalar(select(User.id).where(func.lower(User.email) == old.email.lower()).limit(1)) is not None
+    same_person = not (others or is_user)
+    new = get_or_create_submitter(db, email, old.name if same_person else "", language=old.language)
     if new is old:
-        return
-    if not new.iban and not new.account_holder:
-        new.iban, new.account_holder = old.iban, old.account_holder
+        return True
+    if same_person:
+        if not new.iban and not new.account_holder:
+            new.iban, new.account_holder = old.iban, old.account_holder
+    elif claim.status_enum == Status.RECEIVED:
+        # Nog niet ingevuld: de vooraf ingevulde rekening van de vorige indiener hoort niet bij de nieuwe.
+        if claim.iban == old.iban:
+            claim.iban = new.iban
+        if claim.account_holder == old.account_holder:
+            claim.account_holder = new.account_holder
     claim.submitter = new
     db.flush()
-    if not db.scalar(select(func.count(Claim.id)).where(Claim.submitter_id == old.id)):
+    if same_person:
         db.delete(old)
+    return same_person
 
 
 def remove_files(paths: list[str]) -> None:

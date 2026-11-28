@@ -335,14 +335,27 @@ def edit_claim(
         return _render_claim_edit(request, user, claim, form, errors, status_code=422)
     before = _claim_form(claim)
     email_changed = bool(email) and email != claim.submitter.email
+    new_iban = normalize_iban(iban) if iban.strip() else ""
+    new_holder = account_holder.strip()
     if email_changed:
-        workflow.change_submitter(db, claim, email)
+        old = claim.submitter
+        old_name, old_iban, old_holder = old.name, old.iban, old.account_holder
+        same_person = workflow.change_submitter(db, claim, email)
+        # Een andere persoon (bijvoorbeeld de boekhouder die de factuur doorstuurde): velden die nog zijn
+        # naam of bewaarde rekening tonen niet overnemen.
+        if not same_person and name.strip() == old_name:
+            name = ""
+        if not same_person and claim.status_enum == Status.RECEIVED:
+            if new_iban and new_iban == old_iban:
+                new_iban = claim.iban
+            if new_holder and new_holder == old_holder:
+                new_holder = claim.account_holder
     if name.strip():
         claim.submitter.name = name.strip()
     claim.description = description.strip()
     claim.amount_cents = cents
-    claim.iban = normalize_iban(iban) if iban.strip() else ""
-    claim.account_holder = account_holder.strip()
+    claim.iban = new_iban
+    claim.account_holder = new_holder
     changed = [k for k, v in _claim_form(claim).items() if v != before[k]]
     workflow.log_event(db, claim, "edited", user, note=",".join(changed))
     db.commit()

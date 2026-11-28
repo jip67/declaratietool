@@ -248,3 +248,34 @@ def test_replaced_attachment_gets_new_url_and_is_not_cached(db, client, staff):
     att = db.get(Attachment, att.id)
     page = client.get(f"/portal/claims/{claim.id}").text
     assert old_url not in page and f"/portal/files/{att.id}?v={att.version}" in page
+
+
+def test_forwarded_invoice_does_not_pass_on_forwarders_details(db, client, staff):
+    """De boekhouder stuurt een factuur door en zet daarna het adres van de echte indiener erin."""
+    from app import intake
+    from app.models import Status, Submitter as Sub
+
+    from .test_workflow import make_mail
+
+    db.add(Sub(email="boekhouder@example.org", name="Bob Boekhouder", iban=IBAN, account_holder="B. Boekhouder"))
+    db.commit()
+    intake.process_message(db, make_mail([("factuur.pdf", "application/pdf", pdf_bytes())],
+                                         sender="Bob Boekhouder <boekhouder@example.org>"))
+    claim = db.scalar(select(Claim))
+    assert claim.iban == IBAN  # vooraf ingevuld met de bewaarde rekening van de boekhouder
+    login(client, "boekhouder@example.org")
+    mailer.outbox.clear()
+    # Het formulier stuurt de vooraf ingevulde naam en rekening ongewijzigd mee.
+    client.post(f"/portal/claims/{claim.id}/edit",
+                data={"name": "Bob Boekhouder", "email": "piet@example.org", "resend": "yes", "description": "",
+                      "amount": "", "iban": IBAN, "account_holder": "B. Boekhouder"})
+    db.expire_all()
+    claim = db.get(Claim, claim.id)
+    assert claim.status == Status.RECEIVED.value
+    assert claim.submitter.email == "piet@example.org"
+    assert claim.submitter.name == "" and claim.submitter.iban == ""
+    assert (claim.iban, claim.account_holder) == ("", "")
+    # De boekhouder blijft bestaan met zijn eigen bewaarde rekening.
+    bob = db.scalar(select(Sub).where(Sub.email == "boekhouder@example.org"))
+    assert bob is not None and bob.iban == IBAN
+    assert [m["To"] for m in mailer.outbox] == ["piet@example.org"]
